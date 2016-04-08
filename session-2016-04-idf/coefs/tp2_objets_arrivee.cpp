@@ -253,9 +253,9 @@ class TesteurSomme : public Testeur
 int main()
  {
   Testeur::init(5) ;
-  TesteurCoef tc(100) ;
-  TesteurSomme ts(1000) ;
-  boucle(1,8,1) ;
+  TesteurCoef tc(1000000) ;
+  TesteurSomme ts(1000000) ;
+  boucle(4,16,4) ;
   Testeur::finalise() ;
   std::cout<<std::endl ;
   return 0 ;

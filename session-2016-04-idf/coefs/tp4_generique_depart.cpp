@@ -278,9 +278,9 @@ int main()
   try
    {
     Testeurs ts(5) ;
-    ts.acquiere(new TesteurCoef(100)) ;
-    ts.acquiere(new TesteurSomme(1000)) ;
-    boucle(1,8,1,ts) ;
+    ts.acquiere(new TesteurCoef(1000000)) ;
+    ts.acquiere(new TesteurSomme(1000000)) ;
+    boucle(4,16,4,ts) ;
     std::cout<<std::endl ;
     return 0 ;
    }
