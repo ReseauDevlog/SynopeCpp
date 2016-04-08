@@ -305,7 +305,7 @@ class TesteurSomme : public Testeur
        {
         double c1 = generer_coef();
         double c2 = 1.0-c1;
-        int exact = (int)(c1*e+c2*e+0.5) ;
+        int exact = arrondi(c1*e+c2*e) ;
         coef1 = c1 ;
         coef2 = c2 ;
         int approx = coef1*e + coef2*e ;
