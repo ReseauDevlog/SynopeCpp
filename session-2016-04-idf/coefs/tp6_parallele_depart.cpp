@@ -94,8 +94,13 @@ class Testeur
     static Iterateur end() ;
 	 
     Testeur( int resolution ) ;
+    
     virtual void execute( int bits ) = 0 ;
-    void erreur( int bits, double exact, double approx, int width ) ;
+    
+    void erreur( int bits,
+                 std::vector<double> exacts,
+                 std::vector<double> approxs,
+                 int width ) ;
 
   private :
   
@@ -127,18 +132,27 @@ Testeur::Testeur( int resolution )
  { ajouter_test(this) ; }
 
 
-void Testeur::erreur( int bits, double exact, double approx, int width  )
+void Testeur::erreur( int bits,
+                      std::vector<double> exacts,
+                      std::vector<double> approxs,
+                      int width  )
  {
-  if (exact==0) { throw EchecDivisionParZero() ; }
-  int err = arrondi(resolution_*(exact-approx)/exact) ;
-  if (err<0) err = -err ;
-  if (err>resolution_) err = resolution_ ;
-  
-  std::cout
-    << bits << " bits : " << exact << " ~ "
-    << std::setw(width) << approx
-    << " ("<< err <<"/" << resolution_ << ")"
-    << std::endl ;
+  for ( int i = 0 ; i < exacts.size() ; ++i )
+   {
+    double exact = exacts[i];
+    double approx = approxs[i];
+    
+    if (exact==0) { throw EchecDivisionParZero() ; }
+    int err = arrondi(resolution_*(exact-approx)/exact) ;
+    if (err<0) err = -err ;
+    if (err>resolution_) err = resolution_ ;
+    
+    std::cout
+      << bits << " bits : " << exact << " ~ "
+      << std::setw(width) << approx
+      << " ("<< err <<"/" << resolution_ << ")"
+      << std::endl ;
+   }
  }
  
 void Testeur::ajouter_test( Testeur * t )
@@ -248,70 +262,84 @@ int Coef<U>::exposant() const
 //==============================================
 
 template< typename U >
-class TesteurCoef : public Testeur
+class TesteurCoefs : public Testeur
  {
   public :
   
-    TesteurCoef( int resolution )
-     : Testeur(resolution)
+    TesteurCoefs( int resolution, int nombre_iterations )
+     : Testeur(resolution), iterations_(nombre_iterations)
      {}
 
     virtual void execute( int bits )
      {
-      static const int nombre_iterations = 10; // TODO : Doit devenir un paramètre du constructeur
-      teste(bits, nombre_iterations) ;
+      teste(bits) ;
      }
   
   private :
   
-    void teste( int bits, int iterations )
+    int iterations_;
+  
+    void teste( int bits )
      {
       Coef<U> c(bits) ;
+      std::vector<double> exacts, approxs;
+      exacts.reserve(iterations_);
+      approxs.reserve(iterations_);
       
-      for ( int i = 0 ; i < iterations ; ++i )
+      for ( int i = 0 ; i < iterations_ ; ++i )
        {
         double valeur = generer_coef();
         c = valeur ;
-        
-        erreur(bits,valeur,c,8) ; // TODO : Doit être remplacé par un calcul statistique à la fin
+        exacts.push_back(valeur);
+        approxs.push_back(c);
        }
+       
+      erreur(bits, exacts, approxs, 8);
      }
  } ;
 
 
 template< typename U >
-class TesteurSomme : public Testeur
+class TesteurSommes : public Testeur
  {
   public :
 
-    TesteurSomme( int resolution )
-     : Testeur(resolution)
+    TesteurSommes( int resolution, int nombre_iterations )
+     : Testeur(resolution), iterations_(nombre_iterations)
      {}
 
     virtual void execute( int bits )
      {
       static const U entier_test = 100000;
-      static const int nombre_iterations = 10; // TODO : Doit devenir un paramètre du constructeur
-      teste(bits, entier_test, nombre_iterations) ;
+      teste(bits, entier_test) ;
      }
 
   private :
   
-    void teste( int bits, U e, int iterations )
+    int iterations_;
+  
+    void teste( int bits, U e )
      {
       Coef<U> coef1(bits), coef2(bits) ;
+      std::vector<double> exacts, approxs;
+      exacts.reserve(iterations_);
+      approxs.reserve(iterations_);
       
-      for ( int i = 0 ; i < iterations ; ++i )
+      for ( int i = 0 ; i < iterations_ ; ++i )
        {
         double c1 = generer_coef();
         double c2 = 1.0-c1;
+        
         int exact = arrondi(c1*e+c2*e) ;
+        exacts.push_back(exact);
+        
         coef1 = c1 ;
         coef2 = c2 ;
         int approx = coef1*e + coef2*e ;
-        
-        erreur(bits, exact, approx, 7) ; // TODO : Doit être remplacé par un calcul statistique à la fin
+        approxs.push_back(approx);
        }
+      
+      erreur(bits, exacts, approxs, 7) ;
      }
  } ;
 
@@ -324,8 +352,8 @@ int main()
  {
   try
    {
-    TesteurCoef<unsigned int> tc(100) ;
-    TesteurSomme<unsigned int> ts(1000) ;
+    TesteurCoefs<unsigned int> tc(100, 10) ;
+    TesteurSommes<unsigned int> ts(1000, 10) ;
     
     boucle_tests(1,8,1) ;
     std::cout<<std::endl ;
