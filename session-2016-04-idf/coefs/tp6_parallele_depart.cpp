@@ -80,7 +80,6 @@ class Testeur
     typedef std::vector<Testeur *> Conteneur ;
     typedef Conteneur::iterator Iterateur ;
 	
-    static void enregistre( Testeur * t ) ;
     static Iterateur begin() ;
     static Iterateur end() ;
 	 
@@ -91,8 +90,9 @@ class Testeur
   private :
   
     static std::vector<Testeur *> testeurs__ ;
-
     int const resolution_ ;
+    
+    static void ajouter_test( Testeur * t ) ;
 
  } ;
  
@@ -102,10 +102,6 @@ std::vector<Testeur *> Testeur::testeurs__ ;
 	
 class Testeur::EchecDivisionParZero : public Echec
  { public : EchecDivisionParZero() : Echec(4, "division par 0") {} } ;
-
-
-void Testeur::enregistre( Testeur * t )
- { testeurs__.push_back(t) ; }
  
  
 Testeur::Iterateur Testeur::begin()
@@ -118,7 +114,7 @@ Testeur::Iterateur Testeur::end()
 
 Testeur::Testeur( int resolution )
  : resolution_(resolution)
- { enregistre(this) ; }
+ { ajouter_test(this) ; }
 
 
 void Testeur::erreur( int bits, double exact, double approx, int width  )
@@ -131,9 +127,12 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
   std::cout
     << bits << " bits : " << exact << " ~ "
     << std::setw(width) << approx
-    << " ("<<err<<"/" << resolution_ << ")"
+    << " ("<< err <<"/" << resolution_ << ")"
     << std::endl ;
  }
+ 
+void Testeur::ajouter_test( Testeur * t )
+ { testeurs__.push_back(t) ; }
 
 
 void boucle( int deb, int fin, int inc )
