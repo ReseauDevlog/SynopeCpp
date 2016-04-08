@@ -135,7 +135,7 @@ void Testeur::ajouter_test( Testeur * t )
  { testeurs__.push_back(t) ; }
 
 
-void boucle( int deb, int fin, int inc )
+void boucle_tests( int deb, int fin, int inc )
  {
   Testeur::Iterateur itr ;
   for ( itr=Testeur::begin() ; itr!=Testeur::end() ; itr++ )
@@ -304,7 +304,7 @@ int main()
     TesteurCoef<unsigned short> tc(100) ;
     TesteurSomme<short> ts(1000) ;
     
-    boucle(1,8,1) ;
+    boucle_tests(1,8,1) ;
     std::cout<<std::endl ;
     
     return 0 ;
