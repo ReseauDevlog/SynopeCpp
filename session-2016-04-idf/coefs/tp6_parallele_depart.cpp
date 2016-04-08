@@ -32,10 +32,6 @@ int fois_puissance_de_deux( int nombre, int exposant )
    {
     throw Echec(1, "cas imprevu") ;
    }
-  else if ( (exposant <= -int(sizeof(int)<<3)) || (exposant >= int(sizeof(int)<<3)) )
-   {
-    throw Echec(1, "exposant trop grand") ;
-   }
   else if (exposant < 0)
    {
     return (nombre >> -exposant) ;
@@ -72,7 +68,7 @@ double generer_coef()
  {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<> dis(0,1);
+  static std::uniform_real_distribution<> dis(0.01,1);
   return dis(gen) ;
  }
 
@@ -97,9 +93,14 @@ class Testeur
     
     virtual void execute( int bits ) = 0 ;
     
+    struct ResultatTest
+     {
+      double exact;
+      double approx;
+     };
+
     void erreur( int bits,
-                 std::vector<double> exacts,
-                 std::vector<double> approxs,
+                 std::vector<ResultatTest> resultats,
                  int width ) ;
 
   private :
@@ -133,26 +134,29 @@ Testeur::Testeur( int resolution )
 
 
 void Testeur::erreur( int bits,
-                      std::vector<double> exacts,
-                      std::vector<double> approxs,
+                      std::vector<ResultatTest> resultats,
                       int width  )
  {
-  for ( int i = 0 ; i < exacts.size() ; ++i )
+  const size_t nb_valeurs = resultats.size();
+  double err_moyenne = 0;
+  
+  for ( auto & resultat : resultats )
    {
-    double exact = exacts[i];
-    double approx = approxs[i];
+    double exact = resultat.exact;
+    double approx = resultat.approx;
     
-    if (exact==0) { throw EchecDivisionParZero() ; }
-    int err = arrondi(resolution_*(exact-approx)/exact) ;
+    if (exact == 0.0) { throw EchecDivisionParZero() ; }
+    double err = resolution_*(exact-approx)/exact;
     if (err<0) err = -err ;
     if (err>resolution_) err = resolution_ ;
     
-    std::cout
-      << bits << " bits : " << exact << " ~ "
-      << std::setw(width) << approx
-      << " ("<< err <<"/" << resolution_ << ")"
-      << std::endl ;
+    err_moyenne += err;
    }
+  
+  err_moyenne /= nb_valeurs;
+  int err_finale = arrondi(err_moyenne);
+  
+  std::cout << bits << " bits : " << err_finale <<"/" << resolution_ << std::endl ;
  }
  
 void Testeur::ajouter_test( Testeur * t )
@@ -282,19 +286,17 @@ class TesteurCoefs : public Testeur
     void teste( int bits )
      {
       Coef<U> c(bits) ;
-      std::vector<double> exacts, approxs;
-      exacts.reserve(iterations_);
-      approxs.reserve(iterations_);
+      std::vector<Testeur::ResultatTest> resultats;
+      resultats.reserve(iterations_);
       
       for ( int i = 0 ; i < iterations_ ; ++i )
        {
-        double valeur = generer_coef();
-        c = valeur ;
-        exacts.push_back(valeur);
-        approxs.push_back(c);
+        double coef = generer_coef();
+        c = coef ;
+        resultats.push_back({coef, c});
        }
        
-      erreur(bits, exacts, approxs, 8);
+      erreur(bits, resultats, 8);
      }
  } ;
 
@@ -310,7 +312,7 @@ class TesteurSommes : public Testeur
 
     virtual void execute( int bits )
      {
-      static const U entier_test = 100000;
+      static const U entier_test = 10000;
       teste(bits, entier_test) ;
      }
 
@@ -321,9 +323,8 @@ class TesteurSommes : public Testeur
     void teste( int bits, U e )
      {
       Coef<U> coef1(bits), coef2(bits) ;
-      std::vector<double> exacts, approxs;
-      exacts.reserve(iterations_);
-      approxs.reserve(iterations_);
+      std::vector<Testeur::ResultatTest> resultats;
+      resultats.reserve(iterations_);
       
       for ( int i = 0 ; i < iterations_ ; ++i )
        {
@@ -331,15 +332,15 @@ class TesteurSommes : public Testeur
         double c2 = 1.0-c1;
         
         int exact = arrondi(c1*e+c2*e) ;
-        exacts.push_back(exact);
         
         coef1 = c1 ;
         coef2 = c2 ;
         int approx = coef1*e + coef2*e ;
-        approxs.push_back(approx);
+        
+        resultats.push_back({double(exact), double(approx)});
        }
       
-      erreur(bits, exacts, approxs, 7) ;
+      erreur(bits, resultats, 7) ;
      }
  } ;
 
@@ -352,8 +353,8 @@ int main()
  {
   try
    {
-    TesteurCoefs<unsigned int> tc(100, 10) ;
-    TesteurSommes<unsigned int> ts(1000, 10) ;
+    TesteurCoefs<unsigned short> tc(10000, 10000000) ;
+    TesteurSommes<unsigned short> ts(10000, 10000000) ;
     
     boucle_tests(1,8,1) ;
     std::cout<<std::endl ;
