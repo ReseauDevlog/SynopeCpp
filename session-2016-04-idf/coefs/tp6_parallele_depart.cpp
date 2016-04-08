@@ -21,7 +21,7 @@ class Echec
     
   private :
     unsigned int code_ ;
-	  std::string commentaire_ ;
+	 std::string commentaire_ ;
  } ;
 
 
@@ -75,7 +75,6 @@ class Testeur
  {
   public :
   
-    class EchecIndiceIncorrect ;
     class EchecDivisionParZero ;
   
     typedef std::vector<Testeur *> Conteneur ;
@@ -99,10 +98,6 @@ class Testeur
  
 
 std::vector<Testeur *> Testeur::testeurs__ ;
-
-
-class Testeur::EchecIndiceIncorrect : public Echec
- { public : EchecIndiceIncorrect() : Echec(3, "indice de testeur incorrect") {} } ;
 	
 	
 class Testeur::EchecDivisionParZero : public Echec
