@@ -14,27 +14,54 @@ class Echec
   public :
     Echec( unsigned int c, std::string const & comm )
      : code_(c), commentaire_(comm) {}
+     
     unsigned int code() const { return code_ ; }
+    
     std::string const & commentaire() const { return commentaire_ ; }
+    
   private :
     unsigned int code_ ;
 	  std::string commentaire_ ;
  } ;
 
+
 int fois_puissance_de_deux( int nombre, int exposant )
  {
-  if (nombre<0) { throw Echec(1,"cas imprevu") ; }
-  if ((exposant<=-int(sizeof(int)<<3))||(exposant>=int(sizeof(int)<<3))) { throw Echec(1,"exposant trop grand") ; }
-  if (exposant<0) { return (nombre>>-exposant) ; }
-  if (nombre>(((unsigned int)(-1))>>exposant>>1)) { throw Echec(1,"overflow") ; }
-  return (nombre<<exposant) ; 
+  if (nombre < 0)
+   {
+    throw Echec(1, "cas imprevu") ;
+   }
+  else if ( (exposant <= -int(sizeof(int)<<3)) || (exposant >= int(sizeof(int)<<3)) )
+   {
+    throw Echec(1, "exposant trop grand") ;
+   }
+  else if (exposant < 0)
+   {
+    return (nombre >> -exposant) ;
+   }
+  else if (nombre > (((unsigned int)(-1))>>exposant>>1))
+   {
+    throw Echec(1, "overflow") ;
+   }
+  else
+   {
+    return (nombre<<exposant) ; 
+   }
  }
+
 
 int arrondi( double d )
  {
-  if (d>0) { return int(d+.5) ; }
-  else { return int(d-.5) ; }
+  if (d > 0)
+   {
+    return int(d+.5) ;
+   }
+  else
+   {
+    return int(d-.5) ;
+   }
  }
+
 
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
@@ -70,33 +97,43 @@ class Testeur
     int const resolution_ ;
 
  } ;
+ 
 
 std::vector<Testeur *> Testeur::testeurs__ ;
 
+
 class Testeur::EchecTropDeTesteurs : public Echec
- { public : EchecTropDeTesteurs() : Echec(2,"trop de testeurs") {} } ;
+ { public : EchecTropDeTesteurs() : Echec(2, "trop de testeurs") {} } ;
+
 
 class Testeur::EchecIndiceIncorrect : public Echec
- { public : EchecIndiceIncorrect() : Echec(3,"indice de testeur incorrect") {} } ;
+ { public : EchecIndiceIncorrect() : Echec(3, "indice de testeur incorrect") {} } ;
+	
 	
 class Testeur::EchecDivisionParZero : public Echec
- { public : EchecDivisionParZero() : Echec(4,"division par 0") {} } ;
-	
+ { public : EchecDivisionParZero() : Echec(4, "division par 0") {} } ;
+
+
 void Testeur::enregistre( Testeur * t )
  { testeurs__.push_back(t) ; }
+ 
  
 Testeur::Iterateur Testeur::begin()
  { return testeurs__.begin() ; }
   
+  
 Testeur::Iterateur Testeur::end()
  { return testeurs__.end() ; }
   
+
 Testeur::Testeur( int resolution )
  : resolution_(resolution)
  { enregistre(this) ; }
 
+
 void Testeur::execute( int )
  { std::cout << "Qu'est-ce que je fais la ??" << std::endl ; }
+
 
 void Testeur::erreur( int bits, double exact, double approx, int width  )
  {
@@ -104,12 +141,14 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
   int err = arrondi(resolution_*(exact-approx)/exact) ;
   if (err<0) err = -err ;
   if (err>resolution_) err = resolution_ ;
+  
   std::cout
     << bits << " bits : " << exact << " ~ "
     << std::setw(width) << approx
     << " ("<<err<<"/" << resolution_ << ")"
     << std::endl ;
  }
+
 
 void boucle( int deb, int fin, int inc )
  {
@@ -153,24 +192,29 @@ class Coef
     int exposant_ ;
  } ;
 
+
 template< typename U >
 std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
  { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
 
 template< typename U >
 Coef<U>::Coef( unsigned int bits )
  : bits_(bits), numerateur_(0), exposant_(0)
  {}
  
+ 
 template< typename U >
 unsigned int Coef<U>::lit_bits() const
  { return bits_ ; }
+
 
 template< typename U >
 void Coef<U>::operator=( double valeur )
  {
   numerateur_ = exposant_ = 0 ;
   if (valeur==0) { return ; }
+  
   double min = (entier_max(bits_)+0.5)/2 ;
   while (valeur<min)
    {
@@ -180,6 +224,7 @@ void Coef<U>::operator=( double valeur )
   numerateur_ = arrondi(valeur) ;
  }
 
+
 template< typename U >
 Coef<U>::operator double() const
  {
@@ -187,13 +232,16 @@ Coef<U>::operator double() const
   return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
  }
 
+
 template< typename U >
 U Coef<U>::operator*( U arg ) const
  { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
  
+ 
 template< typename U >
 U Coef<U>::numerateur() const
  { return numerateur_ ; }
+ 
  
 template< typename U >
 int Coef<U>::exposant() const
@@ -224,6 +272,7 @@ class TesteurCoef : public Testeur
     void teste( int bits, double valeur )
      {
       Coef<U> c(bits) ;
+      
       c = valeur ;
       erreur(bits,valeur,c,8) ;
      }
@@ -248,10 +297,12 @@ class TesteurSomme : public Testeur
      {
       Coef<U> coef1(bits), coef2(bits) ;
       int exact, approx ;
+      
       exact = (int)(c1*e1+c2*e2) ;
       coef1 = c1 ;
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
+      
       erreur(bits,exact,approx,4) ;
      }
  } ;
@@ -267,8 +318,10 @@ int main()
    {
     TesteurCoef<unsigned short> tc(100) ;
     TesteurSomme<short> ts(1000) ;
+    
     boucle(1,8,1) ;
     std::cout<<std::endl ;
+    
     return 0 ;
    }
   catch ( Echec const & e )
