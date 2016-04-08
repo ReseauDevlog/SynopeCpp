@@ -75,7 +75,6 @@ class Testeur
  {
   public :
   
-    class EchecTropDeTesteurs ;
     class EchecIndiceIncorrect ;
     class EchecDivisionParZero ;
   
@@ -100,10 +99,6 @@ class Testeur
  
 
 std::vector<Testeur *> Testeur::testeurs__ ;
-
-
-class Testeur::EchecTropDeTesteurs : public Echec
- { public : EchecTropDeTesteurs() : Echec(2, "trop de testeurs") {} } ;
 
 
 class Testeur::EchecIndiceIncorrect : public Echec
