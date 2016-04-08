@@ -248,8 +248,8 @@ class TesteurCoef : public Testeur
 
     virtual void execute( int bits )
      {
-      teste(bits,0.65) ;
-      teste(bits,0.35) ;
+      teste(bits, 0.65) ;
+      teste(bits, 0.35) ;
      }
   
   private :
@@ -274,7 +274,7 @@ class TesteurSomme : public Testeur
      {}
 
     virtual void execute( int bits )
-     { teste(bits,0.65,3515,0.35,4832) ; }
+     { teste(bits, 0.65, 1000000, 0.35, 1000000) ; }
 
   private :
   
@@ -288,7 +288,7 @@ class TesteurSomme : public Testeur
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
       
-      erreur(bits,exact,approx,4) ;
+      erreur(bits, exact, approx, 7) ;
      }
  } ;
 
