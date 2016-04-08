@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -65,6 +66,15 @@ int arrondi( double d )
 
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+
+double generer_coef()
+ {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  static std::uniform_real_distribution<> dis(0,1);
+  return dis(gen) ;
+ }
 
 
 //==============================================
@@ -248,18 +258,23 @@ class TesteurCoef : public Testeur
 
     virtual void execute( int bits )
      {
-      teste(bits, 0.65) ;
-      teste(bits, 0.35) ;
+      static const int nombre_iterations = 10; // TODO : Doit devenir un paramètre du constructeur
+      teste(bits, nombre_iterations) ;
      }
   
   private :
   
-    void teste( int bits, double valeur )
+    void teste( int bits, int iterations )
      {
       Coef<U> c(bits) ;
       
-      c = valeur ;
-      erreur(bits,valeur,c,8) ;
+      for ( int i = 0 ; i < iterations ; ++i )
+       {
+        double valeur = generer_coef();
+        c = valeur ;
+        
+        erreur(bits,valeur,c,8) ; // TODO : Doit être remplacé par un calcul statistique à la fin
+       }
      }
  } ;
 
@@ -274,21 +289,29 @@ class TesteurSomme : public Testeur
      {}
 
     virtual void execute( int bits )
-     { teste(bits, 0.65, 1000000, 0.35, 1000000) ; }
+     {
+      static const U entier_test = 100000;
+      static const int nombre_iterations = 10; // TODO : Doit devenir un paramètre du constructeur
+      teste(bits, entier_test, nombre_iterations) ;
+     }
 
   private :
   
-    void teste( int bits, double c1, U e1, double c2, U e2 )
+    void teste( int bits, U e, int iterations )
      {
       Coef<U> coef1(bits), coef2(bits) ;
-      int exact, approx ;
       
-      exact = (int)(c1*e1+c2*e2) ;
-      coef1 = c1 ;
-      coef2 = c2 ;
-      approx = coef1*e1 + coef2*e2 ;
-      
-      erreur(bits, exact, approx, 7) ;
+      for ( int i = 0 ; i < iterations ; ++i )
+       {
+        double c1 = generer_coef();
+        double c2 = 1.0-c1;
+        int exact = (int)(c1*e+c2*e+0.5) ;
+        coef1 = c1 ;
+        coef2 = c2 ;
+        int approx = coef1*e + coef2*e ;
+        
+        erreur(bits, exact, approx, 7) ; // TODO : Doit être remplacé par un calcul statistique à la fin
+       }
      }
  } ;
 
@@ -301,8 +324,8 @@ int main()
  {
   try
    {
-    TesteurCoef<unsigned short> tc(100) ;
-    TesteurSomme<short> ts(1000) ;
+    TesteurCoef<unsigned int> tc(100) ;
+    TesteurSomme<unsigned int> ts(1000) ;
     
     boucle_tests(1,8,1) ;
     std::cout<<std::endl ;
