@@ -86,7 +86,7 @@ class Testeur
     static Iterateur end() ;
 	 
     Testeur( int resolution ) ;
-    virtual void execute( int bits ) ;
+    virtual void execute( int bits ) = 0 ;
     void erreur( int bits, double exact, double approx, int width ) ;
 
   private :
@@ -124,10 +124,6 @@ Testeur::Iterateur Testeur::end()
 Testeur::Testeur( int resolution )
  : resolution_(resolution)
  { enregistre(this) ; }
-
-
-void Testeur::execute( int )
- { std::cout << "Qu'est-ce que je fais la ??" << std::endl ; }
 
 
 void Testeur::erreur( int bits, double exact, double approx, int width  )
