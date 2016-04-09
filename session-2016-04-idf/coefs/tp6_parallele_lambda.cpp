@@ -1,4 +1,4 @@
-
+#include <functional>
 #include <iostream>
 #include <iomanip>
 #include <random>
@@ -83,11 +83,7 @@ class Testeur
   
     class EchecDivisionParZero ;
   
-    typedef std::vector<Testeur *> Conteneur ;
-    typedef Conteneur::iterator Iterateur ;
-	
-    static Iterateur begin() ;
-    static Iterateur end() ;
+    static void pour_chaque_testeur( std::function<void(Testeur &)> operation );
 	 
     Testeur( int resolution ) ;
     
@@ -121,12 +117,8 @@ class Testeur::EchecDivisionParZero : public Echec
  { public : EchecDivisionParZero() : Echec(4, "division par 0") {} } ;
  
  
-Testeur::Iterateur Testeur::begin()
- { return testeurs__.begin() ; }
-  
-  
-Testeur::Iterateur Testeur::end()
- { return testeurs__.end() ; }
+void Testeur::pour_chaque_testeur( std::function<void(Testeur &)> operation )
+ { for(auto & testeur_ptr : testeurs__) operation(*testeur_ptr); }
   
 
 Testeur::Testeur( int resolution )
@@ -166,19 +158,18 @@ void Testeur::ajouter_test( Testeur * t )
 
 void boucle_tests( int deb, int fin, int inc )
  {
-  Testeur::Iterateur itr ;
-  for ( itr=Testeur::begin() ; itr!=Testeur::end() ; itr++ )
+  Testeur::pour_chaque_testeur([&](Testeur & testeur)
    {
     try
      {
       std::cout<<std::endl ;
       int bits ;
       for ( bits = deb ; bits <= fin ; bits = bits + inc )
-       { (*itr)->execute(bits) ; }
+       { testeur.execute(bits) ; }
      }
     catch ( Echec const & e )
      { std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ; }
-   }
+   });
  }
 
 

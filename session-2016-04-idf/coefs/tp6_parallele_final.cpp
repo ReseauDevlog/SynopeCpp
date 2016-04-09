@@ -1,8 +1,9 @@
-
+#include <functional>
 #include <iostream>
 #include <iomanip>
 #include <random>
 #include <string>
+#include <thread>
 #include <vector>
 
 
@@ -83,11 +84,7 @@ class Testeur
   
     class EchecDivisionParZero ;
   
-    typedef std::vector<Testeur *> Conteneur ;
-    typedef Conteneur::iterator Iterateur ;
-	
-    static Iterateur begin() ;
-    static Iterateur end() ;
+    static void pour_chaque_testeur( std::function<void(Testeur &)> operation );
 	 
     Testeur( int resolution ) ;
     
@@ -102,11 +99,19 @@ class Testeur
     void erreur( int bits,
                  std::vector<ResultatTest> resultats,
                  int width ) ;
+    
+    void affiche();
 
   private :
   
     static std::vector<Testeur *> testeurs__ ;
     
+    struct ErreurParBit
+     {
+      int nb_bits;
+      int err_finale;
+     };
+    std::vector<ErreurParBit> erreurs_par_bits_;
     int const resolution_ ;
     
     static void ajouter_test( Testeur * t ) ;
@@ -121,12 +126,27 @@ class Testeur::EchecDivisionParZero : public Echec
  { public : EchecDivisionParZero() : Echec(4, "division par 0") {} } ;
  
  
-Testeur::Iterateur Testeur::begin()
- { return testeurs__.begin() ; }
+void Testeur::pour_chaque_testeur( std::function<void(Testeur &)> operation )
+ {
+  const size_t nb_testeurs = testeurs__.size();
+  std::vector<std::thread> threads_testeurs;
+  threads_testeurs.reserve(nb_testeurs);
   
-  
-Testeur::Iterateur Testeur::end()
- { return testeurs__.end() ; }
+  for( size_t i = 0 ; i < nb_testeurs ; ++i )
+   {
+    threads_testeurs.emplace_back([=]()
+     {
+      auto & testeur_ptr = testeurs__[i];
+      operation(*testeur_ptr);
+     });
+   }
+   
+  for ( size_t i = 0 ; i < nb_testeurs ; ++i )
+   {
+    threads_testeurs[i].join();
+    testeurs__[i]->affiche();
+   }
+ }
   
 
 Testeur::Testeur( int resolution )
@@ -157,7 +177,20 @@ void Testeur::erreur( int bits,
   err_moyenne /= nb_valeurs;
   int err_finale = arrondi(err_moyenne);
   
-  std::cout << bits << " bits : " << err_finale <<"/" << resolution_ << std::endl ;
+  erreurs_par_bits_.push_back({bits, err_finale});
+ }
+
+void Testeur::affiche()
+ {
+  std::cout << std::endl;
+  
+  for (auto & erreur_par_bit : erreurs_par_bits_) {
+   std::cout
+     << erreur_par_bit.nb_bits << " bits : "
+     << erreur_par_bit.err_finale <<"/" << resolution_ << std::endl ;
+  }
+  
+  erreurs_par_bits_.clear();
  }
  
 void Testeur::ajouter_test( Testeur * t )
@@ -166,19 +199,17 @@ void Testeur::ajouter_test( Testeur * t )
 
 void boucle_tests( int deb, int fin, int inc )
  {
-  Testeur::Iterateur itr ;
-  for ( itr=Testeur::begin() ; itr!=Testeur::end() ; itr++ )
+  Testeur::pour_chaque_testeur([&](Testeur & testeur)
    {
     try
      {
-      std::cout<<std::endl ;
       int bits ;
       for ( bits = deb ; bits <= fin ; bits = bits + inc )
-       { (*itr)->execute(bits) ; }
+       { testeur.execute(bits) ; }
      }
     catch ( Echec const & e )
      { std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ; }
-   }
+   });
  }
 
 
