@@ -68,7 +68,7 @@ double generer_coef()
  {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<> dis(0.01,1);
+  static std::uniform_real_distribution<> dis(0.01, 1.0);
   return dis(gen) ;
  }
 
@@ -106,6 +106,7 @@ class Testeur
   private :
   
     static std::vector<Testeur *> testeurs__ ;
+    
     int const resolution_ ;
     
     static void ajouter_test( Testeur * t ) ;
