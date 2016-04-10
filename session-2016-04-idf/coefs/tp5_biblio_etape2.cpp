@@ -2,8 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-#include <random>
-#include <cstdlib>  // for atoi
+#include <vector>
 
 
 //==============================================
@@ -58,6 +57,18 @@ double * new_rand_coefs( int taille )
   return res ;
  }
 
+template<typename Valeur>
+class Pointeur
+ {
+  public :
+    Pointeur( Valeur * val ) : val_(val), tab_(tab) {}
+    Valeur & operator*() const { return *val_ ; } 
+    Valeur * operator->() const { return val_ ; } 
+    ~Pointeur() { delete val_ ; }
+  private :
+    Valeur * val_ ;
+ } ;
+ 
 
 //==============================================
 // framework general de test
@@ -101,63 +112,28 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
     << " ("<<err<<"/" << resolution_ << ")" ;
  }
 
-template<signed SIZE>
 class Testeurs
  {
   public :
-  
-    class EchecTropDeTesteurs : public Echec
-     { public : EchecTropDeTesteurs() : Echec(2,"trop de testeurs") {} } ;
-    
-    class EchecIndiceIncorrect : public Echec
-     { public : EchecIndiceIncorrect() : Echec(3,"indice de testeur incorrect") {} } ;
-    
-    Testeurs()
-     : indice__{}
-     {
-      static_assert(SIZE>=0,"nombre ngatif de testeurs") ;
-      for ( unsigned i=0 ; i<SIZE ; ++i )
-       { testeurs__[i] = 0 ; }
-     }
-     
-    void acquiere( Testeur * t )
-     {
-      if (indice__==SIZE) { throw EchecTropDeTesteurs() ; }
-      testeurs__[indice__] = t ;
-      indice__++ ;
-     }
-     
-    Testeur * operator[]( unsigned i ) const
-     {
-      if (i>=indice__) { throw EchecIndiceIncorrect() ; }
-      return testeurs__[i] ;
-     }
-     
-    ~Testeurs()
-     {
-      for ( unsigned i=0 ; i<SIZE ; ++i )
-       { delete testeurs__[i] ; }
-     }
-     
+    using container = std::vector<Pointeur<Testeur>> ;
+    using const_iterator = container::const_iterator ;
+    void acquiere( Testeur * t ) { testeurs__.push_back(t) ; }
+    const_iterator begin() const { return testeurs__.begin() ; }
+    const_iterator end() const { return testeurs__.end() ; }
   private :
-  
-    unsigned int indice__ ;
-    Testeur * testeurs__[SIZE] ;
+    container testeurs__ ;
  } ;
     
-template<signed SIZE>
-void boucle( int deb, int fin, int inc, const Testeurs<SIZE> & ts )
+void boucle( int deb, int fin, int inc, const Testeurs & ts )
  {
-  unsigned int i ;
-  for ( i=0 ; i<SIZE ; ++i )
+  for ( Testeur * t : ts )
    {
     try
      {
-      Testeur & t = *ts[i] ;
       std::cout<<std::endl ;
       int bits ;
       for ( bits = deb ; bits <= fin ; bits = bits + inc )
-       { t(bits) ; }
+       { (*t)(bits) ; }
      }
     catch ( Echec const & e )
      { std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ; }
@@ -222,7 +198,7 @@ void Coef<U>::operator=( double valeur )
   while (valeur<min)
    {
       exposant_ = exposant_ + 1 ;
-	  valeur = valeur * 2 ;
+      valeur = valeur * 2 ;
    }
   numerateur_ = arrondi(valeur) ;
  }
@@ -311,8 +287,9 @@ class TesteurRandCoefs : public Testeur
   public :
 
     TesteurRandCoefs( int nbcoefs, int resolution )
-     : Testeur(resolution), nbcoefs_{nbcoefs}
-     { coefs_ = new_rand_coefs(nbcoefs_) ; }
+     : Testeur(resolution), nbcoefs_{nbcoefs},
+       coefs_(new_rand_coefs(nbcoefs_),true)
+     {}
 
     virtual void operator()( int bits )
      {
@@ -334,7 +311,7 @@ class TesteurRandCoefs : public Testeur
      }
     
     int nbcoefs_ ;
-    double * coefs_ ;
+    Pointeur<double> coefs_ ;
     
  } ;
 
@@ -348,13 +325,13 @@ int main()
   try
    {
    
-  Testeurs<3> ts ;
+  Testeurs ts ;
   ts.acquiere(new TesteurCoef<short>(1000000)) ;
   ts.acquiere(new TesteurCoef<int>(1000000)) ;
   ts.acquiere(new TesteurSomme<int>(1000000)) ;
   boucle(4,16,4,ts) ;
   std::cout<<std::endl ;
-  Testeurs<2> ts2 ;
+  Testeurs ts2 ;
   ts2.acquiere(new TesteurCoef<unsigned char>(1000)) ;
   ts2.acquiere(new TesteurRandCoefs<unsigned char>(10,1000)) ;
   boucle(1,8,1,ts2) ;

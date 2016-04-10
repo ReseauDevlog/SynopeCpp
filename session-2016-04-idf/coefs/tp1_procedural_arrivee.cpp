@@ -4,7 +4,7 @@
 #include <string>
 #include <iomanip>
 #include <random>
-#include <cstdlib>
+#include <cstdlib>  // for atoi
 
 
 //==============================================
