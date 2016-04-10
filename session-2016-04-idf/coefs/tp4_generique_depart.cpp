@@ -21,22 +21,14 @@ class Echec
  } ;
 
 int fois_puissance_de_deux( int nombre, int exposant )
- {
-  if (nombre<0)
-   { throw Echec(1,"cas imprevu") ; }
-  if ((exposant<=-int(sizeof(int)<<3))||(exposant>=int(sizeof(int)<<3)))
-   { throw Echec(1,"exposant trop grand") ; }
-  if (exposant<0)
-   { return (nombre>>-exposant) ; }
-  if (nombre>int(((unsigned int)(-1))>>exposant>>1))
-   { throw Echec(1,"overflow") ; }
-  return (nombre<<exposant) ; 
- }
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
 
-int arrondi( double d )
+double arrondi( double d, unsigned precision =0 )
  {
-  if (d>0) { return int(d+.5) ; }
-  else { return int(d-.5) ; }
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
  }
 
 int entier_max( int nombre_bits )
@@ -80,10 +72,9 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
   if (err<0) err = -err ;
   if (err>resolution_) err = resolution_ ;
   std::cout
-    << bits << " bits : " << exact << " ~ "
-    << std::setw(width) << approx
-    << " ("<<err<<"/" << resolution_ << ")"
-    << std::endl ;
+    <<std::right<<std::setw(2)<<bits<<" bits : "
+    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
+    << " ("<<err<<"/" << resolution_ << ")" ;
  }
 
 class Testeurs
@@ -239,6 +230,7 @@ class TesteurCoef : public Testeur
       Coef c(bits) ;
       c = valeur ;
       erreur(bits,valeur,c,8) ;
+      std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
 
@@ -265,6 +257,7 @@ class TesteurSomme : public Testeur
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
       erreur(bits,exact,approx,4) ;
+      std::cout<<std::endl ;
      }
  } ;
 

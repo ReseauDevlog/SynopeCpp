@@ -20,14 +20,16 @@ int fois_puissance_de_deux( int nombre, int exposant )
   if (nombre<0) { echec(1,"cas imprevu") ; }
   if ((exposant<=-int(sizeof(int)<<3))||(exposant>=int(sizeof(int)<<3))) { echec(1,"exposant trop grand") ; }
   if (exposant<0) { return (nombre>>-exposant) ; }
-  if (nombre>(((unsigned int)(-1))>>exposant>>1)) { echec(1,"overflow") ; }
+  if (nombre>int(((unsigned int)(-1))>>exposant>>1)) { echec(1,"overflow") ; }
   return (nombre<<exposant) ; 
  }
 
-int arrondi( double d )
+double arrondi( double d, unsigned precision =0 )
  {
-  if (d>0) { return int(d+.5) ; }
-  else { return int(d-.5) ; }
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
  }
 
 int entier_max( int nombre_bits )
@@ -47,7 +49,7 @@ class Testeur
     static unsigned int nb_testeurs() ;
     static Testeur * testeur( unsigned int i ) ;
     static void finalise() ;
-	 
+     
     Testeur( int resolution ) ;
     virtual void execute( int bits ) ;
     void erreur( int bits, double exact, double approx, int width ) ;
@@ -109,10 +111,9 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
   if (err<0) err = -err ;
   if (err>resolution_) err = resolution_ ;
   std::cout
-    << bits << " bits : " << exact << " ~ "
-    << std::setw(width) << approx
-    << " ("<<err<<"/" << resolution_ << ")"
-    << std::endl ;
+    <<std::right<<std::setw(2)<<bits<<" bits : "
+    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
+    << " ("<<err<<"/" << resolution_ << ")" ;
  }
 
 void boucle( int deb, int fin, int inc )
@@ -141,7 +142,7 @@ class Coef
     unsigned int lit_bits() const ;
     void approxime( double valeur ) ;
     double approximation() const ;
-    int multiplie( U arg ) const ;
+    int multiplie( int arg ) const ;
     int numerateur() const ;
     int exposant() const ;
 
@@ -181,7 +182,7 @@ double Coef::approximation() const
   return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
  }
 
-int Coef::operator*( U arg ) const
+int Coef::multiplie( int arg ) const
  { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
  
 int Coef::numerateur() const
@@ -215,7 +216,10 @@ class TesteurCoef : public Testeur
      {
       Coef c(bits) ;
       c.approxime(valeur) ;
-      erreur(bits,valeur,c.approximation(),8) ;
+      erreur(bits,valeur,arrondi(c.approximation(),6),8) ;
+      std::cout<<" (" ;
+      affiche(c) ;
+      std::cout<<")"<<std::endl ;
      }
  } ;
 
@@ -233,7 +237,7 @@ class TesteurSomme : public Testeur
 
   private :
   
-    void teste( int bits, double c1, U e1, double c2, U e2 )
+    void teste( int bits, double c1, int e1, double c2, int e2 )
      {
       Coef coef1(bits), coef2(bits) ;
       int exact, approx ;
@@ -242,6 +246,7 @@ class TesteurSomme : public Testeur
       coef2.approxime(c2) ;
       approx = coef1.multiplie(e1) + coef2.multiplie(e2) ;
       erreur(bits,exact,approx,4) ;
+      std::cout<<std::endl ;
      }
  } ;
 

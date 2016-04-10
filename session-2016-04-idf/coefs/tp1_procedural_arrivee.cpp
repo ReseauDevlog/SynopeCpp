@@ -87,10 +87,14 @@ void teste_approxime( int bits, double valeur )
   double approximation = double(numerateur)/fois_puissance_de_deux(1,exposant) ;
   erreur = arrondi(100*(valeur-approximation)/valeur) ;
   if (erreur<0) { erreur = -erreur ; }
+  (*sortie).setf(std::ios::fixed,std::ios::floatfield) ;  
   (*sortie)
-    <<bits<<" bits : "<<valeur<<" ~ "
-    <<std::setw(8)<<approximation
-    <<" ("<<erreur<<"/100)"<<std::endl ;
+    <<std::setw(2)<<std::right<<bits<<" bits : "
+    <<std::setw(4)<<std::setprecision(2)<<std::left<<valeur<<" ~ "
+    <<std::setw(8)<<std::setprecision(6)<<std::left<<approximation
+    <<" ("<<erreur<<"/100)"
+    <<" ("<<numerateur<<"/2^"<<exposant<<")"
+    <<std::endl ;
  }
 
 void teste_somme( int bits, double c1, int e1, double c2, int e2 )
@@ -100,9 +104,11 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
   approx = multiplie(bits,c1,e1) + multiplie(bits,c2,e2) ;
   erreur = arrondi(1000*double(exact-approx)/exact) ;
   if (erreur<0) { erreur = -erreur ; }
+  (*sortie).setf(std::ios::fixed,std::ios::floatfield) ;  
   (*sortie)
-    <<bits<<" bits : "<<exact<<" ~ "
-    <<std::setw(4)<<approx
+    <<std::setw(2)<<std::right<<bits<<" bits : "
+    <<std::setw(4)<<std::left<<exact<<" ~ "
+    <<std::setw(4)<<std::left<<approx
     <<" ("<<erreur<<"/1000)"<<std::endl ;
  }
 
@@ -141,6 +147,8 @@ void boucle( int deb, int fin, int inc, void (*f)( int, int, char *[] ), int arg
 
 int main( int argc, char *argv[] )
  {
+  if (argc<3) echec(1,"arguments manquants sur la ligne de commande") ;
+ 
   std::ofstream fichier(argv[2]) ;
   sortie = &fichier ;
   

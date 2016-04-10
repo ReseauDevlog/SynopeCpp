@@ -20,27 +20,28 @@ class Echec
       std::string commentaire_ ;
  } ;
 
-int fois_puissance_de_deux( int nombre, int exposant )
+double arrondi( double d, unsigned precision =0 )
  {
-  if (nombre<0)
-   { throw Echec(1,"cas imprevu") ; }
-  if ((exposant<=-int(sizeof(int)<<3))||(exposant>=int(sizeof(int)<<3)))
-   { throw Echec(1,"exposant trop grand") ; }
-  if (exposant<0)
-   { return (nombre>>-exposant) ; }
-  if (nombre>int(((unsigned int)(-1))>>exposant>>1))
-   { throw Echec(1,"overflow") ; }
-  return (nombre<<exposant) ; 
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
  }
 
-int arrondi( double d )
- {
-  if (d>0) { return int(d+.5) ; }
-  else { return int(d-.5) ; }
- }
+constexpr int fois_puissance_de_deux( int nombre, int exposant )
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
 
-int entier_max( int nombre_bits )
+constexpr int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+template<typename T> constexpr bool avec_signe() { return true ; }
+template<> constexpr bool avec_signe<unsigned int>() { return false ; }
+template<> constexpr bool avec_signe<unsigned short>() { return false ; }
+template<> constexpr bool avec_signe<unsigned char>() { return false ; }
+
+template<typename T>
+constexpr int nombre_bits_hors_signe()
+ { return avec_signe<T>()?(sizeof(T)*8-1):(sizeof(T)*8) ; }
 
 
 //==============================================
@@ -69,7 +70,7 @@ class Testeur
 
 class Testeur::EchecDivisionParZero : public Echec
  { public : EchecDivisionParZero() : Echec(4,"division par 0") {} } ;
-	
+    
 Testeur::Testeur( int resolution )
  : resolution_(resolution) {}
 
@@ -80,12 +81,12 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
   if (err<0) err = -err ;
   if (err>resolution_) err = resolution_ ;
   std::cout
-    << bits << " bits : " << exact << " ~ "
-    << std::setw(width) << approx
-    << " ("<<err<<"/" << resolution_ << ")"
-    << std::endl ;
+    <<std::right<<std::setw(2)<<bits<<" bits : "
+    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
+    << " ("<<err<<"/" << resolution_ << ")" ;
  }
 
+template<signed SIZE>
 class Testeurs
  {
   public :
@@ -96,22 +97,20 @@ class Testeurs
     class EchecIndiceIncorrect : public Echec
      { public : EchecIndiceIncorrect() : Echec(3,"indice de testeur incorrect") {} } ;
     
-    Testeurs( unsigned int max )
-     : max__{max}, indice__{}, testeurs__{new Testeur * [max__]}
+    Testeurs()
+     : indice__{}
      {
-      for ( unsigned i=0 ; i<max__ ; ++i )
+      static_assert(SIZE>=0,"nombre négatif de testeurs") ;
+      for ( unsigned i=0 ; i<SIZE ; ++i )
        { testeurs__[i] = 0 ; }
      }
      
     void acquiere( Testeur * t )
      {
-      if (indice__==max__) { throw EchecTropDeTesteurs() ; }
+      if (indice__==SIZE) { throw EchecTropDeTesteurs() ; }
       testeurs__[indice__] = t ;
       indice__++ ;
      }
-     
-    unsigned int nb_testeurs() const
-     { return indice__ ; }
      
     Testeur * operator[]( unsigned i ) const
      {
@@ -121,22 +120,21 @@ class Testeurs
      
     ~Testeurs()
      {
-      for ( unsigned i=0 ; i<max__ ; ++i )
+      for ( unsigned i=0 ; i<SIZE ; ++i )
        { delete testeurs__[i] ; }
-      delete [] testeurs__ ;
      }
      
   private :
   
-    unsigned int max__ ;
     unsigned int indice__ ;
-    Testeur * * testeurs__ ;
+    Testeur * testeurs__[SIZE] ;
  } ;
-	
-void boucle( int deb, int fin, int inc, const Testeurs & ts )
+    
+template<signed SIZE>
+void boucle( int deb, int fin, int inc, const Testeurs<SIZE> & ts )
  {
   unsigned int i ;
-  for ( i=0 ; i<ts.nb_testeurs() ; ++i )
+  for ( i=0 ; i<SIZE ; ++i )
    {
     try
      {
@@ -161,6 +159,9 @@ class Coef
  {
   public :
   
+    class EchecTropDeBits : public Echec
+     { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
+     
     explicit Coef( unsigned int bits ) ;
     unsigned int lit_bits() const ;
     void operator=( double valeur ) ;
@@ -174,16 +175,24 @@ class Coef
     unsigned const int bits_ ;
     U numerateur_ ;
     int exposant_ ;
+    
+    static constexpr unsigned int max_bits__
+     = nombre_bits_hors_signe<U>() ;
  } ;
+
 
 template<typename U>
 std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
 { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
+template<>
+std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
+{ return (os<<int(c.numerateur())<<"/2^"<<int(c.exposant())) ; }
+
 template<typename U>
 Coef<U>::Coef( unsigned int bits )
  : bits_{bits}, numerateur_{}, exposant_{}
- {}
+ { if (bits_>max_bits__) throw EchecTropDeBits() ; }
  
 template<typename U>
 unsigned int Coef<U>::lit_bits() const
@@ -197,7 +206,7 @@ void Coef<U>::operator=( double valeur )
   double min = (entier_max(bits_)+0.5)/2 ;
   while (valeur<min)
    {
-	  exposant_ = exposant_ + 1 ;
+      exposant_ = exposant_ + 1 ;
 	  valeur = valeur * 2 ;
    }
   numerateur_ = arrondi(valeur) ;
@@ -249,6 +258,7 @@ class TesteurCoef : public Testeur
       Coef<U> c(bits) ;
       c = valeur ;
       erreur(bits,valeur,c,8) ;
+      std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
 
@@ -276,6 +286,7 @@ class TesteurSomme : public Testeur
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
       erreur(bits,exact,approx,4) ;
+      std::cout<<std::endl ;
      }
  } ;
 
@@ -288,11 +299,15 @@ int main()
  {
   try
    {
-    Testeurs ts(5) ;
+    Testeurs<3> ts ;
     ts.acquiere(new TesteurCoef<int>(1000000)) ;
     ts.acquiere(new TesteurSomme<int>(1000000)) ;
-    ts.acquiere(new TesteurCoef<unsigned short>(1000000)) ;
+    ts.acquiere(new TesteurCoef<short>(1000000)) ;
     boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    Testeurs<1> ts2 ;
+    ts2.acquiere(new TesteurCoef<unsigned char>(1000)) ;
+    boucle(1,8,1,ts2) ;
     std::cout<<std::endl ;
     return 0 ;
    }
