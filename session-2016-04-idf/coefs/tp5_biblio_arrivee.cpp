@@ -2,8 +2,6 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-#include <random>
-#include <cstdlib>  // for atoi
 
 
 //==============================================
@@ -44,19 +42,6 @@ template<> constexpr bool avec_signe<unsigned char>() { return false ; }
 template<typename T>
 constexpr int nombre_bits_hors_signe()
  { return avec_signe<T>()?(sizeof(T)*8-1):(sizeof(T)*8) ; }
-
-double * new_rand_coefs( int taille )
- {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0,1);
-  
-  double * res = new double [taille] ;
-  int i ;
-  for ( i=0 ; i<taille ; i++ )
-   { res[i] = dis(gen) ; }
-  return res ;
- }
 
 
 //==============================================
@@ -101,7 +86,6 @@ void Testeur::erreur( int bits, double exact, double approx, int width  )
     << " ("<<err<<"/" << resolution_ << ")" ;
  }
 
-template<signed SIZE>
 class Testeurs
  {
   public :
@@ -115,7 +99,7 @@ class Testeurs
     Testeurs()
      : indice__{}
      {
-      static_assert(SIZE>=0,"nombre négatif de testeurs") ;
+      static_assert(SIZE>=0,"nombre n√©gatif de testeurs") ;
       for ( unsigned i=0 ; i<SIZE ; ++i )
        { testeurs__[i] = 0 ; }
      }
@@ -135,14 +119,13 @@ class Testeurs
      
     ~Testeurs()
      {
-      for ( unsigned i=0 ; i<SIZE ; ++i )
-       { delete testeurs__[i] ; }
+      for ( Testeur * t : testeurs__ )
+       { delete t ; }
      }
      
   private :
   
-    unsigned int indice__ ;
-    Testeur * testeurs__[SIZE] ;
+    std::vector<Testeur *> testeurs__ ;
  } ;
     
 template<signed SIZE>
@@ -222,7 +205,7 @@ void Coef<U>::operator=( double valeur )
   while (valeur<min)
    {
       exposant_ = exposant_ + 1 ;
-	  valeur = valeur * 2 ;
+      valeur = valeur * 2 ;
    }
   numerateur_ = arrondi(valeur) ;
  }
@@ -305,39 +288,6 @@ class TesteurSomme : public Testeur
      }
  } ;
 
-template<typename U>
-class TesteurRandCoefs : public Testeur
- {
-  public :
-
-    TesteurRandCoefs( int nbcoefs, int resolution )
-     : Testeur(resolution), nbcoefs_{nbcoefs}
-     { coefs_ = new_rand_coefs(nbcoefs_) ; }
-
-    virtual void operator()( int bits )
-     {
-      for ( int i=0 ; i<nbcoefs_ ; ++i )
-       { teste(bits,coefs_[i]) ; }
-     }
-    
-    virtual ~TesteurRandCoefs()
-     { delete [] coefs_ ; }
-
-  private :
-  
-    void teste( int bits, double valeur )
-     {
-      Coef<U> c(bits) ;
-      c = valeur ;
-      erreur(bits,arrondi(valeur,2),c,8) ;
-      std::cout<<" ("<<c<<")"<<std::endl ;
-     }
-    
-    int nbcoefs_ ;
-    double * coefs_ ;
-    
- } ;
-
 
 //==============================================
 // fonction principale
@@ -347,20 +297,17 @@ int main()
  {
   try
    {
-   
-  Testeurs<3> ts ;
-  ts.acquiere(new TesteurCoef<short>(1000000)) ;
-  ts.acquiere(new TesteurCoef<int>(1000000)) ;
-  ts.acquiere(new TesteurSomme<int>(1000000)) ;
-  boucle(4,16,4,ts) ;
-  std::cout<<std::endl ;
-  Testeurs<2> ts2 ;
-  ts2.acquiere(new TesteurCoef<unsigned char>(1000)) ;
-  ts2.acquiere(new TesteurRandCoefs<unsigned char>(10,1000)) ;
-  boucle(1,8,1,ts2) ;
-  std::cout<<std::endl ;
-  return 0 ;
-    
+    Testeurs<3> ts ;
+    ts.acquiere(new TesteurCoef<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef<short>(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    Testeurs<1> ts2 ;
+    ts2.acquiere(new TesteurCoef<unsigned char>(1000)) ;
+    boucle(1,8,1,ts2) ;
+    std::cout<<std::endl ;
+    return 0 ;
    }
   catch ( Echec const & e )
    {
