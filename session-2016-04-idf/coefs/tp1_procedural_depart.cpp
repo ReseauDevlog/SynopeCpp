@@ -1,6 +1,7 @@
 
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <cstdlib>
 
@@ -33,7 +34,7 @@ unsigned fois_puissance_de_deux( unsigned nombre, int exposant )
  }
 
 // entier maximum représentable avec "nombre_bits" bits
-unsigned entier_max( unsigned int nombre_bits )
+unsigned entier_max( unsigned nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
 
