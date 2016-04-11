@@ -17,11 +17,9 @@ void echec( unsigned int code, std::string const & commentaire )
 
 int fois_puissance_de_deux( int nombre, int exposant )
  {
-  if (nombre<0) { echec(1,"cas imprevu") ; }
-  if ((exposant<=-int(sizeof(int)<<3))||(exposant>=int(sizeof(int)<<3))) { echec(1,"exposant trop grand") ; }
-  if (exposant<0) { return (nombre>>-exposant) ; }
-  if (nombre>int(((unsigned int)(-1))>>exposant>>1)) { echec(1,"overflow") ; }
-  return (nombre<<exposant) ; 
+  if (exposant>0) { nombre <<= exposant ; }
+  else  { nombre >>= -exposant ; }
+  return nombre ;
  }
 
 double arrondi( double d, unsigned precision =0 )
@@ -40,88 +38,86 @@ int entier_max( int nombre_bits )
 // framework general de test
 //==============================================
 
-class Testeur
+class Testeur ;
+
+class Testeurs
  {
   public :
   
-    static void init( unsigned int max ) ;
-    static void enregistre( Testeur * t ) ;
-    static unsigned int nb_testeurs() ;
-    static Testeur * testeur( unsigned int i ) ;
-    static void finalise() ;
+    static void init( unsigned int max )
+     {
+      max__ = max ;
+      indice__ = 0 ;
+      testeurs__ = new Testeur * [max__] ;
+      unsigned int i ;
+      for ( i=0 ; i<max__ ; ++i )
+       { testeurs__[i] = 0 ; }
+     }
      
-    Testeur( int resolution ) ;
-    virtual void execute( int bits ) ;
-    void erreur( int bits, double exact, double approx, int width ) ;
+    static void acquiere( Testeur * t )
+     {
+      if (indice__==max__) { echec(2,"trop de testeurs") ; }
+      testeurs__[indice__] = t ;
+      indice__++ ;
+     }
+     
+    static unsigned int nb_testeurs()
+     { return indice__ ; }
+     
+    static Testeur * testeur( unsigned int i )
+     {
+      if (i>=indice__) { echec(3,"indice de testeur incorrect") ; }
+      return testeurs__[i] ;
+     }
+     
+    static void finalise()
+     { delete [] testeurs__ ; }
+     
+  private :
+  
+    static Testeur * * testeurs__ {} ;
+    static unsigned int max__ {} ;
+    static unsigned int indice__ {} ;
+
+ } ;
+
+class Testeur ;
+ {
+  public :
+  
+    Testeur( int resolution )
+     : resolution_(resolution)
+     { Testeurs::acquiere(this) ; }
+    
+    virtual void execute( int bits )
+     { std::cout << "Qu'est-ce que je fais la ??" << std::endl ; }
+        
+  protected :
+  
+    void erreur( int bits, double exact, double approx, int width  )
+     {
+      if (exact==0) { echec(4,"division par 0") ; }
+      int err = arrondi(resolution_*(exact-approx)/exact) ;
+      if (err<0) err = -err ;
+      if (err>resolution_) err = resolution_ ;
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
+        << " ("<<err<<"/" << resolution_ << ")" ;
+     }
 
   private :
   
-    static Testeur * * testeurs__ ;
-    static unsigned int max__ ;
-    static unsigned int indice__ ;
-
     int const resolution_ ;
 
  } ;
 
-Testeur * * Testeur::testeurs__ = 0 ;
-unsigned int Testeur::max__ = 0 ;
-unsigned int Testeur::indice__ = 0 ;
-	
-void Testeur::init( unsigned int max )
- {
-  max__ = max ;
-  indice__ = 0 ;
-  testeurs__ = new Testeur * [max__] ;
-  unsigned int i ;
-  for ( i=0 ; i<max__ ; ++i )
-   { testeurs__[i] = 0 ; }
- }
- 
-void Testeur::enregistre( Testeur * t )
- {
-  if (indice__==max__) { echec(2,"trop de testeurs") ; }
-  testeurs__[indice__] = t ;
-  indice__++ ;
- }
- 
-unsigned int Testeur::nb_testeurs()
- { return indice__ ; }
- 
-Testeur * Testeur::testeur( unsigned int i )
- {
-  if (i>=indice__) { echec(3,"indice de testeur incorrect") ; }
-  return testeurs__[i] ;
- }
- 
-void Testeur::finalise()
- { delete [] testeurs__ ; }
-
-Testeur::Testeur( int resolution )
- : resolution_(resolution)
- { enregistre(this) ; }
-
-void Testeur::execute( int )
- { std::cout << "Qu'est-ce que je fais la ??" << std::endl ; }
-
-void Testeur::erreur( int bits, double exact, double approx, int width  )
- {
-  if (exact==0) { echec(4,"division par 0") ; }
-  int err = arrondi(resolution_*(exact-approx)/exact) ;
-  if (err<0) err = -err ;
-  if (err>resolution_) err = resolution_ ;
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
-    << " ("<<err<<"/" << resolution_ << ")" ;
- }
-
 void boucle( int deb, int fin, int inc )
  {
   unsigned int i ;
-  for ( i=0 ; i<Testeur::nb_testeurs() ; ++i )
+  for ( i=0 ; i<Testeurs::nb_testeurs() ; ++i )
    {
-    Testeur * t = Testeur::testeur(i) ;
+    Testeur * t = Testeurs::testeur(i) ;
     std::cout<<std::endl ;
     int bits ;
     for ( bits = deb ; bits <= fin ; bits = bits + inc )
@@ -204,13 +200,7 @@ class TesteurCoef : public Testeur
      : Testeur(resolution)
      {}
 
-    virtual void execute( int bits )
-     {
-      teste(bits,0.65) ;
-      teste(bits,0.35) ;
-     }
-  
-  private :
+  protected :
   
     void teste( int bits, double valeur )
      {
@@ -221,6 +211,20 @@ class TesteurCoef : public Testeur
       affiche(c) ;
       std::cout<<")"<<std::endl ;
      }
+ } ;
+
+class TesteurCoefO65 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.65) ; }
+ } ;
+
+class TesteurCoefO35 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.35) ; }
  } ;
 
 
@@ -257,11 +261,12 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  Testeur::init(5) ;
-  TesteurCoef tc(1000000) ;
+  Testeurs::init(5) ;
+  TesteurCoef065 tc1(1000000) ;
+  TesteurCoef035 tc2(1000000) ;
   TesteurSomme ts(1000000) ;
   boucle(4,16,4) ;
-  Testeur::finalise() ;
+  Testeurs::finalise() ;
   std::cout<<std::endl ;
   return 0 ;
  }

@@ -157,7 +157,6 @@ int main( int argc, char *argv[] )
   boucle(2,8,2,teste_065,argc,argv) ;
   boucle(2,8,2,teste_035,argc,argv) ;
   boucle(1,8,1,teste_065_3515_035_4832,argc,argv) ;
-  
   boucle(1,8,1,teste_rand_coefs,argc,argv) ;
   
   fichier.close() ;
