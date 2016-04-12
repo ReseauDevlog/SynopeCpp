@@ -46,7 +46,7 @@ class Testeur
     class EchecDivisionParZero ;
   
     Testeur( int resolution ) ;
-    virtual void operator()( int bits ) =0 ;
+    virtual void operator()( int bits ) {} //=0 ;
     virtual ~Testeur() {} ;
     
   protected :
@@ -279,8 +279,8 @@ int main()
   try
    {
     Testeurs ts(5) ;
-    ts.acquiere(new TesteurCoef065(1000000)) ;
-    ts.acquiere(new TesteurCoef035(1000000)) ;
+    ts.acquiere(new TesteurCoefO65(1000000)) ;
+    ts.acquiere(new TesteurCoefO35(1000000)) ;
     ts.acquiere(new TesteurSomme(1000000)) ;
     boucle(4,16,4,ts) ;
     std::cout<<std::endl ;
