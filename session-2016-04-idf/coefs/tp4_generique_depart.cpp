@@ -216,14 +216,8 @@ class TesteurCoef : public Testeur
     TesteurCoef( int resolution )
      : Testeur(resolution)
      {}
-
-    virtual void operator()( int bits )
-     {
-      teste(bits,0.65) ;
-      teste(bits,0.35) ;
-     }
   
-  private :
+  protected :
   
     void teste( int bits, double valeur )
      {
@@ -234,6 +228,20 @@ class TesteurCoef : public Testeur
      }
  } ;
 
+
+class TesteurCoefO65 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.65) ; }
+ } ;
+
+class TesteurCoefO35 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.35) ; }
+ } ;
 
 class TesteurSomme : public Testeur
  {
@@ -271,7 +279,8 @@ int main()
   try
    {
     Testeurs ts(5) ;
-    ts.acquiere(new TesteurCoef(1000000)) ;
+    ts.acquiere(new TesteurCoef065(1000000)) ;
+    ts.acquiere(new TesteurCoef035(1000000)) ;
     ts.acquiere(new TesteurSomme(1000000)) ;
     boucle(4,16,4,ts) ;
     std::cout<<std::endl ;

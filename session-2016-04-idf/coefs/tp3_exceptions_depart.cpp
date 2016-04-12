@@ -17,11 +17,9 @@ void echec( unsigned int code, std::string const & commentaire )
 
 int fois_puissance_de_deux( int nombre, int exposant )
  {
-  if (nombre<0) { echec(1,"cas imprevu") ; }
-  if ((exposant<=-int(sizeof(int)<<3))||(exposant>=int(sizeof(int)<<3))) { echec(1,"exposant trop grand") ; }
-  if (exposant<0) { return (nombre>>-exposant) ; }
-  if (nombre>int(((unsigned int)(-1))>>exposant>>1)) { echec(1,"overflow") ; }
-  return (nombre<<exposant) ; 
+  if (exposant>0) { nombre <<= exposant ; }
+  else  { nombre >>= -exposant ; }
+  return nombre ;
  }
 
 double arrondi( double d, unsigned precision =0 )
@@ -202,13 +200,7 @@ class TesteurCoef : public Testeur
      : Testeur(resolution)
      {}
 
-    virtual void execute( int bits )
-     {
-      teste(bits,0.65) ;
-      teste(bits,0.35) ;
-     }
-  
-  private :
+  protected :
   
     void teste( int bits, double valeur )
      {
@@ -221,6 +213,19 @@ class TesteurCoef : public Testeur
      }
  } ;
 
+class TesteurCoefO65 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.65) ; }
+ } ;
+
+class TesteurCoefO35 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.35) ; }
+ } ;
 
 class TesteurSomme : public Testeur
  {
@@ -256,7 +261,8 @@ class TesteurSomme : public Testeur
 int main()
  {
   Testeurs ts(5) ;
-  ts.acquiere(new TesteurCoef(1000000)) ;
+  ts.acquiere(new TesteurCoef065(1000000)) ;
+  ts.acquiere(new TesteurCoef035(1000000)) ;
   ts.acquiere(new TesteurSomme(1000000)) ;
   boucle(4,16,4,ts) ;
   std::cout<<std::endl ;

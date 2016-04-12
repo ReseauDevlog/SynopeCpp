@@ -102,10 +102,11 @@ int main()
 
   std::cout<<std::endl ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   {
-    teste_approxime(bits,0.65) ;
-    teste_approxime(bits,0.35) ;
-   }
+   { teste_approxime(bits,0.65) ; }
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { teste_approxime(bits,0.35) ; }
 
   std::cout<<std::endl ;
   for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )

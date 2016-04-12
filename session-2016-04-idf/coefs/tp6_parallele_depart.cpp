@@ -27,36 +27,15 @@ class Echec
 
 
 int fois_puissance_de_deux( int nombre, int exposant )
- {
-  if (nombre < 0)
-   {
-    throw Echec(1, "cas imprevu") ;
-   }
-  else if (exposant < 0)
-   {
-    return (nombre >> -exposant) ;
-   }
-  else if (nombre > (((unsigned int)(-1))>>exposant>>1))
-   {
-    throw Echec(1, "overflow") ;
-   }
-  else
-   {
-    return (nombre<<exposant) ; 
-   }
- }
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
 
 
 int arrondi( double d )
  {
-  if (d > 0)
-   {
-    return int(d+.5) ;
-   }
-  else
-   {
-    return int(d-.5) ;
-   }
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
  }
 
 

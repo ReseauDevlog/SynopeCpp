@@ -225,13 +225,7 @@ class TesteurCoef : public Testeur
      : Testeur(resolution)
      {}
 
-    virtual void operator()( int bits )
-     {
-      teste(bits,0.65) ;
-      teste(bits,0.35) ;
-     }
-  
-  private :
+  protected :
   
     void teste( int bits, double valeur )
      {
@@ -242,6 +236,22 @@ class TesteurCoef : public Testeur
      }
  } ;
 
+
+template<typename U>
+class TesteurCoefO65 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.65) ; }
+ } ;
+
+template<typename U>
+class TesteurCoefO35 : public TesteurCoef
+ {
+  public :
+    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.35) ; }
+ } ;
 
 template<typename U>
 class TesteurSomme : public Testeur
@@ -314,13 +324,16 @@ int main()
    {
    
   Testeurs ts ;
-  ts.acquiere(new TesteurCoef<short>(1000000)) ;
-  ts.acquiere(new TesteurCoef<int>(1000000)) ;
+  ts.acquiere(new TesteurCoef065<short>(1000000)) ;
+  ts.acquiere(new TesteurCoef035<short>(1000000)) ;
+  ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+  ts.acquiere(new TesteurCoef035<int>(1000000)) ;
   ts.acquiere(new TesteurSomme<int>(1000000)) ;
   boucle(4,16,4,ts) ;
   std::cout<<std::endl ;
   Testeurs ts2 ;
-  ts2.acquiere(new TesteurCoef<unsigned char>(1000)) ;
+  ts2.acquiere(new TesteurCoef65<unsigned char>(1000)) ;
+  ts2.acquiere(new TesteurCoef35<unsigned char>(1000)) ;
   ts2.acquiere(new TesteurRandCoefs<unsigned char>(10,1000)) ;
   boucle(1,8,1,ts2) ;
   std::cout<<std::endl ;
