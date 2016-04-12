@@ -50,41 +50,34 @@ constexpr int nombre_bits_hors_signe()
 
 class Testeur
  {
+ 
   public :
   
-    class EchecDivisionParZero ;
+    class EchecDivisionParZero : public Echec
+     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
   
-    Testeur( int resolution ) ;
+    Testeur( int resolution ) : resolution_(resolution) {}
     virtual void operator()( int bits ) =0 ;
     virtual ~Testeur() {} ;
     
   protected :
   
-    void erreur( int bits, double exact, double approx, int width ) ;
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { throw EchecDivisionParZero() ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
 
   private :
   
     int const resolution_ ;
 
  } ;
-
-class Testeur::EchecDivisionParZero : public Echec
- { public : EchecDivisionParZero() : Echec(4,"division par 0") {} } ;
-    
-Testeur::Testeur( int resolution )
- : resolution_(resolution) {}
-
-void Testeur::erreur( int bits, double exact, double approx, int width  )
- {
-  if (exact==0) { throw EchecDivisionParZero() ; }
-  int err = arrondi(resolution_*(exact-approx)/exact) ;
-  if (err<0) err = -err ;
-  if (err>resolution_) err = resolution_ ;
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
-    << " ("<<err<<"/" << resolution_ << ")" ;
- }
 
 template<signed SIZE>
 class Testeurs
@@ -308,7 +301,7 @@ int main()
  {
   try
    {
-    Testeurs<3> ts ;
+    Testeurs<5> ts ;
     ts.acquiere(new TesteurCoef065<int>(1000000)) ;
     ts.acquiere(new TesteurCoef035<int>(1000000)) ;
     ts.acquiere(new TesteurSomme<int>(1000000)) ;
@@ -316,7 +309,7 @@ int main()
     ts.acquiere(new TesteurCoef035<short>(1000000)) ;
     boucle(4,16,4,ts) ;
     std::cout<<std::endl ;
-    Testeurs<1> ts2 ;
+    Testeurs<2> ts2 ;
     ts2.acquiere(new TesteurCoef65<unsigned char>(1000)) ;
     ts2.acquiere(new TesteurCoef35<unsigned char>(1000)) ;
     boucle(1,8,1,ts2) ;

@@ -67,7 +67,6 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-
     std::string texte()
      { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
 

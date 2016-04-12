@@ -64,41 +64,34 @@ double * new_rand_coefs( int taille )
 
 class Testeur
  {
+ 
   public :
   
-    class EchecDivisionParZero ;
+    class EchecDivisionParZero : public Echec
+     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
   
-    Testeur( int resolution ) ;
+    Testeur( int resolution ) : resolution_(resolution) {}
     virtual void operator()( int bits ) =0 ;
     virtual ~Testeur() {} ;
     
   protected :
   
-    void erreur( int bits, double exact, double approx, int width ) ;
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { throw EchecDivisionParZero() ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
 
   private :
   
     int const resolution_ ;
 
  } ;
-
-class Testeur::EchecDivisionParZero : public Echec
- { public : EchecDivisionParZero() : Echec(4,"division par 0") {} } ;
-    
-Testeur::Testeur( int resolution )
- : resolution_(resolution) {}
-
-void Testeur::erreur( int bits, double exact, double approx, int width  )
- {
-  if (exact==0) { throw EchecDivisionParZero() ; }
-  int err = arrondi(resolution_*(exact-approx)/exact) ;
-  if (err<0) err = -err ;
-  if (err>resolution_) err = resolution_ ;
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
-    << " ("<<err<<"/" << resolution_ << ")" ;
- }
 
 class Testeurs
  {
