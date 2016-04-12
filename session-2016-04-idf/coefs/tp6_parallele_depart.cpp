@@ -32,10 +32,14 @@ int fois_puissance_de_deux( int nombre, int exposant )
 
 int arrondi( double d )
  {
-  double mult {1.} ;
-  while (precision-->0) mult *= 10. ;
-  if (d>0) { return int(d*mult+.5)/mult ; }
-  else { return int(d*mult-.5)/mult ; }
+  if (d > 0)
+   {
+    return int(d+.5) ;
+   }
+  else
+   {
+    return int(d-.5) ;
+   }
  }
 
 
