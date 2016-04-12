@@ -42,13 +42,22 @@ class Testeur
  {
   public :
   
-    Testeur( int resolution ) ;
+    Testeur( int resolution )  : resolution_(resolution) {}
     virtual void execute( int bits ) =0 ;
     virtual ~Testeur() {} ;
     
   protected :
   
-    void erreur( int bits, double exact, double approx, int width ) ;
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { echec(1,"division par 0") ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
 
   private :
   
@@ -56,31 +65,13 @@ class Testeur
 
  } ;
 
-Testeur::Testeur( int resolution )
- : resolution_(resolution) {}
-
-void Testeur::erreur( int bits, double exact, double approx, int width  )
- {
-  if (exact==0) { echec(4,"division par 0") ; }
-  int err = arrondi(resolution_*(exact-approx)/exact) ;
-  if (err<0) err = -err ;
-  if (err>resolution_) err = resolution_ ;
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
-    << " ("<<err<<"/" << resolution_ << ")" ;
- }
-
 class Testeurs
  {
   public :
   
     Testeurs( unsigned int max )
      : max__{max}, indice__{}, testeurs__{new Testeur * [max__]}
-     {
-      for ( unsigned i=0 ; i<max__ ; ++i )
-       { testeurs__[i] = 0 ; }
-     }
+     {}
      
     void acquiere( Testeur * t )
      {
@@ -134,13 +125,32 @@ class Coef
  {
   public :
   
-    Coef( unsigned int bits ) ;
-    unsigned int lit_bits() const ;
-    void approxime( double valeur ) ;
-    double approximation() const ;
-    int multiplie( int arg ) const ;
-    int numerateur() const ;
-    int exposant() const ;
+    Coef( unsigned int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+    unsigned int lit_bits() const
+     { return bits_ ; }
+    void approxime( double valeur )
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        {
+         exposant_ = exposant_ + 1 ;
+     	valeur = valeur * 2 ;
+        }
+       numerateur_ = arrondi(valeur) ;
+      }
+    double approximation() const
+      {
+       if (exposant_<0) { echec(5,"exposant negatif") ; }
+       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+      }
+    int multiplie( int arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
 
   private :
   
@@ -150,42 +160,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.numerateur() << "/2^" << c.exposant() ; }
-
-Coef::Coef( unsigned int bits )
- : bits_(bits), numerateur_(0), exposant_(0)
- {}
- 
-unsigned int Coef::lit_bits() const
- { return bits_ ; }
-
-void Coef::approxime( double valeur )
- {
-  numerateur_ = exposant_ = 0 ;
-  if (valeur==0) { return ; }
-  double min = (entier_max(bits_)+0.5)/2 ;
-  while (valeur<min)
-   {
-	exposant_ = exposant_ + 1 ;
-	valeur = valeur * 2 ;
-   }
-  numerateur_ = arrondi(valeur) ;
- }
-
-double Coef::approximation() const
- {
-  if (exposant_<0) { echec(5,"exposant negatif") ; }
-  return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
- }
-
-int Coef::multiplie( int arg ) const
- { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
- 
-int Coef::numerateur() const
- { return numerateur_ ; }
- 
-int Coef::exposant() const
- { return exposant_ ; }
+ { std::cout << c.texte() ; }
 
 
 //==============================================
@@ -206,7 +181,7 @@ class TesteurCoef : public Testeur
      {
       Coef c(bits) ;
       c.approxime(valeur) ;
-      erreur(bits,valeur,c.approximation(),8) ;
+      erreur(bits,valeur,c.approximation()) ;
       std::cout<<" (" ;
       affiche(c) ;
       std::cout<<")"<<std::endl ;
@@ -248,7 +223,7 @@ class TesteurSomme : public Testeur
       coef1.approxime(c1) ;
       coef2.approxime(c2) ;
       approx = coef1.multiplie(e1) + coef2.multiplie(e2) ;
-      erreur(bits,exact,approx,4) ;
+      erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
  } ;

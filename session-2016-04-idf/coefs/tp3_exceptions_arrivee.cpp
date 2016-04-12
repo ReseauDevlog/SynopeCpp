@@ -45,41 +45,34 @@ int entier_max( int nombre_bits )
 
 class Testeur
  {
+ 
   public :
   
-    class EchecDivisionParZero ;
+    class EchecDivisionParZero : public Echec
+     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
   
-    Testeur( int resolution ) ;
+    Testeur( int resolution ) : resolution_(resolution) {}
     virtual void operator()( int bits ) =0 ;
     virtual ~Testeur() {} ;
     
   protected :
   
-    void erreur( int bits, double exact, double approx, int width ) ;
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { throw EchecDivisionParZero() ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
 
   private :
   
     int const resolution_ ;
 
  } ;
-
-class Testeur::EchecDivisionParZero : public Echec
- { public : EchecDivisionParZero() : Echec(4,"division par 0") {} } ;
-	
-Testeur::Testeur( int resolution )
- : resolution_(resolution) {}
-
-void Testeur::erreur( int bits, double exact, double approx, int width  )
- {
-  if (exact==0) { throw EchecDivisionParZero() ; }
-  int err = arrondi(resolution_*(exact-approx)/exact) ;
-  if (err<0) err = -err ;
-  if (err>resolution_) err = resolution_ ;
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<std::setw(width)<<approx
-    << " ("<<err<<"/" << resolution_ << ")" ;
- }
 
 class Testeurs
  {
@@ -93,10 +86,7 @@ class Testeurs
     
     Testeurs( unsigned int max )
      : max__{max}, indice__{}, testeurs__{new Testeur * [max__]}
-     {
-      for ( unsigned i=0 ; i<max__ ; ++i )
-       { testeurs__[i] = 0 ; }
-     }
+     {}
      
     void acquiere( Testeur * t )
      {
@@ -155,13 +145,32 @@ class Coef
  {
   public :
   
-    explicit Coef( unsigned int bits ) ;
-    unsigned int lit_bits() const ;
-    void operator=( double valeur ) ;
-    operator double() const ;
-    int operator*( int arg ) const ;
-    int numerateur() const ;
-    int exposant() const ;
+    explicit Coef( unsigned int bits )
+     : bits_{bits}, numerateur_{0}, exposant_{0}
+     {}
+    unsigned int lit_bits() const
+     { return bits_ ; }
+    void operator=( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+    	  exposant_ = exposant_ + 1 ;
+    	  valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    operator double() const
+     {
+      if (exposant_<0) { throw Echec(5,"exposant negatif") ; }
+      return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+     }
+    int operator*( int arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
 
   private :
   
@@ -171,42 +180,7 @@ class Coef
  } ;
 
 std::ostream & operator<<( std::ostream & os, Coef const & c )
-{ return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
-
-Coef::Coef( unsigned int bits )
- : bits_{bits}, numerateur_{0}, exposant_{0}
- {}
- 
-unsigned int Coef::lit_bits() const
- { return bits_ ; }
-
-void Coef::operator=( double valeur )
- {
-  numerateur_ = exposant_ = 0 ;
-  if (valeur==0) { return ; }
-  double min = (entier_max(bits_)+0.5)/2 ;
-  while (valeur<min)
-   {
-	  exposant_ = exposant_ + 1 ;
-	  valeur = valeur * 2 ;
-   }
-  numerateur_ = arrondi(valeur) ;
- }
-
-Coef::operator double() const
- {
-  if (exposant_<0) { throw Echec(5,"exposant negatif") ; }
-  return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
- }
-
-int Coef::operator*( int arg ) const
- { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
- 
-int Coef::numerateur() const
- { return numerateur_ ; }
- 
-int Coef::exposant() const
- { return exposant_ ; }
+ { return (os<<c.texte()) ; }
 
 
 //==============================================
@@ -236,14 +210,14 @@ class TesteurCoefO65 : public TesteurCoef
  {
   public :
     TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.65) ; }
+    virtual void operator()( int bits ) { teste(bits,0.65) ; }
  } ;
 
 class TesteurCoefO35 : public TesteurCoef
  {
   public :
     TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.35) ; }
+    virtual void operator()( int bits ) { teste(bits,0.35) ; }
  } ;
 
 class TesteurSomme : public Testeur
