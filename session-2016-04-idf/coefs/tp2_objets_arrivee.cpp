@@ -75,13 +75,17 @@ class Testeurs
      
   private :
   
-    static Testeur * * testeurs__ {} ;
-    static unsigned int max__ {} ;
-    static unsigned int indice__ {} ;
+    static Testeur * * testeurs__ ;
+    static unsigned int max__ ;
+    static unsigned int indice__ ;
 
  } ;
 
-class Testeur ;
+Testeur * * Testeurs::testeurs__ {} ;
+unsigned int Testeurs::max__ {} ;
+unsigned int Testeurs::indice__ {} ;
+
+class Testeur
  {
   public :
   
@@ -166,7 +170,7 @@ void Coef::approxime( double valeur )
   double min = (entier_max(bits_)+0.5)/2 ;
   while (valeur<min)
    {
-	exposant_ = exposant_ + 1 ;
+    exposant_ = exposant_ + 1 ;
 	valeur = valeur * 2 ;
    }
   numerateur_ = arrondi(valeur) ;
@@ -213,20 +217,19 @@ class TesteurCoef : public Testeur
      }
  } ;
 
-class TesteurCoefO65 : public TesteurCoef
+class TesteurCoef065 : public TesteurCoef
  {
   public :
-    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
+    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
     virtual void execute( int bits ) { teste(bits,0.65) ; }
  } ;
 
-class TesteurCoefO35 : public TesteurCoef
+class TesteurCoef035 : public TesteurCoef
  {
   public :
-    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
+    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
     virtual void execute( int bits ) { teste(bits,0.35) ; }
  } ;
-
 
 class TesteurSomme : public Testeur
  {
