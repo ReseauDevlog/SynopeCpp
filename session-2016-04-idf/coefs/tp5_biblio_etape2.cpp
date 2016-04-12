@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <random>
 
 
 //==============================================
@@ -61,7 +62,7 @@ template<typename Valeur>
 class Pointeur
  {
   public :
-    Pointeur( Valeur * val ) : val_(val), tab_(tab) {}
+    Pointeur( Valeur * val ) : val_{val} {}
     Valeur & operator*() const { return *val_ ; } 
     Valeur * operator->() const { return val_ ; } 
     ~Pointeur() { delete val_ ; }
@@ -119,7 +120,7 @@ class Testeurs
     
 void boucle( int deb, int fin, int inc, const Testeurs & ts )
  {
-  for ( Testeur * t : ts )
+  for ( Pointeur<Testeur> t : ts )
    {
     try
      {
@@ -241,19 +242,19 @@ class TesteurCoef : public Testeur
  } ;
 
 template<typename U>
-class TesteurCoefO65 : public TesteurCoef
+class TesteurCoef065 : public TesteurCoef<U>
  {
   public :
-    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.65) ; }
+    TesteurCoef065( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void execute( int bits ) { this->teste(bits,0.65) ; }
  } ;
 
 template<typename U>
-class TesteurCoefO35 : public TesteurCoef
+class TesteurCoef035 : public TesteurCoef<U>
  {
   public :
-    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.35) ; }
+    TesteurCoef035( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void execute( int bits ) { this->teste(bits,0.35) ; }
  } ;
 
 template<typename U>
@@ -336,8 +337,8 @@ int main()
   boucle(4,16,4,ts) ;
   std::cout<<std::endl ;
   Testeurs ts2 ;
-  ts2.acquiere(new TesteurCoef65<unsigned char>(1000)) ;
-  ts2.acquiere(new TesteurCoef35<unsigned char>(1000)) ;
+  ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+  ts2.acquiere(new TesteurCoef035<unsigned char>(1000)) ;
   ts2.acquiere(new TesteurRandCoefs<unsigned char>(10,1000)) ;
   boucle(1,8,1,ts2) ;
   std::cout<<std::endl ;
@@ -347,7 +348,7 @@ int main()
   catch ( Echec const & e )
    {
     std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
-	return e.code() ;
+    return e.code() ;
    }
  }
 

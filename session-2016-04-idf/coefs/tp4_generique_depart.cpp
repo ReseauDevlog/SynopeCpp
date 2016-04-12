@@ -17,7 +17,7 @@ class Echec
       std::string const & commentaire() const { return commentaire_ ; }
   private :
     unsigned int code_ ;
-	  std::string commentaire_ ;
+      std::string commentaire_ ;
  } ;
 
 int fois_puissance_de_deux( int nombre, int exposant )
@@ -197,7 +197,7 @@ class TesteurCoef : public Testeur
      {
       Coef c(bits) ;
       c = valeur ;
-      erreur(bits,valeur,c,8) ;
+      erreur(bits,valeur,c) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
@@ -207,14 +207,14 @@ class TesteurCoef065 : public TesteurCoef
  {
   public :
     TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.65) ; }
+    virtual void operator()( int bits ) { teste(bits,0.65) ; }
  } ;
 
 class TesteurCoef035 : public TesteurCoef
  {
   public :
     TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.35) ; }
+    virtual void operator()( int bits ) { teste(bits,0.35) ; }
  } ;
 
 class TesteurSomme : public Testeur
@@ -238,7 +238,7 @@ class TesteurSomme : public Testeur
       coef1 = c1 ;
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
-      erreur(bits,exact,approx,4) ;
+      erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
  } ;
