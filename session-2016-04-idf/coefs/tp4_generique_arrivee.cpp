@@ -254,7 +254,7 @@ class TesteurCoefO65 : public TesteurCoef
  {
   public :
     TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.65) ; }
+    virtual void operator()( int bits ) { teste(bits,0.65) ; }
  } ;
 
 template<typename U>
@@ -262,7 +262,7 @@ class TesteurCoefO35 : public TesteurCoef
  {
   public :
     TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
-    virtual void execute( int bits ) { teste(bits,0.35) ; }
+    virtual void operator()( int bits ) { teste(bits,0.35) ; }
  } ;
 
 template<typename U>
