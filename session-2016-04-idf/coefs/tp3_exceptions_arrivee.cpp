@@ -201,22 +201,22 @@ class TesteurCoef : public Testeur
      {
       Coef c(bits) ;
       c = valeur ;
-      erreur(bits,valeur,c,8) ;
+      erreur(bits,valeur,c) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
 
-class TesteurCoefO65 : public TesteurCoef
+class TesteurCoef065 : public TesteurCoef
  {
   public :
-    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
+    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
     virtual void operator()( int bits ) { teste(bits,0.65) ; }
  } ;
 
-class TesteurCoefO35 : public TesteurCoef
+class TesteurCoef035 : public TesteurCoef
  {
   public :
-    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
+    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
     virtual void operator()( int bits ) { teste(bits,0.35) ; }
  } ;
 
@@ -237,11 +237,11 @@ class TesteurSomme : public Testeur
      {
       Coef coef1(bits), coef2(bits) ;
       int exact, approx ;
-      exact = (int)(c1*e1+c2*e2) ;
+      exact = arrondi(c1*e1+c2*e2) ;
       coef1 = c1 ;
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
-      erreur(bits,exact,approx,4) ;
+      erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
  } ;
