@@ -9,11 +9,17 @@
 // utilitaires
 //==============================================
 
-void echec( unsigned int code, std::string const & commentaire )
+class Echec
  {
-  std::cout<<"[ERREUR "<<code<<" : "<<commentaire<<"]"<<std::endl ;
-  exit(code) ;
- }
+  public :
+    Echec( unsigned int c, std::string const & comm )
+     : code_(c), commentaire_(comm) {}
+    unsigned int code() const { return code_ ; }
+    std::string const & commentaire() const { return commentaire_ ; }
+  private :
+    unsigned int code_ ;
+	  std::string commentaire_ ;
+ } ;
 
 int fois_puissance_de_deux( int nombre, int exposant )
  {
@@ -50,7 +56,7 @@ class Testeur
   
     void erreur( int bits, double exact, double approx )
      {
-      if (exact==0) { echec(1,"division par 0") ; }
+      if (exact==0) { throw Echec(1,"division par 0") ; }
       int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
@@ -75,7 +81,7 @@ class Testeurs
      
     void acquiere( Testeur * t )
      {
-      if (indice__==max__) { echec(2,"trop de testeurs") ; }
+      if (indice__==max__) { throw Echec(2,"trop de testeurs") ; }
       testeurs__[indice__] = t ;
       indice__++ ;
      }
@@ -85,7 +91,7 @@ class Testeurs
      
     Testeur * testeur( unsigned i ) const
      {
-      if (i>=indice__) { echec(3,"indice de testeur incorrect") ; }
+      if (i>=indice__) { throw Echec(3,"indice de testeur incorrect") ; }
       return testeurs__[i] ;
      }
      
@@ -144,7 +150,7 @@ class Coef
       }
     double approximation() const
       {
-       if (exposant_<0) { echec(5,"exposant negatif") ; }
+       if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
        return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
       }
     int multiplie( int arg ) const
@@ -235,13 +241,21 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  Testeurs ts(5) ;
-  ts.acquiere(new TesteurCoef065(1000000)) ;
-  ts.acquiere(new TesteurCoef035(1000000)) ;
-  ts.acquiere(new TesteurSomme(1000000)) ;
-  boucle(4,16,4,ts) ;
-  std::cout<<std::endl ;
-  return 0 ;
+  try
+   {
+    Testeurs ts(5) ;
+    ts.acquiere(new TesteurCoef065(1000000)) ;
+    ts.acquiere(new TesteurCoef035(1000000)) ;
+    ts.acquiere(new TesteurSomme(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
  }
 
 
