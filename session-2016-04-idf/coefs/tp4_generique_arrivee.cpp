@@ -155,74 +155,53 @@ class Coef
     class EchecTropDeBits : public Echec
      { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
      
-    explicit Coef( unsigned int bits ) ;
-    unsigned int lit_bits() const ;
-    void operator=( double valeur ) ;
-    operator double() const ;
-    U operator*( U arg ) const ;
-    U numerateur() const ;
-    int exposant() const ;
+    explicit Coef( unsigned int bits )
+     : bits_{bits}, numerateur_{0}, exposant_{0}
+     { if (bits_>max_bits__) throw EchecTropDeBits() ; }
+    unsigned int lit_bits() const
+     { return bits_ ; }
+    void operator=( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+          exposant_ = exposant_ + 1 ;
+          valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    operator double() const
+     {
+      if (exposant_<0) { throw Echec(5,"exposant negatif") ; }
+      return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+     }
+    U operator*( U arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }   
+    U numerateur() const
+     { return numerateur_ ; }
+    int exposant() const
+     { return exposant_ ; }
 
   private :
   
-    unsigned const int bits_ ;
+    const unsigned int bits_ ;
     U numerateur_ ;
     int exposant_ ;
     
     static constexpr unsigned int max_bits__
      = nombre_bits_hors_signe<U>() ;
+    
  } ;
-
 
 template<typename U>
 std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
-{ return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
 template<>
 std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
-{ return (os<<int(c.numerateur())<<"/2^"<<int(c.exposant())) ; }
-
-template<typename U>
-Coef<U>::Coef( unsigned int bits )
- : bits_{bits}, numerateur_{}, exposant_{}
- { if (bits_>max_bits__) throw EchecTropDeBits() ; }
- 
-template<typename U>
-unsigned int Coef<U>::lit_bits() const
- { return bits_ ; }
-
-template<typename U>
-void Coef<U>::operator=( double valeur )
- {
-  numerateur_ = exposant_ = 0 ;
-  if (valeur==0) { return ; }
-  double min = (entier_max(bits_)+0.5)/2 ;
-  while (valeur<min)
-   {
-      exposant_ = exposant_ + 1 ;
-	  valeur = valeur * 2 ;
-   }
-  numerateur_ = arrondi(valeur) ;
- }
-
-template<typename U>
-Coef<U>::operator double() const
- {
-  if (exposant_<0) { throw Echec(5,"exposant negatif") ; }
-  return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
- }
-
-template<typename U>
-U Coef<U>::operator*( U arg ) const
- { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
- 
-template<typename U>
-U Coef<U>::numerateur() const
- { return numerateur_ ; }
- 
-template<typename U>
-int Coef<U>::exposant() const
- { return exposant_ ; }
+ { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
 
 
 //==============================================
@@ -244,25 +223,25 @@ class TesteurCoef : public Testeur
      {
       Coef<U> c(bits) ;
       c = valeur ;
-      erreur(bits,valeur,c,8) ;
+      erreur(bits,valeur,c) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
 
 template<typename U>
-class TesteurCoefO65 : public TesteurCoef
+class TesteurCoef065 : public TesteurCoef<U>
  {
   public :
-    TesteurCoefO65( int resolution ) : TesteurCoef(resolution) {}
-    virtual void operator()( int bits ) { teste(bits,0.65) ; }
+    TesteurCoef065( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.65) ; }
  } ;
 
 template<typename U>
-class TesteurCoefO35 : public TesteurCoef
+class TesteurCoef035 : public TesteurCoef<U>
  {
   public :
-    TesteurCoefO35( int resolution ) : TesteurCoef(resolution) {}
-    virtual void operator()( int bits ) { teste(bits,0.35) ; }
+    TesteurCoef035( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.35) ; }
  } ;
 
 template<typename U>
@@ -287,7 +266,7 @@ class TesteurSomme : public Testeur
       coef1 = c1 ;
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
-      erreur(bits,exact,approx,4) ;
+      erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
  } ;
@@ -310,8 +289,8 @@ int main()
     boucle(4,16,4,ts) ;
     std::cout<<std::endl ;
     Testeurs<2> ts2 ;
-    ts2.acquiere(new TesteurCoef65<unsigned char>(1000)) ;
-    ts2.acquiere(new TesteurCoef35<unsigned char>(1000)) ;
+    ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+    ts2.acquiere(new TesteurCoef035<unsigned char>(1000)) ;
     boucle(1,8,1,ts2) ;
     std::cout<<std::endl ;
     return 0 ;

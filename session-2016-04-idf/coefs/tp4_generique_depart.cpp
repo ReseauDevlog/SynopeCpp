@@ -113,7 +113,7 @@ class Testeurs
     unsigned int indice__ ;
     Testeur * * testeurs__ ;
  } ;
-	
+    
 void boucle( int deb, int fin, int inc, const Testeurs & ts )
  {
   unsigned int i ;
@@ -165,8 +165,10 @@ class Coef
      }
     int operator*( int arg ) const
      { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const
+     { return numerateur_ ; }
+    int exposant() const
+     { return exposant_ ; }
 
   private :
   
@@ -176,7 +178,7 @@ class Coef
  } ;
 
 std::ostream & operator<<( std::ostream & os, Coef const & c )
- { return (os<<c.texte()) ; }
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
 
 //==============================================
