@@ -59,20 +59,6 @@ double * new_rand_coefs( int taille )
   return res ;
  }
 
-template<typename Valeur>
-class Pointeur
- {
-  public :
-    Pointeur( Valeur * val ) : val_{val} {}
-    Pointeur( Pointeur & p ) : val_{p.val_} { p.val_ = nullptr ; }
-    Pointeur & operator=( Pointeur & p ) { val_ = p.val_ ; p.val_ = nullptr ; return *this ; }
-    Valeur & operator*() const { return *val_ ; } 
-    Valeur * operator->() const { return val_ ; } 
-    ~Pointeur() { delete val_ ; }
-  private :
-    Valeur * val_ ;
- } ;
- 
 
 //==============================================
 // framework general de test
@@ -109,22 +95,11 @@ class Testeur
 
  } ;
 
-class Testeurs
- {
-  public :
-    using pointer = std::unique_ptr<Testeur> ;
-    using container = std::vector<pointer> ;
-    using const_iterator = container::const_iterator ;
-    void acquiere( pointer && t ) { testeurs__.push_back(std::move(t)) ; }
-    const_iterator begin() const { return testeurs__.begin() ; }
-    const_iterator end() const { return testeurs__.end() ; }
-  private :
-    container testeurs__ ;
- } ;
-    
+using Testeurs = std::vector<std::unique_ptr<Testeur>> ;
+
 void boucle( int deb, int fin, int inc, const Testeurs & ts )
  {
-  for ( const Testeurs::pointer & t : ts )
+  for ( const Testeurs::value_type & t : ts )
    {
     try
      {
@@ -312,17 +287,17 @@ int main()
    {
    
   Testeurs ts ;
-  ts.acquiere(std::make_unique<TesteurCoef065<short>>(1000000)) ;
-  ts.acquiere(std::make_unique<TesteurCoef035<short>>(1000000)) ;
-  ts.acquiere(std::make_unique<TesteurCoef065<int>>(1000000)) ;
-  ts.acquiere(std::make_unique<TesteurCoef035<int>>(1000000)) ;
-  ts.acquiere(std::make_unique<TesteurSomme<int>>(1000000)) ;
+  ts.push_back(std::make_unique<TesteurCoef065<short>>(1000000)) ;
+  ts.push_back(std::make_unique<TesteurCoef035<short>>(1000000)) ;
+  ts.push_back(std::make_unique<TesteurCoef065<int>>(1000000)) ;
+  ts.push_back(std::make_unique<TesteurCoef035<int>>(1000000)) ;
+  ts.push_back(std::make_unique<TesteurSomme<int>>(1000000)) ;
   boucle(4,16,4,ts) ;
   std::cout<<std::endl ;
   Testeurs ts2 ;
-  ts2.acquiere(std::make_unique<TesteurCoef065<unsigned char>>(1000)) ;
-  ts2.acquiere(std::make_unique<TesteurCoef035<unsigned char>>(1000)) ;
-  ts2.acquiere(std::make_unique<TesteurRandCoefs<unsigned char>>(10,1000)) ;
+  ts2.push_back(std::make_unique<TesteurCoef065<unsigned char>>(1000)) ;
+  ts2.push_back(std::make_unique<TesteurCoef035<unsigned char>>(1000)) ;
+  ts2.push_back(std::make_unique<TesteurRandCoefs<unsigned char>>(10,1000)) ;
   boucle(1,8,1,ts2) ;
   std::cout<<std::endl ;
   return 0 ;
