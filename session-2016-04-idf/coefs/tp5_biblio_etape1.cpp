@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <random>
 
 
 //==============================================
@@ -203,26 +204,26 @@ class TesteurCoef : public Testeur
      {
       Coef<U> c(bits) ;
       c = valeur ;
-      erreur(bits,valeur,c,8) ;
+      erreur(bits,valeur,c) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
 
 
 template<typename U>
-class TesteurCoef065 : public TesteurCoef
+class TesteurCoef065 : public TesteurCoef<U>
  {
   public :
-    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
-    virtual void operator()( int bits ) { teste(bits,0.65) ; }
+    TesteurCoef065( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.65) ; }
  } ;
 
 template<typename U>
-class TesteurCoef035 : public TesteurCoef
+class TesteurCoef035 : public TesteurCoef<U>
  {
   public :
-    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
-    virtual void operator()( int bits ) { teste(bits,0.35) ; }
+    TesteurCoef035( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.35) ; }
  } ;
 
 template<typename U>
@@ -247,7 +248,7 @@ class TesteurSomme : public Testeur
       coef1 = c1 ;
       coef2 = c2 ;
       approx = coef1*e1 + coef2*e2 ;
-      erreur(bits,exact,approx,4) ;
+      erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
  } ;
@@ -276,7 +277,7 @@ class TesteurRandCoefs : public Testeur
      {
       Coef<U> c(bits) ;
       c = valeur ;
-      erreur(bits,arrondi(valeur,2),c,8) ;
+      erreur(bits,arrondi(valeur,2),c) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
      }
     
@@ -304,8 +305,8 @@ int main()
   boucle(4,16,4,ts) ;
   std::cout<<std::endl ;
   Testeurs ts2 ;
-  ts2.acquiere(new TesteurCoef65<unsigned char>(1000)) ;
-  ts2.acquiere(new TesteurCoef35<unsigned char>(1000)) ;
+  ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+  ts2.acquiere(new TesteurCoef035<unsigned char>(1000)) ;
   ts2.acquiere(new TesteurRandCoefs<unsigned char>(10,1000)) ;
   boucle(1,8,1,ts2) ;
   std::cout<<std::endl ;
