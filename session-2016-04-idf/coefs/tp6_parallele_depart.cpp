@@ -50,11 +50,11 @@ class RandCoefs
   public :
     RandCoefs() : rd_{}, gen_{rd_()}, dis_(0,1) {}
     double operator()()
-     { return dis(gen) ; }
+     { return dis_(gen_) ; }
   private :
     std::random_device rd_ ;
-    std::mt19937 gen_(rd()) ;
-    std::uniform_real_distribution<> dis_(0,1) ;
+    std::mt19937 gen_ ;
+    std::uniform_real_distribution<> dis_ ;
  } ;
 
 
@@ -64,91 +64,63 @@ class RandCoefs
 
 class Testeur
  {
+ 
   public :
   
-    class EchecDivisionParZero ;
+    class EchecDivisionParZero : public Echec
+     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
   
-    typedef std::vector<Testeur *> Conteneur ;
-    typedef Conteneur::iterator Iterateur ;
-	
-    static Iterateur begin() ;
-    static Iterateur end() ;
-	 
-    Testeur( int resolution ) ;
+    Testeur( int resolution ) : resolution_(resolution) {}
+    virtual void operator()( int bits ) =0 ;
+    virtual ~Testeur() {} ;
     
-    virtual void execute( int bits ) = 0 ;
-    
-    struct ResultatTest
-     {
-      double exact;
-      double approx;
-     };
-
-
   protected :
   
-    void erreur ( int bits, std::vector<ResultatTest> resultats ) ;
+    struct ResultatTest
+     {
+      double exact ;
+      double approx ;
+     } ;
+
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { throw EchecDivisionParZero() ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+    void erreur( int bits, std::vector<ResultatTest> resultats )
+     {
+      double err_moyenne {} ;
+      for ( auto const & res : resultats )
+       {
+        double exact = res.exact;
+        double approx = res.approx;
+        
+        if (res.exact == 0.0) { throw EchecDivisionParZero() ; }
+        double err = resolution_*(res.exact-res.approx)/res.exact ;
+        if (err<0) err = -err ;
+        if (err>resolution_) err = resolution_ ;
+        
+        err_moyenne += err;
+       }
+      
+      err_moyenne /= resultats.size() ;
+      int err_finale = arrondi(err_moyenne);
+      
+      std::cout << bits << " bits : " << err_finale <<"/" << resolution_ << std::endl ;
+     }
+
     RandCoefs rand_ ;
     
   private :
   
-    static std::vector<Testeur *> testeurs__ ;
-    
     int const resolution_ ;
-    
-    static void ajouter_test( Testeur * t ) ;
 
  } ;
- 
-
-std::vector<Testeur *> Testeur::testeurs__ ;
-	
-	
-class Testeur::EchecDivisionParZero : public Echec
- { public : EchecDivisionParZero() : Echec(4, "division par 0") {} } ;
- 
- 
-Testeur::Iterateur Testeur::begin()
- { return testeurs__.begin() ; }
-  
-  
-Testeur::Iterateur Testeur::end()
- { return testeurs__.end() ; }
-  
-
-Testeur::Testeur( int resolution )
- : resolution_(resolution)
- { ajouter_test(this) ; }
-
-
-void Testeur::erreur( int bits,
-                      std::vector<ResultatTest> resultats )
- {
-  const size_t nb_valeurs = resultats.size();
-  double err_moyenne = 0;
-  
-  for ( auto & resultat : resultats )
-   {
-    double exact = resultat.exact;
-    double approx = resultat.approx;
-    
-    if (exact == 0.0) { throw EchecDivisionParZero() ; }
-    double err = resolution_*(exact-approx)/exact;
-    if (err<0) err = -err ;
-    if (err>resolution_) err = resolution_ ;
-    
-    err_moyenne += err;
-   }
-  
-  err_moyenne /= nb_valeurs;
-  int err_finale = arrondi(err_moyenne);
-  
-  std::cout << bits << " bits : " << err_finale <<"/" << resolution_ << std::endl ;
- }
- 
-void Testeur::acquiere( Testeur * t )
- { testeurs__.push_back(t) ; }
-
 
 class Testeurs
  {
@@ -286,7 +258,7 @@ class TesteurSommes : public Testeur
      : Testeur(resolution), iterations_(nombre_iterations)
      {}
 
-    virtual void execute( int bits )
+    virtual void operator()( int bits )
      {
       constexpr U e {10000} ;
       Coef<U> coef1(bits), coef2(bits) ;
@@ -328,7 +300,7 @@ int main()
     Testeurs ts ;
     ts.acquiere(std::make_unique<TesteurCoefs<unsigned short>>(10000,10000000)) ;
     ts.acquiere(std::make_unique<TesteurSommes<unsigned short>>(10000,10000000)) ;
-    boucle_tests(1,8,1,ts) ;
+    boucle(1,8,1,ts) ;
     std::cout<<std::endl ;
     return 0 ;
    }
