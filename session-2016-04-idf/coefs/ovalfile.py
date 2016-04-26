@@ -29,7 +29,7 @@ tps = [
 ]
 
 name = "make_{}_{}"
-command = "g++-5 -std=c++14 {0}_{1}.cpp -o {0}_{1}.exe"
+command = "g++ -std=c++11 {0}_{1}.cpp -o {0}_{1}.exe"
 
 for session in tps:
 
