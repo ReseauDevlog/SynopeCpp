@@ -283,7 +283,7 @@ int main( int argc, char *argv[] )
 
 """
 
-classes = """
+tcoef = """
 //==============================================
 // fonction principale
 //==============================================
@@ -293,14 +293,33 @@ int main()
   int bits ;
 
   std::cout<<std::endl ;
-  TesteurCoef065 tc065 ;
+  TesteurCoef tc ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   { tc065.execute(bits) ; }
+   { tc.execute(bits) ; }
 
   std::cout<<std::endl ;
-  TesteurCoef035 tc035 ;
+  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
+   { teste_somme(bits,0.65,3515,0.35,4832) ; }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
+testeurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  TesteurCoef tc ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   { tc035.execute(bits) ; }
+   { tc.execute(bits) ; }
 
   std::cout<<std::endl ;
   TesteurSomme ts ;
@@ -313,7 +332,59 @@ int main()
  
 """
 
+heritage = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  TesteurCoef065 tc065 ;
+  tc065.init(100) ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { tc065.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  TesteurCoef035 tc035 ;
+  tc035.init(100) ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { tc035.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  TesteurSomme ts ;
+  ts.init(1000) ;
+  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
+   { ts.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
 virtual = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  boucle(tc065,1000000,4,16,4) ;
+  boucle(tc035,1000000,4,16,4) ;
+  boucle(ts,1000,1,8,1) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+classe_boucle = """
 //==============================================
 // fonction principale
 //==============================================

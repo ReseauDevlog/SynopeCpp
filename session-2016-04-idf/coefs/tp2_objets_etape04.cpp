@@ -34,21 +34,6 @@ int entier_max( int nombre_bits )
 
 
 //==============================================
-// framework general de test
-//==============================================
-
-void erreur( int bits, double exact, double approx, int resolution )
- {
-  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
-  if (erreur<0) { erreur = -erreur ; }
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<approx
-    <<" ("<<erreur<<"/"<<resolution<<")" ;
- }
- 
-
-//==============================================
 // calculs
 //==============================================
 
@@ -56,17 +41,11 @@ class Coef
  {
   public :
   
-    void init( int bits )
-     { bits_ = bits ; }
-    
-    int lit_bits()
-     { return bits_ ; }
-    
     // transformation d'un double en Coef
-    void approxime( double valeur )
+    void approxime( int bits, double valeur )
      {
       numerateur_ = exposant_ = 0 ;
-      double min = (entier_max(bits_)+0.5)/2 ;
+      double min = (entier_max(bits)+0.5)/2 ;
       while (valeur<min)
        {
         exposant_ = exposant_ + 1 ;
@@ -87,7 +66,6 @@ class Coef
 
   private :
   
-    int bits_ ;
     int numerateur_ ;
     int exposant_ ;
     
@@ -104,48 +82,43 @@ class TesteurCoef
   
     void execute( int bits )
      {
-      c_.init(bits) ;
-      teste(0.65) ;
-      teste(0.35) ;
+      teste(bits,0.65) ;
+      teste(bits,0.35) ;
      }
 
   private :
   
-    void teste( double valeur )
+    void teste( int bits, double valeur )
      {
-      c_.approxime(valeur) ;
-      double approximation = c_.approximation() ;
-      erreur(c_.lit_bits(),valeur,approximation,100) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      Coef coef ;
+      coef.approxime(bits,valeur) ;
+      double approximation = coef.approximation() ;
+      int erreur = arrondi(100*(valeur-approximation)/valeur) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
+        <<" ("<<erreur<<"/100)"
+        <<" ("<<coef.texte()<<")"
+        <<std::endl ;
      }
     
-    Coef c_ ;
-
  } ;
- 
-class TesteurSomme
+  
+void teste_somme( int bits, double c1, int e1, double c2, int e2 )
  {
-  public :
-    void execute( int bits )
-     {
-      c1_.init(bits) ;
-      c2_.init(bits) ;
-      teste(0.65,3515,0.35,4832) ;
-     }
-  private :
-    void teste( double c1, int e1, double c2, int e2 )
-     {
-      c1_.approxime(c1) ;
-      c2_.approxime(c2) ;
-      int exact, approx ;
-      exact = arrondi(c1*e1+c2*e2) ;
-      approx = c1_.multiplie(e1) + c2_.multiplie(e2) ;
-      erreur(c1_.lit_bits(),exact,approx,1000) ;
-      std::cout<<std::endl ;
-     }
-    Coef c1_ ;
-    Coef c2_ ;
- } ;
+  Coef coef1, coef2 ;
+  coef1.approxime(bits,c1) ;
+  coef2.approxime(bits,c2) ;
+  int approx = coef1.multiplie(e1) + coef2.multiplie(e2) ;
+  int exact = arrondi(c1*e1+c2*e2) ;
+  int erreur = arrondi(1000*double(exact-approx)/exact) ;
+  if (erreur<0) { erreur = -erreur ; }
+  std::cout
+    <<std::right<<std::setw(2)<<bits<<" bits : "
+    <<std::left<<exact<<" ~ "<<approx
+    <<" ("<<erreur<<"/1000)"<<std::endl ;
+ }
 
 
 //==============================================
@@ -162,11 +135,10 @@ int main()
    { tc.execute(bits) ; }
 
   std::cout<<std::endl ;
-  TesteurSomme ts ;
   for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
-   { ts.execute(bits) ; }
+   { teste_somme(bits,0.65,3515,0.35,4832) ; }
 
   std::cout<<std::endl ;
   return 0 ;
  }
- 
+

@@ -37,16 +37,31 @@ int entier_max( int nombre_bits )
 // framework general de test
 //==============================================
 
-void erreur( int bits, double exact, double approx, int resolution )
+class Testeur
  {
-  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
-  if (erreur<0) { erreur = -erreur ; }
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<approx
-    <<" ("<<erreur<<"/"<<resolution<<")" ;
- }
- 
+
+  public :
+
+    void init( int resolution )
+     { resolution_ = resolution ; }
+    
+  protected :
+
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+    
+  private :
+
+    int resolution_ ;
+ } ;
+
 
 //==============================================
 // calculs
@@ -98,24 +113,15 @@ class Coef
 // tests
 //==============================================
 
-class TesteurCoef
+class TesteurCoef : public Testeur
  {
-  public :
-  
-    void execute( int bits )
-     {
-      c_.init(bits) ;
-      teste(0.65) ;
-      teste(0.35) ;
-     }
-
-  private :
+  protected :
   
     void teste( double valeur )
      {
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
-      erreur(c_.lit_bits(),valeur,approximation,100) ;
+      erreur(c_.lit_bits(),valeur,approximation) ;
       std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
      }
     
@@ -123,7 +129,21 @@ class TesteurCoef
 
  } ;
  
-class TesteurSomme
+class TesteurCoef065 : public TesteurCoef
+ {
+  public :
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.65) ;  }
+ } ;
+ 
+class TesteurCoef035 : public TesteurCoef
+ {
+  public :
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.35) ;  }
+ } ;
+ 
+class TesteurSomme : public Testeur
  {
   public :
     void execute( int bits )
@@ -140,7 +160,7 @@ class TesteurSomme
       int exact, approx ;
       exact = arrondi(c1*e1+c2*e2) ;
       approx = c1_.multiplie(e1) + c2_.multiplie(e2) ;
-      erreur(c1_.lit_bits(),exact,approx,1000) ;
+      erreur(c1_.lit_bits(),exact,approx) ;
       std::cout<<std::endl ;
      }
     Coef c1_ ;
@@ -157,12 +177,20 @@ int main()
   int bits ;
 
   std::cout<<std::endl ;
-  TesteurCoef tc ;
+  TesteurCoef065 tc065 ;
+  tc065.init(100) ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   { tc.execute(bits) ; }
+   { tc065.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  TesteurCoef035 tc035 ;
+  tc035.init(100) ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { tc035.execute(bits) ; }
 
   std::cout<<std::endl ;
   TesteurSomme ts ;
+  ts.init(1000) ;
   for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
    { ts.execute(bits) ; }
 

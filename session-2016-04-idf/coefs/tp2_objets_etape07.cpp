@@ -34,21 +34,6 @@ int entier_max( int nombre_bits )
 
 
 //==============================================
-// framework general de test
-//==============================================
-
-void erreur( int bits, double exact, double approx, int resolution )
- {
-  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
-  if (erreur<0) { erreur = -erreur ; }
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<approx
-    <<" ("<<erreur<<"/"<<resolution<<")" ;
- }
- 
-
-//==============================================
 // calculs
 //==============================================
 
@@ -115,8 +100,14 @@ class TesteurCoef
      {
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
-      erreur(c_.lit_bits(),valeur,approximation,100) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      int erreur = arrondi(100*(valeur-approximation)/valeur) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<c_.lit_bits()<<" bits : "
+        <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
+        <<" ("<<erreur<<"/100)"
+        <<" ("<<c_.texte()<<")"
+        <<std::endl ;
      }
     
     Coef c_ ;
@@ -140,8 +131,12 @@ class TesteurSomme
       int exact, approx ;
       exact = arrondi(c1*e1+c2*e2) ;
       approx = c1_.multiplie(e1) + c2_.multiplie(e2) ;
-      erreur(c1_.lit_bits(),exact,approx,1000) ;
-      std::cout<<std::endl ;
+      int erreur = arrondi(1000*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<c1_.lit_bits()<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/1000)"<<std::endl ;
      }
     Coef c1_ ;
     Coef c2_ ;

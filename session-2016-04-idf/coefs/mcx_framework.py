@@ -49,7 +49,82 @@ void erreur( int bits, double exact, double approx, int resolution )
  
 """
 
+testeur = """
+//==============================================
+// framework general de test
+//==============================================
+
+class Testeur
+ {
+
+  public :
+
+    void init( int resolution )
+     { resolution_ = resolution ; }
+    
+  protected :
+
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+    
+  private :
+
+    int resolution_ ;
+ } ;
+
+"""
+
 virtual = """
+//==============================================
+// framework general de test
+//==============================================
+
+class Testeur
+ {
+
+  public :
+
+    void init( int resolution )
+     { resolution_ = resolution ; }
+    
+    virtual void execute( int bits )
+     { std::cout << "Mais qu'est-ce que je fais là ?" << std::endl ; }
+
+  protected :
+  
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+    
+  private :
+
+    int resolution_ ;
+ } ;
+
+void boucle( Testeur & testeur, int resolution, int debut, int fin, int inc )
+ {
+  std::cout<<std::endl ;
+  testeur.init(resolution) ;
+  for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+   { testeur.execute(bits) ; }
+ }
+ 
+"""
+
+classe_boucle = """
 //==============================================
 // framework general de test
 //==============================================
