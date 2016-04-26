@@ -55,6 +55,139 @@ int main()
 
 """
 
+boucle_exposant = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  std::cout<<std::endl ;
+  int exposant ;
+  for ( exposant = 1 ; exposant <= 8 ; exposant = exposant + 1 )
+   {
+    int num = arrondi(0.65*fois_puissance_de_deux(1,exposant))  ;
+    std::cout << "0.65 ~ " << std::setw(3) << num << "/2^" << exposant << std::endl ;
+   }
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
+approxime = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  std::cout << std::endl ;
+  approxime(0.65) ;
+  std::cout << std::endl ;
+  approxime(0.35) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+
+"""
+
+approxime_max = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  std::cout << std::endl ;
+  approxime(15,0.65) ;
+  approxime(255,0.65) ;
+  std::cout << std::endl ;
+  approxime(15,0.35) ;
+  approxime(255,0.35) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+
+"""
+
+approxime_bits = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { approxime(bits,0.65) ; }
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { approxime(bits,0.35) ; }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
+teste_approxime = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { teste_approxime(bits,0.65) ; }
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { teste_approxime(bits,0.35) ; }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
+multiplie = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { teste_approxime(bits,0.65) ; }
+
+  std::cout<<std::endl ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { teste_approxime(bits,0.35) ; }
+
+  std::cout<<std::endl ;
+  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
+   {
+    int exact = arrondi(0.65*3515+0.35*4832) ;
+    int approx = multiplie(bits,0.65,3515) + multiplie(bits,0.35,4832) ;
+    std::cout << bits << " bits : 0.65*3515+0.35*4832 = " << exact << " ~ " << approx << std::endl ;
+   }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
 simple = """
 //==============================================
 // fonction principale
@@ -77,6 +210,74 @@ int main()
    { teste_somme(bits,0.65,3515,0.35,4832) ; }
 
   std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
+pfonctions = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  std::cout<<std::endl ;
+  boucle(2,8,2,teste_065) ;
+  boucle(2,8,2,teste_035) ;
+  boucle(1,8,1,teste_065_3515_035_4832) ;
+  return 0 ;
+ }
+
+"""
+
+pfonctions_rand = """
+//==============================================
+// fonction principale
+//==============================================
+
+#include <cstdlib>  // for atoi
+
+int main( int argc, char *argv[] )
+ {
+  if (argc<2) echec(1,"argument manquant sur la ligne de commande") ;
+  nb_teste_rand_coefs = atoi(argv[1]) ;
+  
+  std::cout<<std::endl ;
+  
+  boucle(2,8,2,teste_065) ;
+  boucle(2,8,2,teste_035) ;
+  boucle(1,8,1,teste_065_3515_035_4832) ;
+  boucle(1,8,1,teste_rand_coefs) ;
+  
+  return 0 ;
+ }
+
+"""
+
+pfonctions_ostream = """
+//==============================================
+// fonction principale
+//==============================================
+
+#include <fstream>
+
+int main( int argc, char *argv[] )
+ {
+  if (argc<3) echec(1,"arguments manquants sur la ligne de commande") ;
+  nb_teste_rand_coefs = atoi(argv[1]) ;
+  std::ofstream fichier(argv[2]) ;
+  sortie = &fichier ;
+  
+  (*sortie)<<std::endl ;
+  
+  boucle(2,8,2,teste_065) ;
+  boucle(2,8,2,teste_035) ;
+  boucle(1,8,1,teste_065_3515_035_4832) ;
+  boucle(1,8,1,teste_rand_coefs) ;
+  
+  fichier.close() ;
+  
   return 0 ;
  }
 
@@ -146,34 +347,6 @@ int main()
   boucle(4,16,4) ;
   Testeurs::finalise() ;
   std::cout<<std::endl ;
-  return 0 ;
- }
-
-"""
-
-pfonctions = """
-//==============================================
-// fonction principale
-//==============================================
-
-#include <fstream>
-
-int main( int argc, char *argv[] )
- {
-  if (argc<3) echec(1,"arguments manquants sur la ligne de commande") ;
- 
-  std::ofstream fichier(argv[2]) ;
-  sortie = &fichier ;
-  
-  (*sortie)<<std::endl ;
-  
-  boucle(2,8,2,teste_065,argc,argv) ;
-  boucle(2,8,2,teste_035,argc,argv) ;
-  boucle(1,8,1,teste_065_3515_035_4832,argc,argv) ;
-  boucle(1,8,1,teste_rand_coefs,argc,argv) ;
-  
-  fichier.close() ;
-  
   return 0 ;
  }
 

@@ -9,42 +9,52 @@ Configuration file for the tool oval.
 tps = [
     {"name": "tp1_procedural",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.simple mcx_main.test_utilitaires"},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.rand mcx_framework.pfonctions mcx_calculs.simple mcx_tests.fonctions mcx_main.pfonctions"}
+         {"name": "etape00", "mcx": "mcx_utilitaires.simple mcx_main.test_utilitaires", "args": ""},
+         {"name": "etape01", "mcx": "mcx_utilitaires.simple mcx_main.boucle_exposant", "args": ""},
+         {"name": "etape02", "mcx": "mcx_utilitaires.simple mcx_calculs.approxime_for mcx_main.approxime", "args": ""},
+         {"name": "etape03", "mcx": "mcx_utilitaires.simple mcx_calculs.approxime_for_approximation mcx_main.approxime", "args": ""},
+         {"name": "etape04", "mcx": "mcx_utilitaires.simple mcx_calculs.approxime_max mcx_main.approxime_max", "args": ""},
+         {"name": "etape05", "mcx": "mcx_utilitaires.simple mcx_calculs.approxime_bits mcx_main.approxime_bits", "args": ""},
+         {"name": "etape06", "mcx": "mcx_utilitaires.simple mcx_calculs.approxime_ref mcx_tests.approxime mcx_main.teste_approxime", "args": ""},
+         {"name": "etape07", "mcx": "mcx_utilitaires.simple mcx_calculs.simple mcx_tests.approxime mcx_main.multiplie", "args": ""},
+         {"name": "etape08", "mcx": "mcx_utilitaires.compacte mcx_calculs.simple mcx_tests.simple mcx_main.simple", "args": ""},
+         {"name": "etape09", "mcx": "mcx_utilitaires.compacte mcx_framework.pfonctions mcx_calculs.simple mcx_tests.fonctions mcx_main.pfonctions", "args": ""},
+         {"name": "etape10", "mcx": "mcx_utilitaires.compacte_rand mcx_framework.pfonctions mcx_calculs.simple mcx_tests.fonctions_rand mcx_main.pfonctions_rand", "args": "10"},
+         {"name": "etape11", "mcx": "mcx_utilitaires.compacte_rand mcx_framework.pfonctions_ostream mcx_calculs.simple mcx_tests.fonctions_ostream mcx_main.pfonctions_ostream", "args": "10 resultat.txt"}
          ]},
     {"name": "tp2_objets",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.compacte mcx_calculs.simple mcx_tests.simple mcx_main.simple"},
-         {"name": "etape1", "mcx": "mcx_utilitaires.compacte mcx_framework.erreur mcx_calculs.classe mcx_tests.classes mcx_main.classes"}, 
-         {"name": "etape2", "mcx": "mcx_utilitaires.compacte mcx_framework.virtual mcx_calculs.classe mcx_tests.virtual mcx_main.virtual"},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.const mcx_framework.constructeurs_et_statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.constructeurs_et_statiques"}
+         {"name": "etape0", "mcx": "mcx_utilitaires.compacte mcx_calculs.simple mcx_tests.simple mcx_main.simple", "args": ""},
+         {"name": "etape1", "mcx": "mcx_utilitaires.compacte mcx_framework.erreur mcx_calculs.classe mcx_tests.classes mcx_main.classes", "args": ""}, 
+         {"name": "etape2", "mcx": "mcx_utilitaires.compacte mcx_framework.virtual mcx_calculs.classe mcx_tests.virtual mcx_main.virtual", "args": ""},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.const mcx_framework.constructeurs_et_statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.constructeurs_et_statiques", "args": ""}
          ]},
     {"name": "tp3_exceptions",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etape1", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etape1", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple", "args": ""}
          ]},
     {"name": "tp4_generique",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple", "args": ""}
          ]},
     {"name": "tp5_biblio",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etape1", "mcx": "mcx_utilitaires.simple"}, 
-         {"name": "etape2", "mcx": "mcx_utilitaires.simple"}, 
-         {"name": "etape3", "mcx": "mcx_utilitaires.simple"}, 
-         {"name": "etape4", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etape1", "mcx": "mcx_utilitaires.simple", "args": ""}, 
+         {"name": "etape2", "mcx": "mcx_utilitaires.simple", "args": ""}, 
+         {"name": "etape3", "mcx": "mcx_utilitaires.simple", "args": ""}, 
+         {"name": "etape4", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple", "args": ""}
          ]},
     {"name": "tp6_parallele",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etape1", "mcx": "mcx_utilitaires.simple"}, 
-         {"name": "etape2", "mcx": "mcx_utilitaires.simple"},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etape1", "mcx": "mcx_utilitaires.simple", "args": ""}, 
+         {"name": "etape2", "mcx": "mcx_utilitaires.simple", "args": ""},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple", "args": ""}
          ]},
 ]
 
@@ -102,13 +112,13 @@ for session in tps:
 # execution targets
 
 name = "run_{}_{}"
-command = "./{0}_{1}.exe"
+command = "./{}_{}.exe {}"
 
 for session in tps:
 
     base = session["name"]
     for etape in session["etapes"]:
-        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
+        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"],etape["args"])})
 
 
 # filters

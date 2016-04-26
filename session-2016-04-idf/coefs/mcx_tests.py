@@ -1,5 +1,27 @@
 # -*- coding: utf-8 -*-
 
+approxime = """
+//==============================================
+// tests
+//==============================================
+
+void teste_approxime( int bits, double valeur )
+ {
+  int numerateur, exposant, erreur ;
+  approxime(bits,valeur,numerateur,exposant) ;
+  double approximation = double(numerateur)/fois_puissance_de_deux(1,exposant) ;
+  erreur = arrondi(100*(valeur-approximation)/valeur) ;
+  if (erreur<0) { erreur = -erreur ; }
+  std::cout
+    << bits << " bits : " << valeur << " ~ "
+    << std::setw(8) << approximation
+    <<" ("<<erreur<<"/100)"
+    <<" ("<<numerateur<<"/2^"<<exposant<<")"
+    <<std::endl ;
+ }
+
+"""
+
 simple = """
 //==============================================
 // tests
@@ -47,6 +69,114 @@ void teste_approxime( int bits, double valeur )
   double approximation = double(numerateur)/fois_puissance_de_deux(1,exposant) ;
   erreur = arrondi(100*(valeur-approximation)/valeur) ;
   if (erreur<0) { erreur = -erreur ; }
+  std::cout.setf(std::ios::fixed,std::ios::floatfield) ;  
+  std::cout
+    <<std::setw(2)<<std::right<<bits<<" bits : "
+    <<std::setw(4)<<std::setprecision(2)<<std::left<<valeur<<" ~ "
+    <<std::setw(8)<<std::setprecision(6)<<std::left<<approximation
+    <<" ("<<erreur<<"/100)"
+    <<" ("<<numerateur<<"/2^"<<exposant<<")"
+    <<std::endl ;
+ }
+
+void teste_somme( int bits, double c1, int e1, double c2, int e2 )
+ {
+  int exact, approx, erreur ;
+  exact = arrondi(c1*e1+c2*e2) ;
+  approx = multiplie(bits,c1,e1) + multiplie(bits,c2,e2) ;
+  erreur = arrondi(1000*double(exact-approx)/exact) ;
+  if (erreur<0) { erreur = -erreur ; }
+  std::cout.setf(std::ios::fixed,std::ios::floatfield) ;  
+  std::cout
+    <<std::setw(2)<<std::right<<bits<<" bits : "
+    <<std::setw(4)<<std::left<<exact<<" ~ "
+    <<std::setw(4)<<std::left<<approx
+    <<" ("<<erreur<<"/1000)"<<std::endl ;
+ }
+
+void teste_065( int bits )
+ { teste_approxime(bits,0.65) ; }
+
+void teste_035( int bits )
+ { teste_approxime(bits,0.35) ; }
+
+void teste_065_3515_035_4832( int bits )
+ { teste_somme(bits,0.65,3515,0.35,4832) ; }
+
+"""
+
+fonctions_rand = """
+//==============================================
+// tests
+//==============================================
+
+void teste_approxime( int bits, double valeur )
+ {
+  int numerateur, exposant, erreur ;
+  approxime(bits,valeur,numerateur,exposant) ;
+  double approximation = double(numerateur)/fois_puissance_de_deux(1,exposant) ;
+  erreur = arrondi(100*(valeur-approximation)/valeur) ;
+  if (erreur<0) { erreur = -erreur ; }
+  std::cout.setf(std::ios::fixed,std::ios::floatfield) ;  
+  std::cout
+    <<std::setw(2)<<std::right<<bits<<" bits : "
+    <<std::setw(4)<<std::setprecision(2)<<std::left<<valeur<<" ~ "
+    <<std::setw(8)<<std::setprecision(6)<<std::left<<approximation
+    <<" ("<<erreur<<"/100)"
+    <<" ("<<numerateur<<"/2^"<<exposant<<")"
+    <<std::endl ;
+ }
+
+void teste_somme( int bits, double c1, int e1, double c2, int e2 )
+ {
+  int exact, approx, erreur ;
+  exact = arrondi(c1*e1+c2*e2) ;
+  approx = multiplie(bits,c1,e1) + multiplie(bits,c2,e2) ;
+  erreur = arrondi(1000*double(exact-approx)/exact) ;
+  if (erreur<0) { erreur = -erreur ; }
+  std::cout.setf(std::ios::fixed,std::ios::floatfield) ;  
+  std::cout
+    <<std::setw(2)<<std::right<<bits<<" bits : "
+    <<std::setw(4)<<std::left<<exact<<" ~ "
+    <<std::setw(4)<<std::left<<approx
+    <<" ("<<erreur<<"/1000)"<<std::endl ;
+ }
+
+void teste_065( int bits )
+ { teste_approxime(bits,0.65) ; }
+
+void teste_035( int bits )
+ { teste_approxime(bits,0.35) ; }
+
+void teste_065_3515_035_4832( int bits )
+ { teste_somme(bits,0.65,3515,0.35,4832) ; }
+
+int nb_teste_rand_coefs {} ;
+
+void teste_rand_coefs( int bits )
+ {
+  double * values = new_rand_coefs(nb_teste_rand_coefs) ; 
+  int i ;
+  for ( i=0 ; i<nb_teste_rand_coefs ; i++ )
+   { teste_approxime(bits,values[i]) ; }
+  std::cout<<std::endl ;
+  delete [] values ;
+ }
+
+"""
+
+fonctions_ostream = """
+//==============================================
+// tests
+//==============================================
+
+void teste_approxime( int bits, double valeur )
+ {
+  int numerateur, exposant, erreur ;
+  approxime(bits,valeur,numerateur,exposant) ;
+  double approximation = double(numerateur)/fois_puissance_de_deux(1,exposant) ;
+  erreur = arrondi(100*(valeur-approximation)/valeur) ;
+  if (erreur<0) { erreur = -erreur ; }
   (*sortie).setf(std::ios::fixed,std::ios::floatfield) ;  
   (*sortie)
     <<std::setw(2)<<std::right<<bits<<" bits : "
@@ -72,23 +202,22 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
     <<" ("<<erreur<<"/1000)"<<std::endl ;
  }
 
-void teste_065( int bits, int argc, char *argv[] )
+void teste_065( int bits )
  { teste_approxime(bits,0.65) ; }
 
-void teste_035( int bits, int argc, char *argv[] )
+void teste_035( int bits )
  { teste_approxime(bits,0.35) ; }
 
-void teste_065_3515_035_4832( int bits, int argc, char *argv[] )
+void teste_065_3515_035_4832( int bits )
  { teste_somme(bits,0.65,3515,0.35,4832) ; }
 
-#include <cstdlib>  // for atoi
+int nb_teste_rand_coefs {} ;
 
-void teste_rand_coefs( int bits, int argc, char *argv[] )
+void teste_rand_coefs( int bits )
  {
-  int taille = atoi(argv[1]) ;
-  double * values = new_rand_coefs(taille) ; 
+  double * values = new_rand_coefs(nb_teste_rand_coefs) ; 
   int i ;
-  for ( i=0 ; i<taille ; i++ )
+  for ( i=0 ; i<nb_teste_rand_coefs ; i++ )
    { teste_approxime(bits,values[i]) ; }
   (*sortie)<<std::endl ;
   delete [] values ;

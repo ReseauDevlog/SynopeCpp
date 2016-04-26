@@ -38,7 +38,7 @@ int entier_max( int nombre_bits )
 
 """
 
-rand = simple + """#include <random>
+rand_patch =  """#include <random>
 
 double * new_rand_coefs( int taille )
  {
@@ -54,6 +54,8 @@ double * new_rand_coefs( int taille )
  }
 
 """
+
+simple_rand = simple + rand_patch
 
 compacte = """
 //==============================================
@@ -89,6 +91,8 @@ int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
 """
+
+compacte_rand = compacte + rand_patch
 
 const = """
 //==============================================

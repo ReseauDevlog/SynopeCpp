@@ -14,24 +14,21 @@ void echec( unsigned int code, std::string commentaire )
   exit(code) ;
  }
 
-// arrondi
-int arrondi( double d )
- {
-  if (d>0) { return int(d+.5) ; }
-  else { return int(d-.5) ; }
- }
-
-// multiplie "nombre" par 2 puissance "exposant"
 int fois_puissance_de_deux( int nombre, int exposant )
  {
-  while (exposant>0)
-   { nombre *= 2 ; exposant -= 1 ; }
-  while (exposant<0)
-   { nombre /= 2 ; exposant += 1 ; }
+  if (exposant>0) { nombre <<= exposant ; }
+  else  { nombre >>= -exposant ; }
   return nombre ;
  }
 
-// entier maximum représentable avec "nombre_bits" bits
+double arrondi( double d, unsigned precision =0 )
+ {
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
+ }
+
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
@@ -55,14 +52,12 @@ double * new_rand_coefs( int taille )
 // framework general de test
 //==============================================
 
-std::ostream * sortie {} ;
-
-void boucle( int deb, int fin, int inc, void (*f)( int, int, char *[] ), int argc, char *argv[] )
+void boucle( int deb, int fin, int inc, void (*f)( int ) )
  {
   int bits ;
   for ( bits = deb ; bits <= fin ; bits += inc )
-   { f(bits,argc,argv) ; }
-  (*sortie)<<std::endl ;
+   { f(bits) ; }
+  std::cout<<std::endl ;
  }
 
 
@@ -102,8 +97,8 @@ void teste_approxime( int bits, double valeur )
   double approximation = double(numerateur)/fois_puissance_de_deux(1,exposant) ;
   erreur = arrondi(100*(valeur-approximation)/valeur) ;
   if (erreur<0) { erreur = -erreur ; }
-  (*sortie).setf(std::ios::fixed,std::ios::floatfield) ;  
-  (*sortie)
+  std::cout.setf(std::ios::fixed,std::ios::floatfield) ;  
+  std::cout
     <<std::setw(2)<<std::right<<bits<<" bits : "
     <<std::setw(4)<<std::setprecision(2)<<std::left<<valeur<<" ~ "
     <<std::setw(8)<<std::setprecision(6)<<std::left<<approximation
@@ -119,33 +114,32 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
   approx = multiplie(bits,c1,e1) + multiplie(bits,c2,e2) ;
   erreur = arrondi(1000*double(exact-approx)/exact) ;
   if (erreur<0) { erreur = -erreur ; }
-  (*sortie).setf(std::ios::fixed,std::ios::floatfield) ;  
-  (*sortie)
+  std::cout.setf(std::ios::fixed,std::ios::floatfield) ;  
+  std::cout
     <<std::setw(2)<<std::right<<bits<<" bits : "
     <<std::setw(4)<<std::left<<exact<<" ~ "
     <<std::setw(4)<<std::left<<approx
     <<" ("<<erreur<<"/1000)"<<std::endl ;
  }
 
-void teste_065( int bits, int argc, char *argv[] )
+void teste_065( int bits )
  { teste_approxime(bits,0.65) ; }
 
-void teste_035( int bits, int argc, char *argv[] )
+void teste_035( int bits )
  { teste_approxime(bits,0.35) ; }
 
-void teste_065_3515_035_4832( int bits, int argc, char *argv[] )
+void teste_065_3515_035_4832( int bits )
  { teste_somme(bits,0.65,3515,0.35,4832) ; }
 
-#include <cstdlib>  // for atoi
+int nb_teste_rand_coefs {} ;
 
-void teste_rand_coefs( int bits, int argc, char *argv[] )
+void teste_rand_coefs( int bits )
  {
-  int taille = atoi(argv[1]) ;
-  double * values = new_rand_coefs(taille) ; 
+  double * values = new_rand_coefs(nb_teste_rand_coefs) ; 
   int i ;
-  for ( i=0 ; i<taille ; i++ )
+  for ( i=0 ; i<nb_teste_rand_coefs ; i++ )
    { teste_approxime(bits,values[i]) ; }
-  (*sortie)<<std::endl ;
+  std::cout<<std::endl ;
   delete [] values ;
  }
 
@@ -154,23 +148,19 @@ void teste_rand_coefs( int bits, int argc, char *argv[] )
 // fonction principale
 //==============================================
 
-#include <fstream>
+#include <cstdlib>  // for atoi
 
 int main( int argc, char *argv[] )
  {
-  if (argc<3) echec(1,"arguments manquants sur la ligne de commande") ;
- 
-  std::ofstream fichier(argv[2]) ;
-  sortie = &fichier ;
+  if (argc<2) echec(1,"argument manquant sur la ligne de commande") ;
+  nb_teste_rand_coefs = atoi(argv[1]) ;
   
-  (*sortie)<<std::endl ;
+  std::cout<<std::endl ;
   
-  boucle(2,8,2,teste_065,argc,argv) ;
-  boucle(2,8,2,teste_035,argc,argv) ;
-  boucle(1,8,1,teste_065_3515_035_4832,argc,argv) ;
-  boucle(1,8,1,teste_rand_coefs,argc,argv) ;
-  
-  fichier.close() ;
+  boucle(2,8,2,teste_065) ;
+  boucle(2,8,2,teste_035) ;
+  boucle(1,8,1,teste_065_3515_035_4832) ;
+  boucle(1,8,1,teste_rand_coefs) ;
   
   return 0 ;
  }

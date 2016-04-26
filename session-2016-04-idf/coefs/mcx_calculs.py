@@ -1,5 +1,112 @@
 # -*- coding: utf-8 -*-
 
+approxime_for = """
+//==============================================
+// calculs
+//==============================================
+
+void approxime( double valeur )
+ {
+  int exposant ;
+  for ( exposant = 1 ; exposant <= 8 ; exposant = exposant + 1 )
+   {
+    int num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+    std::cout
+      << valeur << " ~ " << std::setw(3) << num << "/2^" << exposant
+      << std::endl ;
+   }
+ }
+
+"""
+
+approxime_for_approximation = """
+//==============================================
+// calculs
+//==============================================
+
+void approxime( double valeur )
+ {
+  int exposant ;
+  for ( exposant = 1 ; exposant <= 8 ; exposant = exposant + 1 )
+   {
+    int num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+    std::cout
+      << valeur << " ~ " << std::setw(3) << num << "/2^" << exposant
+      << " = " << double(num)/fois_puissance_de_deux(1,exposant)
+      << std::endl ;
+   }
+ }
+
+"""
+
+approxime_max = """
+//==============================================
+// calculs
+//==============================================
+
+void approxime( int max, double valeur )
+ {
+  int exposant {}, num ;
+  do
+   {
+    exposant = exposant + 1 ;
+    num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+   } while (num<=max) ;
+  exposant = exposant - 1 ;
+  num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+  std::cout
+    << valeur << " ~ " << std::setw(3) << num << "/2^" << exposant
+    << " = " << double(num)/fois_puissance_de_deux(1,exposant)
+    << std::endl ;
+ }
+
+"""
+
+approxime_bits = """
+//==============================================
+// calculs
+//==============================================
+
+void approxime( int bits, double valeur )
+ {
+  int max = entier_max(bits) ;
+  int exposant {}, num ;
+  do
+   {
+    exposant = exposant + 1 ;
+    num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+   } while (num<=max) ;
+  exposant = exposant - 1 ;
+  num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+  std::cout
+    << bits << " bits : "
+    << valeur << " ~ " << std::setw(3) << num << "/2^" << exposant
+    << " = " << double(num)/fois_puissance_de_deux(1,exposant)
+    << std::endl ;
+ }
+
+"""
+
+approxime_ref = """
+//==============================================
+// calculs
+//==============================================
+
+void approxime( int bits, double valeur, int & numerateur, int & exposant )
+ {
+  numerateur = exposant = 0 ;
+  if (valeur==0) { return ; }
+  double min = (entier_max(bits)+0.5)/2 ;
+  while (valeur<min)
+   {
+    exposant = exposant + 1 ;
+    valeur = valeur * 2 ;
+   }
+  numerateur = arrondi(valeur) ;
+ }
+
+"""
+
 simple = """
 //==============================================
 // calculs

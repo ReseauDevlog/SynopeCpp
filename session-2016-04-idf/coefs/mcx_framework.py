@@ -5,13 +5,28 @@ pfonctions = """
 // framework general de test
 //==============================================
 
-std::ostream * sortie {} ;
-
-void boucle( int deb, int fin, int inc, void (*f)( int, int, char *[] ), int argc, char *argv[] )
+void boucle( int deb, int fin, int inc, void (*f)( int ) )
  {
   int bits ;
   for ( bits = deb ; bits <= fin ; bits += inc )
-   { f(bits,argc,argv) ; }
+   { f(bits) ; }
+  std::cout<<std::endl ;
+ }
+
+"""
+
+pfonctions_ostream = """
+//==============================================
+// framework general de test
+//==============================================
+
+std::ostream * sortie {} ;
+
+void boucle( int deb, int fin, int inc, void (*f)( int ) )
+ {
+  int bits ;
+  for ( bits = deb ; bits <= fin ; bits += inc )
+   { f(bits) ; }
   (*sortie)<<std::endl ;
  }
 
