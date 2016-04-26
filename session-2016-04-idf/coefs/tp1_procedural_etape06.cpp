@@ -1,13 +1,12 @@
-
-#include <iostream>
-#include <string>
-#include <iomanip>
-#include <cstdlib>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 void echec( unsigned int code, std::string commentaire )
  {
@@ -15,21 +14,24 @@ void echec( unsigned int code, std::string commentaire )
   exit(code) ;
  }
 
+// arrondi
+int arrondi( double d )
+ {
+  if (d>0) { return int(d+.5) ; }
+  else { return int(d-.5) ; }
+ }
+
+// multiplie "nombre" par 2 puissance "exposant"
 int fois_puissance_de_deux( int nombre, int exposant )
  {
-  if (exposant>0) { nombre <<= exposant ; }
-  else  { nombre >>= -exposant ; }
+  while (exposant>0)
+   { nombre *= 2 ; exposant -= 1 ; }
+  while (exposant<0)
+   { nombre /= 2 ; exposant += 1 ; }
   return nombre ;
  }
 
-double arrondi( double d, unsigned precision =0 )
- {
-  double mult {1.} ;
-  while (precision-->0) mult *= 10. ;
-  if (d>0) { return int(d*mult+.5)/mult ; }
-  else { return int(d*mult-.5)/mult ; }
- }
-
+// entier maximum représentable avec "nombre_bits" bits
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
@@ -51,13 +53,6 @@ void approxime( int bits, double valeur, int & numerateur, int & exposant )
   numerateur = arrondi(valeur) ;
  }
 
-int multiplie( int bits, double c, int e )
- {
-  int numerateur, exposant ;
-  approxime(bits,c,numerateur,exposant) ;
-  return fois_puissance_de_deux(numerateur*e,-exposant) ;
- }
-
 
 //==============================================
 // tests
@@ -71,24 +66,11 @@ void teste_approxime( int bits, double valeur )
   erreur = arrondi(100*(valeur-approximation)/valeur) ;
   if (erreur<0) { erreur = -erreur ; }
   std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
+    << bits << " bits : " << valeur << " ~ "
+    << std::setw(8) << approximation
     <<" ("<<erreur<<"/100)"
     <<" ("<<numerateur<<"/2^"<<exposant<<")"
     <<std::endl ;
- }
-
-void teste_somme( int bits, double c1, int e1, double c2, int e2 )
- {
-  int exact, approx, erreur ;
-  exact = arrondi(c1*e1+c2*e2) ;
-  approx = multiplie(bits,c1,e1) + multiplie(bits,c2,e2) ;
-  erreur = arrondi(1000*double(exact-approx)/exact) ;
-  if (erreur<0) { erreur = -erreur ; }
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<approx
-    <<" ("<<erreur<<"/1000)"<<std::endl ;
  }
 
 
@@ -109,9 +91,6 @@ int main()
    { teste_approxime(bits,0.35) ; }
 
   std::cout<<std::endl ;
-  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
-   { teste_somme(bits,0.65,3515,0.35,4832) ; }
-
-  std::cout<<std::endl ;
   return 0 ;
  }
+

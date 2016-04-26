@@ -1,13 +1,12 @@
-
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <cstdlib>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 void echec( unsigned int code, std::string const & commentaire )
  {
@@ -38,14 +37,19 @@ int entier_max( int nombre_bits )
 // framework general de test
 //==============================================
 
+class Testeur ;
+
 class Testeur
  {
   public :
   
-    Testeur( int resolution )  : resolution_(resolution) {}
-    virtual void execute( int bits ) =0 ;
-    virtual ~Testeur() {} ;
+    Testeur( int resolution )
+     : resolution_(resolution)
+     {}
     
+    virtual void execute( int bits )
+     { std::cout << "Qu'est-ce que je fais la ??" << std::endl ; }
+        
   protected :
   
     void erreur( int bits, double exact, double approx )
@@ -69,46 +73,54 @@ class Testeurs
  {
   public :
   
-    Testeurs( unsigned int max )
-     : max__{max}, indice__{}, testeurs__{new Testeur * [max__]}
-     {}
-     
-    void acquiere( Testeur * t )
+    static void init( unsigned int max )
      {
-      if (indice__==max__) { echec(2,"trop de testeurs") ; }
+      max__ = max ;
+      indice__ = 0 ;
+      testeurs__ = new Testeur * [max__] ;
+     }
+     
+    static void acquiere( Testeur * t )
+     {
+      if (indice__==max__) { echec(1,"trop de testeurs") ; }
       testeurs__[indice__] = t ;
       indice__++ ;
      }
      
-    unsigned int nb_testeurs() const
+    static unsigned int nb_testeurs()
      { return indice__ ; }
      
-    Testeur * testeur( unsigned i ) const
+    static Testeur * testeur( unsigned int i )
      {
-      if (i>=indice__) { echec(3,"indice de testeur incorrect") ; }
+      if (i>=indice__) { echec(1,"indice de testeur incorrect") ; }
       return testeurs__[i] ;
      }
      
-    ~Testeurs()
+    static void finalise()
      {
-      for ( unsigned i=0 ; i<max__ ; ++i )
+      for ( unsigned int i=0 ; i<indice__ ; ++i )
        { delete testeurs__[i] ; }
       delete [] testeurs__ ;
      }
      
   private :
   
-    unsigned int max__ ;
-    unsigned int indice__ ;
-    Testeur * * testeurs__ ;
+    static Testeur * * testeurs__ ;
+    static unsigned int max__ ;
+    static unsigned int indice__ ;
+
  } ;
 
-void boucle( int deb, int fin, int inc, const Testeurs & ts )
+Testeur * * Testeurs::testeurs__ {} ;
+unsigned int Testeurs::max__ {} ;
+unsigned int Testeurs::indice__ {} ;
+
+void boucle( int deb, int fin, int inc )
  {
   unsigned int i ;
-  for ( i=0 ; i<ts.nb_testeurs() ; ++i )
+  for ( i=0 ; i<Testeurs::nb_testeurs() ; ++i )
    {
-    Testeur * t = ts.testeur(i) ;
+    Testeur * t = Testeurs::testeur(i) ;
     std::cout<<std::endl ;
     int bits ;
     for ( bits = deb ; bits <= fin ; bits = bits + inc )
@@ -118,7 +130,7 @@ void boucle( int deb, int fin, int inc, const Testeurs & ts )
 
 
 //==============================================
-// Coef
+// calculs
 //==============================================
 
 class Coef
@@ -149,6 +161,7 @@ class Coef
       }
     int multiplie( int arg ) const
      { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+   
     std::string texte() const
      { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
 
@@ -164,7 +177,7 @@ void affiche( Coef const & c )
 
 
 //==============================================
-// Testeurs dedies a Coef
+// tests
 //==============================================
 
 class TesteurCoef : public Testeur
@@ -181,7 +194,7 @@ class TesteurCoef : public Testeur
      {
       Coef c(bits) ;
       c.approxime(valeur) ;
-      erreur(bits,valeur,c.approximation()) ;
+      erreur(bits,valeur,arrondi(c.approximation(),6)) ;
       std::cout<<" (" ;
       affiche(c) ;
       std::cout<<")"<<std::endl ;
@@ -235,13 +248,13 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  Testeurs ts(5) ;
-  ts.acquiere(new TesteurCoef065(1000000)) ;
-  ts.acquiere(new TesteurCoef035(1000000)) ;
-  ts.acquiere(new TesteurSomme(1000000)) ;
-  boucle(4,16,4,ts) ;
+  Testeurs::init(3) ;
+  Testeurs::acquiere(new TesteurCoef065(1000000)) ;
+  Testeurs::acquiere(new TesteurCoef035(1000000)) ;
+  Testeurs::acquiere(new TesteurSomme(1000000)) ;
+  boucle(4,16,4) ;
+  Testeurs::finalise() ;
   std::cout<<std::endl ;
   return 0 ;
  }
-
 

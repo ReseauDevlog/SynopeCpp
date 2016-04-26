@@ -138,7 +138,7 @@ elif subcommand == 'run':
         with open(out_file_name,'w') as out_content:
             runexps = [re.compile('^'+f.replace('%', '.*')+'$') for f in target['run_filters_out']]
             diffexps = [re.compile('^'+f.replace('%', '.*')+'$') for f in target['diff_filters_in']]
-            for line in out_value.rstrip().split('\n'):
+            for line in out_value[:-1].split('\n'):
                 fmatches = [fexp.match(line) for fexp in runexps]
                 if [fmatch for fmatch in fmatches if fmatch]:
                     continue
