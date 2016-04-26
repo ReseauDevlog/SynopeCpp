@@ -1,15 +1,12 @@
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <iomanip>
-#include <random>
-#include <cstdlib>  // for atoi
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 void echec( unsigned int code, std::string commentaire )
  {
@@ -17,6 +14,14 @@ void echec( unsigned int code, std::string commentaire )
   exit(code) ;
  }
 
+// arrondi
+int arrondi( double d )
+ {
+  if (d>0) { return int(d+.5) ; }
+  else { return int(d-.5) ; }
+ }
+
+// multiplie "nombre" par 2 puissance "exposant"
 int fois_puissance_de_deux( int nombre, int exposant )
  {
   while (exposant>0)
@@ -26,14 +31,11 @@ int fois_puissance_de_deux( int nombre, int exposant )
   return nombre ;
  }
 
-int arrondi( double d )
- {
-  if (d>0) { return int(d+.5) ; }
-  else { return int(d-.5) ; }
- }
-
+// entier maximum représentable avec "nombre_bits" bits
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+#include <random>
 
 double * new_rand_coefs( int taille )
  {
@@ -46,6 +48,21 @@ double * new_rand_coefs( int taille )
   for ( i=0 ; i<taille ; i++ )
    { res[i] = dis(gen) ; }
   return res ;
+ }
+
+
+//==============================================
+// framework general de test
+//==============================================
+
+std::ostream * sortie {} ;
+
+void boucle( int deb, int fin, int inc, void (*f)( int, int, char *[] ), int argc, char *argv[] )
+ {
+  int bits ;
+  for ( bits = deb ; bits <= fin ; bits += inc )
+   { f(bits,argc,argv) ; }
+  (*sortie)<<std::endl ;
  }
 
 
@@ -77,8 +94,6 @@ int multiplie( int bits, double c, int e )
 //==============================================
 // tests
 //==============================================
-
-std::ostream * sortie ;
 
 void teste_approxime( int bits, double valeur )
  {
@@ -121,6 +136,8 @@ void teste_035( int bits, int argc, char *argv[] )
 void teste_065_3515_035_4832( int bits, int argc, char *argv[] )
  { teste_somme(bits,0.65,3515,0.35,4832) ; }
 
+#include <cstdlib>  // for atoi
+
 void teste_rand_coefs( int bits, int argc, char *argv[] )
  {
   int taille = atoi(argv[1]) ;
@@ -132,18 +149,12 @@ void teste_rand_coefs( int bits, int argc, char *argv[] )
   delete [] values ;
  }
 
-void boucle( int deb, int fin, int inc, void (*f)( int, int, char *[] ), int argc, char *argv[] )
- {
-  int bits ;
-  for ( bits = deb ; bits <= fin ; bits += inc )
-   { f(bits,argc,argv) ; }
-  (*sortie)<<std::endl ;
- }
-
 
 //==============================================
 // fonction principale
 //==============================================
+
+#include <fstream>
 
 int main( int argc, char *argv[] )
  {
@@ -163,3 +174,4 @@ int main( int argc, char *argv[] )
   
   return 0 ;
  }
+

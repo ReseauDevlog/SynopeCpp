@@ -1,12 +1,12 @@
-#include <iostream>
-#include <string>
-#include <iomanip>
-#include <cstdlib>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 void echec( unsigned int code, std::string commentaire )
  {
@@ -32,6 +32,82 @@ double arrondi( double d, unsigned precision =0 )
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
+
+//==============================================
+// framework general de test
+//==============================================
+
+class Testeur
+ {
+
+  public :
+
+    void init( int resolution )
+     { resolution_ = resolution ; }
+    
+    virtual void execute( int bits )
+     { std::cout << "Mais qu'est-ce que je fais là ?" << std::endl ; }
+
+  protected :
+  
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+    
+  private :
+
+    int resolution_ ;
+ } ;
+
+class Boucle
+ {
+  public :
+    void init( int taille )
+     {
+      taille_ = taille ;
+      indice_ = 0 ;
+      testeurs_ = new Testeur * [taille_] ;
+     }
+    void acquiere( Testeur * pt )
+     {
+      if (indice_==taille_)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = pt ;
+     }
+    void execute( int resolution, int debut, int fin, int inc )
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       {
+        if (testeurs_[i]!=nullptr)
+         {
+          std::cout<<std::endl ;
+          testeurs_[i]->init(resolution) ;
+          for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+           { testeurs_[i]->execute(bits) ; }
+         }
+       }
+     }
+    void finalise()
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
+     }
+    
+  private :
+  
+    int taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+    
+ } ;
+ 
 
 //==============================================
 // calculs
@@ -79,55 +155,13 @@ class Coef
  } ;
 
 
-
-
 //==============================================
 // tests
 //==============================================
 
-class Testeur
- {
-
-  public :
-
-    void init( int resolution )
-     { resolution_ = resolution ; }
-    
-    virtual void execute( int bits )
-     {
-      std::cout << "Mais qu'est-ce que je fais là ?" << std::endl ;
-     }
-
-  protected :
-  
-    void erreur( int bits, double exact, double approx )
-     {
-      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
-      if (erreur<0) { erreur = -erreur ; }
-      std::cout
-        <<std::right<<std::setw(2)<<bits<<" bits : "
-        <<std::left<<exact<<" ~ "<<approx
-        <<" ("<<erreur<<"/"<<resolution_<<")" ;
-     }
-    
-  private :
-
-    int resolution_ ;
- } ;
-
-
 class TesteurCoef : public Testeur
  {
-  public :
-  
-    void execute( int bits )
-     {
-      c_.init(bits) ;
-      teste(0.65) ;
-      teste(0.35) ;
-     }
-
-  private :
+  protected :
   
     void teste( double valeur )
      {
@@ -138,13 +172,24 @@ class TesteurCoef : public Testeur
      }
     
     Coef c_ ;
-
  } ;
  
+class TesteurCoef065 : public TesteurCoef
+ {
+  public :
+    virtual void execute( int bits ) { c_.init(bits) ; teste(0.65) ; }
+ } ;
+
+class TesteurCoef035 : public TesteurCoef
+ {
+  public :
+    virtual void execute( int bits ) { c_.init(bits) ; teste(0.35) ; }
+ } ;
+
 class TesteurSomme : public Testeur
  {
   public :
-    void execute( int bits )
+    virtual void execute( int bits )
      {
       c1_.init(bits) ;
       c2_.init(bits) ;
@@ -170,57 +215,16 @@ class TesteurSomme : public Testeur
 // fonction principale
 //==============================================
 
-class Boucle
- {
-  public :
-    void init( int taille )
-     {
-      taille_ = taille ;
-      indice_ = 0 ;
-      testeurs_ = new Testeur * [taille_] ;
-     }
-    void acquiere( Testeur * pt )
-     {
-      if (indice_==taille_)
-       { echec(10,"trop de testeurs") ; }
-      testeurs_[indice_++] = pt ;
-     }
-    void execute( int resolution, int debut, int fin, int inc )
-     {
-      for ( int i=0; i<indice_ ; i++ )
-       {
-        if (testeurs_[i]!=nullptr)
-         {
-          std::cout<<std::endl ;
-          testeurs_[i]->init(resolution) ;
-          for ( int bits =debut ; bits <= fin ; bits = bits + inc )
-           { testeurs_[i]->execute(bits) ; }
-         }
-       }
-     }
-    void finalise()
-     {
-      for ( int i=0; i<indice_ ; i++ )
-       { delete testeurs_[i] ; }
-      delete [] testeurs_ ;
-     }
-    
-  private :
-  
-    int taille_ ;
-    int indice_ ;
-    Testeur * * testeurs_ ;
-    
- } ;
- 
 int main()
  {
   Boucle boucle ;
   boucle.init(2) ;
-  boucle.acquiere(new TesteurCoef) ;
+  boucle.acquiere(new TesteurCoef065) ;
+  boucle.acquiere(new TesteurCoef035) ;
   boucle.acquiere(new TesteurSomme) ;
   boucle.execute(1000000,4,16,4) ;
   boucle.finalise() ;
   std::cout << std::endl ;
   return 0 ;
  }
+ 

@@ -1,12 +1,12 @@
-#include <iostream>
-#include <string>
-#include <iomanip>
-#include <cstdlib>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 void echec( unsigned int code, std::string commentaire )
  {
@@ -32,6 +32,21 @@ double arrondi( double d, unsigned precision =0 )
 int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
+
+//==============================================
+// framework general de test
+//==============================================
+
+void erreur( int bits, double exact, double approx, int resolution )
+ {
+  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
+  if (erreur<0) { erreur = -erreur ; }
+  std::cout
+    <<std::right<<std::setw(2)<<bits<<" bits : "
+    <<std::left<<exact<<" ~ "<<approx
+    <<" ("<<erreur<<"/"<<resolution<<")" ;
+ }
+ 
 
 //==============================================
 // calculs
@@ -79,23 +94,11 @@ class Coef
  } ;
 
 
-
-
 //==============================================
 // tests
 //==============================================
 
-void erreur( int bits, double exact, double approx, int resolution )
- {
-  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
-  if (erreur<0) { erreur = -erreur ; }
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<approx
-    <<" ("<<erreur<<"/"<<resolution<<")" ;
- }
- 
-class TesteurCoef
+class TesteurCoef065
  {
   public :
   
@@ -103,6 +106,29 @@ class TesteurCoef
      {
       c_.init(bits) ;
       teste(0.65) ;
+     }
+
+  private :
+  
+    void teste( double valeur )
+     {
+      c_.approxime(valeur) ;
+      double approximation = c_.approximation() ;
+      erreur(c_.lit_bits(),valeur,approximation,100) ;
+      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+     }
+    
+    Coef c_ ;
+
+ } ;
+ 
+class TesteurCoef035
+ {
+  public :
+  
+    void execute( int bits )
+     {
+      c_.init(bits) ;
       teste(0.35) ;
      }
 
@@ -154,9 +180,14 @@ int main()
   int bits ;
 
   std::cout<<std::endl ;
-  TesteurCoef tc ;
+  TesteurCoef065 tc065 ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   { tc.execute(bits) ; }
+   { tc065.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  TesteurCoef035 tc035 ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { tc035.execute(bits) ; }
 
   std::cout<<std::endl ;
   TesteurSomme ts ;
@@ -166,5 +197,4 @@ int main()
   std::cout<<std::endl ;
   return 0 ;
  }
- 
  

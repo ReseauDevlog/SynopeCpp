@@ -1,13 +1,12 @@
-
-#include <iostream>
-#include <string>
-#include <iomanip>
-#include <cstdlib>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 void echec( unsigned int code, std::string commentaire )
  {
@@ -115,3 +114,4 @@ int main()
   std::cout<<std::endl ;
   return 0 ;
  }
+

@@ -4,29 +4,90 @@
 Configuration file for the tool oval.
 '''
 
-# compilation targets
+# tableau récapitulatif de toutes les étapes
 
-#targets = [
-#
-#    {"name": "analyze_ex0", "command": "pylint ex0_hello_loops.py"},
-#    {"name": "analyze_ex1", "command": "pylint ex1_read_image.py"},
-#    {"name": "analyze_ex2", "command": "pylint ex2_background.py"},
-#    {"name": "analyze_ex3", "command": "pylint ex3_clusters.py"},
-#    {"name": "analyze_ex4", "command": "pylint ex4_coordinates.py"},
-#    {"name": "analyze_ex5", "command": "pylint ex5_find_stars.py"},
-#
-#]
+tps = [
+    {"name": "tp1_procedural",
+     "etapes": [
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple mcx_main.test_utilitaires"},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.rand mcx_framework.pfonctions mcx_calculs.simple mcx_tests.fonctions mcx_main.pfonctions"}
+         ]},
+    {"name": "tp2_objets",
+     "etapes": [
+         {"name": "etape0", "mcx": "mcx_utilitaires.compacte mcx_calculs.simple mcx_tests.simple mcx_main.simple"},
+         {"name": "etape1", "mcx": "mcx_utilitaires.compacte mcx_framework.erreur mcx_calculs.classe mcx_tests.classes mcx_main.classes"}, 
+         {"name": "etape2", "mcx": "mcx_utilitaires.compacte mcx_framework.virtual mcx_calculs.classe mcx_tests.virtual mcx_main.virtual"},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.const mcx_framework.constructeurs_et_statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.constructeurs_et_statiques"}
+         ]},
+    {"name": "tp3_exceptions",
+     "etapes": [
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etape1", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         ]},
+    {"name": "tp4_generique",
+     "etapes": [
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         ]},
+    {"name": "tp5_biblio",
+     "etapes": [
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etape1", "mcx": "mcx_utilitaires.simple"}, 
+         {"name": "etape2", "mcx": "mcx_utilitaires.simple"}, 
+         {"name": "etape3", "mcx": "mcx_utilitaires.simple"}, 
+         {"name": "etape4", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         ]},
+    {"name": "tp6_parallele",
+     "etapes": [
+         {"name": "etape0", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etape1", "mcx": "mcx_utilitaires.simple"}, 
+         {"name": "etape2", "mcx": "mcx_utilitaires.simple"},
+         {"name": "etapeN", "mcx": "mcx_utilitaires.simple"}
+         ]},
+]
 
 targets = []
 
-tps = [
-    {"name": "tp1_procedural", "etapes": []},
-    {"name": "tp2_objets", "etapes": ["etape1", "etape2"]},
-    {"name": "tp3_exceptions", "etapes": ["etape1"]},
-    {"name": "tp4_generique", "etapes": []},
-    {"name": "tp5_biblio", "etapes": ["etape1", "etape2", "etape3", "etape4"]},
-    {"name": "tp6_parallele", "etapes": ["lambda", "thread"]},
-]
+
+# backup targets
+
+name = "bak_{}_{}"
+command = "cp {0}_{1}.cpp bak_{0}_{1}.cpp"
+
+for session in tps:
+
+    base = session["name"]
+    for etape in session["etapes"]:
+        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
+
+
+# code generation targets
+
+name = "gen_{}_{}"
+command = "./ovalgen.py {}_{}.cpp {}"
+
+for session in tps:
+
+    base = session["name"]
+    for etape in session["etapes"]:
+        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"],etape["mcx"])})
+
+
+# source diff targets
+
+name = "sdiff_{}_{}"
+command = "diff bak_{0}_{1}.cpp {0}_{1}.cpp"
+
+for session in tps:
+
+    base = session["name"]
+    for etape in session["etapes"]:
+        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
+
+
+# compilation targets
 
 name = "make_{}_{}"
 command = "g++ -std=c++11 {0}_{1}.cpp -o {0}_{1}.exe"
@@ -34,29 +95,27 @@ command = "g++ -std=c++11 {0}_{1}.cpp -o {0}_{1}.exe"
 for session in tps:
 
     base = session["name"]
-    targets.append({"name": name.format(base,"depart"), "command": command.format(base,"depart")})
     for etape in session["etapes"]:
-        targets.append({"name": name.format(base,etape), "command": command.format(base,etape)})
-    targets.append({"name": name.format(base,"arrivee"), "command": command.format(base,"arrivee")})
+        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
 
-"""
-# generated targets
 
-import os
-for exercice in exercices:
-    for index, img in enumerate(os.listdir('data')):
-        token = "data{}".format(index)
-        target = "{}.{}".format(exercice,token)
-        command = "./{}.py -b data/{}".\
-            format(exercice,img,exercice,exercice,token)
-        targets.append({"name": target, "command": command})
-"""
+# execution targets
 
-# Filters
+name = "run_{}_{}"
+command = "./{0}_{1}.exe"
+
+for session in tps:
+
+    base = session["name"]
+    for etape in session["etapes"]:
+        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
+
+
+# filters
 
 run_filters_out = []
 diff_filters_in = [
-    {"name": "make", "re": "%", "apply": "make%"},
+    {"name": "all", "re": "%", "apply": "%"},
 ]
 
 """
