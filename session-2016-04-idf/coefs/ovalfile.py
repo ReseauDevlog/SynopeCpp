@@ -24,10 +24,10 @@ tps = [
          ]},
     {"name": "tp2_objets",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.compacte mcx_calculs.simple mcx_tests.simple mcx_main.simple", "args": ""},
-         {"name": "etape1", "mcx": "mcx_utilitaires.compacte mcx_framework.erreur mcx_calculs.classe mcx_tests.classes mcx_main.classes", "args": ""}, 
-         {"name": "etape2", "mcx": "mcx_utilitaires.compacte mcx_framework.virtual mcx_calculs.classe mcx_tests.virtual mcx_main.virtual", "args": ""},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.const mcx_framework.constructeurs_et_statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.constructeurs_et_statiques", "args": ""}
+         {"name": "etape00", "mcx": "mcx_utilitaires.compacte mcx_calculs.simple mcx_tests.simple mcx_main.simple", "args": ""},
+         {"name": "etape08", "mcx": "mcx_utilitaires.compacte mcx_framework.erreur mcx_calculs.classe mcx_tests.classes mcx_main.classes", "args": ""}, 
+         {"name": "etape17", "mcx": "mcx_utilitaires.compacte mcx_framework.virtual mcx_calculs.classe mcx_tests.virtual mcx_main.virtual", "args": ""},
+         {"name": "etape25", "mcx": "mcx_utilitaires.const mcx_framework.constructeurs_et_statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.constructeurs_et_statiques", "args": ""}
          ]},
     {"name": "tp3_exceptions",
      "etapes": [
