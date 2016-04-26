@@ -108,7 +108,7 @@ class Testeurs
     Testeurs()
      : indice__{}
      {
-      static_assert(SIZE>=0,"nombre ngatif de testeurs") ;
+      static_assert(SIZE>=0,"nombre nÃ©gatif de testeurs") ;
       for ( unsigned i=0 ; i<SIZE ; ++i )
        { testeurs__[i] = 0 ; }
      }
