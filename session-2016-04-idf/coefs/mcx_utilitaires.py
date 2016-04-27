@@ -128,3 +128,45 @@ int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
 """
+
+
+exception = """
+//==============================================
+// utilitaires
+//==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
+
+class Echec
+ {
+  public :
+    Echec( unsigned int c, std::string const & comm )
+     : code_(c), commentaire_(comm) {}
+    unsigned int code() const { return code_ ; }
+    std::string const & commentaire() const { return commentaire_ ; }
+  private :
+    unsigned int code_ ;
+	std::string commentaire_ ;
+ } ;
+
+int fois_puissance_de_deux( int nombre, int exposant )
+ {
+  if (exposant>0) { nombre <<= exposant ; }
+  else  { nombre >>= -exposant ; }
+  return nombre ;
+ }
+
+double arrondi( double d, unsigned precision =0 )
+ {
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
+ }
+
+int entier_max( int nombre_bits )
+ { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+"""
