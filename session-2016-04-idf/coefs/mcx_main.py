@@ -283,7 +283,56 @@ int main( int argc, char *argv[] )
 
 """
 
-classes = """
+tcoef = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  TesteurCoef tc ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { tc.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
+   { teste_somme(bits,0.65,3515,0.35,4832) ; }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+
+"""
+
+testeurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  int bits ;
+
+  std::cout<<std::endl ;
+  TesteurCoef tc ;
+  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
+   { tc.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  TesteurSomme ts ;
+  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
+   { ts.execute(bits) ; }
+
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+heritage = """
 //==============================================
 // fonction principale
 //==============================================
@@ -294,16 +343,19 @@ int main()
 
   std::cout<<std::endl ;
   TesteurCoef065 tc065 ;
+  tc065.init(100) ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
    { tc065.execute(bits) ; }
 
   std::cout<<std::endl ;
   TesteurCoef035 tc035 ;
+  tc035.init(100) ;
   for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
    { tc035.execute(bits) ; }
 
   std::cout<<std::endl ;
   TesteurSomme ts ;
+  ts.init(1000) ;
   for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
    { ts.execute(bits) ; }
 
@@ -320,8 +372,135 @@ virtual = """
 
 int main()
  {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  boucle(tc065,1000000,4,16,4) ;
+  boucle(tc035,1000000,4,16,4) ;
+  boucle(ts,1000,1,8,1) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+boucle_foncteur = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
   Boucle boucle ;
-  boucle.init(2) ;
+  boucle.execute(tc065,1000000,4,16,4) ;
+  boucle.execute(tc035,1000000,4,16,4) ;
+  boucle.execute(ts,1000,1,8,1) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+boucle_conteneur = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.copie(0,tc065) ;
+  boucle.copie(1,tc035) ;
+  boucle.copie(2,ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_ptr = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.init() ;
+  boucle.enregistre(0,&tc065) ;
+  boucle.enregistre(1,&tc035) ;
+  boucle.enregistre(2,&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_indice = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.init() ;
+  boucle.enregistre(&tc065) ;
+  boucle.enregistre(&tc035) ;
+  boucle.enregistre(&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_dyn = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.init(3) ;
+  boucle.enregistre(&tc065) ;
+  boucle.enregistre(&tc035) ;
+  boucle.enregistre(&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  boucle.finalise() ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_owner = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Boucle boucle ;
+  boucle.init(3) ;
   boucle.acquiere(new TesteurCoef065) ;
   boucle.acquiere(new TesteurCoef035) ;
   boucle.acquiere(new TesteurSomme) ;
@@ -333,7 +512,63 @@ int main()
  
 """
 
-constructeurs_et_statiques = """
+constructeurs_testeurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Boucle boucle ;
+  boucle.init(3) ;
+  boucle.acquiere(new TesteurCoef065(1000000)) ;
+  boucle.acquiere(new TesteurCoef035(1000000)) ;
+  boucle.acquiere(new TesteurSomme(1000000)) ;
+  boucle.execute(4,16,4) ;
+  boucle.finalise() ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+constructeurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Boucle boucle(3) ;
+  boucle.acquiere(new TesteurCoef065(1000000)) ;
+  boucle.acquiere(new TesteurCoef035(1000000)) ;
+  boucle.acquiere(new TesteurSomme(1000000)) ;
+  boucle.execute(4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_dedie = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Testeurs ts(3) ;
+  ts.acquiere(new TesteurCoef065(1000000)) ;
+  ts.acquiere(new TesteurCoef035(1000000)) ;
+  ts.acquiere(new TesteurSomme(1000000)) ;
+  boucle(4,16,4,ts) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+statiques = """
 //==============================================
 // fonction principale
 //==============================================

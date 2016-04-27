@@ -37,15 +37,58 @@ int entier_max( int nombre_bits )
 // framework general de test
 //==============================================
 
-void erreur( int bits, double exact, double approx, int resolution )
+class Testeur
  {
-  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
-  if (erreur<0) { erreur = -erreur ; }
-  std::cout
-    <<std::right<<std::setw(2)<<bits<<" bits : "
-    <<std::left<<exact<<" ~ "<<approx
-    <<" ("<<erreur<<"/"<<resolution<<")" ;
- }
+
+  public :
+
+    void init( int resolution )
+     { resolution_ = resolution ; }
+    
+    virtual void execute( int bits )
+     { std::cout << "Mais qu'est-ce que je fais là ?" << std::endl ; }
+
+  protected :
+  
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+    
+  private :
+
+    int resolution_ ;
+ } ;
+
+class Boucle
+ {
+  public :
+    void init()
+     {
+      for ( Testeur * & pt : testeurs_ )
+       { pt = nullptr ; }
+     }
+    void enregistre( int indice, Testeur * t )
+     { testeurs_[indice] = t ; }
+    void execute( int resolution, int debut, int fin, int inc )
+     {
+      for ( Testeur * pt : testeurs_ )
+       {
+        if (pt==nullptr) continue ;
+        std::cout<<std::endl ;
+        pt->init(resolution) ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { pt->execute(bits) ; }
+       }
+     }
+  private :
+    Testeur * testeurs_[5] ;
+ } ;
  
 
 //==============================================
@@ -98,23 +141,15 @@ class Coef
 // tests
 //==============================================
 
-class TesteurCoef065
+class TesteurCoef : public Testeur
  {
-  public :
-  
-    void execute( int bits )
-     {
-      c_.init(bits) ;
-      teste(0.65) ;
-     }
-
-  private :
+  protected :
   
     void teste( double valeur )
      {
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
-      erreur(c_.lit_bits(),valeur,approximation,100) ;
+      erreur(c_.lit_bits(),valeur,approximation) ;
       std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
      }
     
@@ -122,31 +157,21 @@ class TesteurCoef065
 
  } ;
  
-class TesteurCoef035
+class TesteurCoef065 : public TesteurCoef
  {
   public :
-  
     void execute( int bits )
-     {
-      c_.init(bits) ;
-      teste(0.35) ;
-     }
-
-  private :
-  
-    void teste( double valeur )
-     {
-      c_.approxime(valeur) ;
-      double approximation = c_.approximation() ;
-      erreur(c_.lit_bits(),valeur,approximation,100) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
-     }
-    
-    Coef c_ ;
-
+     { c_.init(bits) ; teste(0.65) ;  }
  } ;
  
-class TesteurSomme
+class TesteurCoef035 : public TesteurCoef
+ {
+  public :
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.35) ;  }
+ } ;
+ 
+class TesteurSomme : public Testeur
  {
   public :
     void execute( int bits )
@@ -163,7 +188,7 @@ class TesteurSomme
       int exact, approx ;
       exact = arrondi(c1*e1+c2*e2) ;
       approx = c1_.multiplie(e1) + c2_.multiplie(e2) ;
-      erreur(c1_.lit_bits(),exact,approx,1000) ;
+      erreur(c1_.lit_bits(),exact,approx) ;
       std::cout<<std::endl ;
      }
     Coef c1_ ;
@@ -177,24 +202,15 @@ class TesteurSomme
 
 int main()
  {
-  int bits ;
-
-  std::cout<<std::endl ;
   TesteurCoef065 tc065 ;
-  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   { tc065.execute(bits) ; }
-
-  std::cout<<std::endl ;
   TesteurCoef035 tc035 ;
-  for ( bits = 2 ; bits <= 8 ; bits = bits + 2 )
-   { tc035.execute(bits) ; }
-
-  std::cout<<std::endl ;
   TesteurSomme ts ;
-  for ( bits = 1 ; bits <= 8 ; bits = bits + 1 )
-   { ts.execute(bits) ; }
-
-  std::cout<<std::endl ;
+  Boucle boucle ;
+  boucle.enregistre(0,&tc065) ;
+  boucle.enregistre(1,&tc035) ;
+  boucle.enregistre(2,&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
   return 0 ;
  }
  

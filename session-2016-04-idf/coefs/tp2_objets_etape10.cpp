@@ -65,48 +65,13 @@ class Testeur
     int resolution_ ;
  } ;
 
-class Boucle
+void boucle( Testeur & testeur, int resolution, int debut, int fin, int inc )
  {
-  public :
-    void init( int taille )
-     {
-      taille_ = taille ;
-      indice_ = 0 ;
-      testeurs_ = new Testeur * [taille_] ;
-     }
-    void acquiere( Testeur * pt )
-     {
-      if (indice_==taille_)
-       { echec(10,"trop de testeurs") ; }
-      testeurs_[indice_++] = pt ;
-     }
-    void execute( int resolution, int debut, int fin, int inc )
-     {
-      for ( int i=0; i<indice_ ; i++ )
-       {
-        if (testeurs_[i]!=nullptr)
-         {
-          std::cout<<std::endl ;
-          testeurs_[i]->init(resolution) ;
-          for ( int bits =debut ; bits <= fin ; bits = bits + inc )
-           { testeurs_[i]->execute(bits) ; }
-         }
-       }
-     }
-    void finalise()
-     {
-      for ( int i=0; i<indice_ ; i++ )
-       { delete testeurs_[i] ; }
-      delete [] testeurs_ ;
-     }
-    
-  private :
-  
-    int taille_ ;
-    int indice_ ;
-    Testeur * * testeurs_ ;
-    
- } ;
+  std::cout<<std::endl ;
+  testeur.init(resolution) ;
+  for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+   { testeur.execute(bits) ; }
+ }
  
 
 //==============================================
@@ -172,24 +137,27 @@ class TesteurCoef : public Testeur
      }
     
     Coef c_ ;
+
  } ;
  
 class TesteurCoef065 : public TesteurCoef
  {
   public :
-    virtual void execute( int bits ) { c_.init(bits) ; teste(0.65) ; }
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.65) ;  }
  } ;
-
+ 
 class TesteurCoef035 : public TesteurCoef
  {
   public :
-    virtual void execute( int bits ) { c_.init(bits) ; teste(0.35) ; }
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.35) ;  }
  } ;
-
+ 
 class TesteurSomme : public Testeur
  {
   public :
-    virtual void execute( int bits )
+    void execute( int bits )
      {
       c1_.init(bits) ;
       c2_.init(bits) ;
@@ -217,13 +185,12 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  Boucle boucle ;
-  boucle.init(2) ;
-  boucle.acquiere(new TesteurCoef065) ;
-  boucle.acquiere(new TesteurCoef035) ;
-  boucle.acquiere(new TesteurSomme) ;
-  boucle.execute(1000000,4,16,4) ;
-  boucle.finalise() ;
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  boucle(tc065,1000000,4,16,4) ;
+  boucle(tc035,1000000,4,16,4) ;
+  boucle(ts,1000,1,8,1) ;
   std::cout << std::endl ;
   return 0 ;
  }
