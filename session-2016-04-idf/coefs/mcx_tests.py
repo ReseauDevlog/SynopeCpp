@@ -312,7 +312,7 @@ void teste_approxime( int bits, double valeur )
     <<std::right<<std::setw(2)<<bits<<" bits : "
     <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
     <<" ("<<erreur<<"/100)"
-    <<" ("<<coef.texte()<<")"
+    <<" ("<<coef.numerateur()<<"/2^"<<coef.exposant()<<")"
     <<std::endl ;
  }
 
@@ -361,7 +361,7 @@ class TesteurCoef
         <<std::right<<std::setw(2)<<bits<<" bits : "
         <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
         <<" ("<<erreur<<"/100)"
-        <<" ("<<coef.texte()<<")"
+        <<" ("<<coef.numerateur()<<"/2^"<<coef.exposant()<<")"
         <<std::endl ;
      }
     
@@ -413,7 +413,7 @@ class TesteurCoef
         <<std::right<<std::setw(2)<<bits<<" bits : "
         <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
         <<" ("<<erreur<<"/100)"
-        <<" ("<<coef.texte()<<")"
+        <<" ("<<coef.numerateur()<<"/2^"<<coef.exposant()<<")"
         <<std::endl ;
      }
     
@@ -466,7 +466,7 @@ class TesteurCoef
         <<std::right<<std::setw(2)<<c_.lit_bits()<<" bits : "
         <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
         <<" ("<<erreur<<"/100)"
-        <<" ("<<c_.texte()<<")"
+        <<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"
         <<std::endl ;
      }
     
@@ -521,7 +521,7 @@ class TesteurCoef
         <<std::right<<std::setw(2)<<c_.lit_bits()<<" bits : "
         <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
         <<" ("<<erreur<<"/100)"
-        <<" ("<<c_.texte()<<")"
+        <<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"
         <<std::endl ;
      }
     
@@ -582,7 +582,7 @@ class TesteurCoef
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
       erreur(c_.lit_bits(),valeur,approximation,100) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
     
     Coef c_ ;
@@ -629,7 +629,7 @@ class TesteurCoef : public Testeur
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
       erreur(c_.lit_bits(),valeur,approximation) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
     
     Coef c_ ;
@@ -690,7 +690,7 @@ class TesteurCoef : public Testeur
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
       erreur(c_.lit_bits(),valeur,approximation) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
     
     Coef c_ ;
@@ -749,7 +749,7 @@ class TesteurCoef : public Testeur
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
       erreur(c_.lit_bits(),valeur,approximation) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
     
     Coef c_ ;
@@ -816,7 +816,7 @@ class TesteurCoef : public Testeur
      {
       c_.approxime(valeur) ;
       erreur(bits,valeur,arrondi(c_.approximation(),6)) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
 
     Coef c_ ;
@@ -890,7 +890,7 @@ class TesteurCoef : public Testeur
       Coef c(bits) ;
       c.approxime(valeur) ;
       erreur(bits,valeur,arrondi(c.approximation(),6)) ;
-      std::cout<<" ("<<c.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
  } ;
 
@@ -1391,6 +1391,208 @@ class TesteurSomme : public Testeur
       coef1 = c1 ;
       coef2 = c2 ;
       int approx = coef1*e1 + coef2*e2 ;
+      erreur(bits,exact,approx) ;
+      std::cout<<std::endl ;
+     }
+ } ;
+
+"""
+
+gen0 = opexec
+
+coefint = """
+//==============================================
+// tests
+//==============================================
+
+class TesteurCoef : public Testeur
+ {
+  public :
+  
+    TesteurCoef( int resolution )
+     : Testeur(resolution)
+     {}
+
+  protected :
+  
+    void teste( int bits, double valeur )
+     {
+      Coef<int> c(bits) ;
+      c = valeur ;
+      erreur(bits,valeur,arrondi(c,6)) ;
+      std::cout<<" ("<<c<<")"<<std::endl ;
+     }
+ } ;
+
+class TesteurCoef065 : public TesteurCoef
+ {
+  public :
+    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
+    virtual void operator()( int bits ) { teste(bits,0.65) ; }
+ } ;
+
+class TesteurCoef035 : public TesteurCoef
+ {
+  public :
+    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
+    virtual void operator()( int bits ) { teste(bits,0.35) ; }
+ } ;
+
+class TesteurSomme : public Testeur
+ {
+  public :
+
+    TesteurSomme( int resolution )
+     : Testeur(resolution)
+     {}
+
+    virtual void operator()( int bits )
+     { teste(bits,0.65,3515,0.35,4832) ; }
+
+  private :
+  
+    void teste( int bits, double c1, int e1, double c2, int e2 )
+     {
+      int exact = arrondi(c1*e1+c2*e2) ;
+      Coef<int> coef1(bits), coef2(bits) ;
+      coef1 = c1 ;
+      coef2 = c2 ;
+      int approx = coef1*e1 + coef2*e2 ;
+      erreur(bits,exact,approx) ;
+      std::cout<<std::endl ;
+     }
+ } ;
+
+"""
+
+gensomme = """
+//==============================================
+// tests
+//==============================================
+
+class TesteurCoef : public Testeur
+ {
+  public :
+  
+    TesteurCoef( int resolution )
+     : Testeur(resolution)
+     {}
+
+  protected :
+  
+    void teste( int bits, double valeur )
+     {
+      Coef<int> c(bits) ;
+      c = valeur ;
+      erreur(bits,valeur,arrondi(c,6)) ;
+      std::cout<<" ("<<c<<")"<<std::endl ;
+     }
+ } ;
+
+class TesteurCoef065 : public TesteurCoef
+ {
+  public :
+    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
+    virtual void operator()( int bits ) { teste(bits,0.65) ; }
+ } ;
+
+class TesteurCoef035 : public TesteurCoef
+ {
+  public :
+    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
+    virtual void operator()( int bits ) { teste(bits,0.35) ; }
+ } ;
+
+template<typename U>
+class TesteurSomme : public Testeur
+ {
+  public :
+
+    TesteurSomme( int resolution )
+     : Testeur(resolution)
+     {}
+
+    virtual void operator()( int bits )
+     { teste(bits,0.65,3515,0.35,4832) ; }
+
+  private :
+  
+    void teste( int bits, double c1, U e1, double c2, U e2 )
+     {
+      U exact = arrondi(c1*e1+c2*e2) ;
+      Coef<U> coef1(bits), coef2(bits) ;
+      coef1 = c1 ;
+      coef2 = c2 ;
+      U approx = coef1*e1 + coef2*e2 ;
+      erreur(bits,exact,approx) ;
+      std::cout<<std::endl ;
+     }
+ } ;
+
+"""
+
+gencoef = """
+//==============================================
+// tests
+//==============================================
+
+template<typename U>
+class TesteurCoef : public Testeur
+ {
+  public :
+  
+    TesteurCoef( int resolution )
+     : Testeur(resolution)
+     {}
+
+  protected :
+  
+    void teste( int bits, double valeur )
+     {
+      Coef<U> c(bits) ;
+      c = valeur ;
+      erreur(bits,valeur,arrondi(c,6)) ;
+      std::cout<<" ("<<c<<")"<<std::endl ;
+     }
+ } ;
+
+template<typename U>
+class TesteurCoef065 : public TesteurCoef<U>
+ {
+  public :
+    TesteurCoef065( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.65) ; }
+ } ;
+
+template<typename U>
+class TesteurCoef035 : public TesteurCoef<U>
+ {
+  public :
+    TesteurCoef035( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.35) ; }
+ } ;
+
+template<typename U>
+class TesteurSomme : public Testeur
+ {
+  public :
+
+    TesteurSomme( int resolution )
+     : Testeur(resolution)
+     {}
+
+    virtual void operator()( int bits )
+     { teste(bits,0.65,3515,0.35,4832) ; }
+
+  private :
+  
+    void teste( int bits, double c1, U e1, double c2, U e2 )
+     {
+      U exact = arrondi(c1*e1+c2*e2) ;
+      Coef<U> coef1(bits), coef2(bits) ;
+      coef1 = c1 ;
+      coef2 = c2 ;
+      U approx = coef1*e1 + coef2*e2 ;
       erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }

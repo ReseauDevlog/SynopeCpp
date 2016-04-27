@@ -139,6 +139,7 @@ void boucle( int deb, int fin, int inc, const Testeurs & ts )
 // calculs
 //==============================================
 
+template<typename U>
 class Coef
  {
   public :
@@ -165,27 +166,34 @@ class Coef
       if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
        return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
       }
-    int operator*( int arg ) const
+    U operator*( U arg ) const
      { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
    
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    U numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
     int const bits_ ;
-    int numerateur_ ;
+    U numerateur_ ;
     int exposant_ ;
  } ;
 
-std::ostream & operator<<( std::ostream & os, Coef const & c )
- { return (os<<c.texte()) ; }
+
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
+template<>
+std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
+ { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
 
 
 //==============================================
 // tests
 //==============================================
 
+template<typename U>
 class TesteurCoef : public Testeur
  {
   public :
@@ -198,27 +206,30 @@ class TesteurCoef : public Testeur
   
     void teste( int bits, double valeur )
      {
-      Coef c(bits) ;
+      Coef<U> c(bits) ;
       c = valeur ;
       erreur(bits,valeur,arrondi(c,6)) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
      }
  } ;
 
-class TesteurCoef065 : public TesteurCoef
+template<typename U>
+class TesteurCoef065 : public TesteurCoef<U>
  {
   public :
-    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
-    virtual void operator()( int bits ) { teste(bits,0.65) ; }
+    TesteurCoef065( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.65) ; }
  } ;
 
-class TesteurCoef035 : public TesteurCoef
+template<typename U>
+class TesteurCoef035 : public TesteurCoef<U>
  {
   public :
-    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
-    virtual void operator()( int bits ) { teste(bits,0.35) ; }
+    TesteurCoef035( int resolution ) : TesteurCoef<U>(resolution) {}
+    virtual void operator()( int bits ) { this->teste(bits,0.35) ; }
  } ;
 
+template<typename U>
 class TesteurSomme : public Testeur
  {
   public :
@@ -232,13 +243,13 @@ class TesteurSomme : public Testeur
 
   private :
   
-    void teste( int bits, double c1, int e1, double c2, int e2 )
+    void teste( int bits, double c1, U e1, double c2, U e2 )
      {
-      int exact = arrondi(c1*e1+c2*e2) ;
-      Coef coef1(bits), coef2(bits) ;
+      U exact = arrondi(c1*e1+c2*e2) ;
+      Coef<U> coef1(bits), coef2(bits) ;
       coef1 = c1 ;
       coef2 = c2 ;
-      int approx = coef1*e1 + coef2*e2 ;
+      U approx = coef1*e1 + coef2*e2 ;
       erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
@@ -253,11 +264,16 @@ int main()
  {
   try
    {
-    Testeurs ts(5) ;
-    ts.acquiere(new TesteurCoef065(1000000)) ;
-    ts.acquiere(new TesteurCoef035(1000000)) ;
-    ts.acquiere(new TesteurSomme(1000000)) ;
+    Testeurs ts(3) ;
+    ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef035<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
     boucle(4,16,4,ts) ;
+
+    Testeurs ts2(1) ;
+    ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+    boucle(1,8,1,ts2) ;
+    
     std::cout<<std::endl ;
     return 0 ;
    }

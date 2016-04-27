@@ -639,3 +639,185 @@ int main()
  
 """
 
+gen0 = catch
+
+template = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs ts(5) ;
+    ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef035<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+
+shortsomme = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs ts(5) ;
+    ts.acquiere(new TesteurCoef065(1000000)) ;
+    ts.acquiere(new TesteurCoef035(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<unsigned short>(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+
+shortcoef = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs ts(5) ;
+    ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef035<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef065<unsigned short>(1000000)) ;
+    ts.acquiere(new TesteurSomme<unsigned short>(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+
+uchar = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs ts(5) ;
+    ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef035<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef065<unsigned short>(1000000)) ;
+    ts.acquiere(new TesteurSomme<unsigned short>(1000000)) ;
+    boucle(4,16,4,ts) ;
+
+    Testeurs ts2(1) ;
+    ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+    boucle(1,8,1,ts2) ;
+    
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+
+gentesteurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs<5> ts ;
+    ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef035<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef065<unsigned short>(1000000)) ;
+    ts.acquiere(new TesteurSomme<unsigned short>(1000000)) ;
+    boucle(4,16,4,ts) ;
+
+    Testeurs<1> ts2 ;
+    ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+    boucle(1,8,1,ts2) ;
+    
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+
+traits = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs<5> ts ;
+    ts.acquiere(new TesteurCoef065<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef035<int>(1000000)) ;
+    ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef065<short>(1000000)) ;
+    ts.acquiere(new TesteurSomme<short>(1000000)) ;
+    boucle(4,16,4,ts) ;
+
+    Testeurs<1> ts2 ;
+    ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
+    boucle(1,8,1,ts2) ;
+    
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+

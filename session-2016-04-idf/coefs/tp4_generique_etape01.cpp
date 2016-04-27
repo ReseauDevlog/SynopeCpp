@@ -139,6 +139,7 @@ void boucle( int deb, int fin, int inc, const Testeurs & ts )
 // calculs
 //==============================================
 
+template<typename U>
 class Coef
  {
   public :
@@ -174,11 +175,12 @@ class Coef
   private :
   
     int const bits_ ;
-    int numerateur_ ;
+    U numerateur_ ;
     int exposant_ ;
  } ;
 
-std::ostream & operator<<( std::ostream & os, Coef const & c )
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
  { return (os<<c.texte()) ; }
 
 
@@ -198,7 +200,7 @@ class TesteurCoef : public Testeur
   
     void teste( int bits, double valeur )
      {
-      Coef c(bits) ;
+      Coef<int> c(bits) ;
       c = valeur ;
       erreur(bits,valeur,arrondi(c,6)) ;
       std::cout<<" ("<<c<<")"<<std::endl ;
@@ -235,7 +237,7 @@ class TesteurSomme : public Testeur
     void teste( int bits, double c1, int e1, double c2, int e2 )
      {
       int exact = arrondi(c1*e1+c2*e2) ;
-      Coef coef1(bits), coef2(bits) ;
+      Coef<int> coef1(bits), coef2(bits) ;
       coef1 = c1 ;
       coef2 = c2 ;
       int approx = coef1*e1 + coef2*e2 ;
