@@ -154,8 +154,8 @@ class Coef
     int operator*( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -166,7 +166,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur()<<"/2^"<<c.exposant() ; }
 
 
 //==============================================

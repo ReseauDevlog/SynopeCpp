@@ -85,37 +85,37 @@ class Testeurs
      { public : EchecIndiceIncorrect() : Echec(3,"indice de testeur incorrect") {} } ;
     
     Testeurs( int max )
-     : max__{max}, indice__{}, testeurs__{new Testeur * [max__]}
+     : max_{max}, indice_{}, testeurs_{new Testeur * [max]}
      {}
      
     void acquiere( Testeur * t )
      {
-      if (indice__==max__) { throw EchecTropDeTesteurs() ; }
-      testeurs__[indice__] = t ;
-      indice__++ ;
+      if (indice_==max_) { throw EchecTropDeTesteurs() ; }
+      testeurs_[indice_] = t ;
+      indice_++ ;
      }
      
     unsigned int nb_testeurs() const
-     { return indice__ ; }
+     { return indice_ ; }
      
     Testeur * operator[]( unsigned i ) const
      {
-      if (i>=indice__) { throw EchecIndiceIncorrect() ; }
-      return testeurs__[i] ;
+      if (i>=indice_) { throw EchecIndiceIncorrect() ; }
+      return testeurs_[i] ;
      }
      
     ~Testeurs()
      {
-      for ( unsigned i=0 ; i<max__ ; ++i )
-       { delete testeurs__[i] ; }
-      delete [] testeurs__ ;
+      for ( unsigned i=0 ; i<indice_ ; ++i )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
      }
      
   private :
   
-    int max__ ;
-    int indice__ ;
-    Testeur * * testeurs__ ;
+    int max_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
  } ;
     
 void boucle( int deb, int fin, int inc, const Testeurs & ts )
@@ -168,8 +168,8 @@ class Coef
     int operator*( int arg ) const
      { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
    
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -179,7 +179,7 @@ class Coef
  } ;
 
 std::ostream & operator<<( std::ostream & os, Coef const & c )
- { return (os<<c.texte()) ; }
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
 
 //==============================================

@@ -262,10 +262,12 @@ int main()
  {
   try
    {
-    Testeurs<3> ts ;
+    Testeurs<5> ts ;
     ts.acquiere(new TesteurCoef065<int>(1000000)) ;
     ts.acquiere(new TesteurCoef035<int>(1000000)) ;
     ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef065<unsigned short>(1000000)) ;
+    ts.acquiere(new TesteurSomme<unsigned short>(1000000)) ;
     boucle(4,16,4,ts) ;
 
     Testeurs<1> ts2 ;

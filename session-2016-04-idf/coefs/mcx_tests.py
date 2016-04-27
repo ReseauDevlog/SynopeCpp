@@ -890,7 +890,7 @@ class TesteurCoef : public Testeur
       Coef c(bits) ;
       c.approxime(valeur) ;
       erreur(bits,valeur,arrondi(c.approximation(),6)) ;
-      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
+      std::cout<<" ("<<c.numerateur()<<"/2^"<<c.exposant()<<")"<<std::endl ;
      }
  } ;
 

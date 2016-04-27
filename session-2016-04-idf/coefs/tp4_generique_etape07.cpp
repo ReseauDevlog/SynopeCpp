@@ -20,13 +20,6 @@ class Echec
 	std::string commentaire_ ;
  } ;
 
-int fois_puissance_de_deux( int nombre, int exposant )
- {
-  if (exposant>0) { nombre <<= exposant ; }
-  else  { nombre >>= -exposant ; }
-  return nombre ;
- }
-
 double arrondi( double d, unsigned precision =0 )
  {
   double mult {1.} ;
@@ -35,7 +28,10 @@ double arrondi( double d, unsigned precision =0 )
   else { return int(d*mult-.5)/mult ; }
  }
 
-int entier_max( int nombre_bits )
+constexpr int fois_puissance_de_deux( int nombre, int exposant )
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
+
+constexpr int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
 template<typename T>
@@ -276,15 +272,17 @@ int main()
  {
   try
    {
-    Testeurs<3> ts ;
+    Testeurs<5> ts ;
     ts.acquiere(new TesteurCoef065<int>(1000000)) ;
     ts.acquiere(new TesteurCoef035<int>(1000000)) ;
     ts.acquiere(new TesteurSomme<int>(1000000)) ;
+    ts.acquiere(new TesteurCoef065<unsigned short>(1000000)) ;
+    ts.acquiere(new TesteurSomme<unsigned short>(1000000)) ;
     boucle(4,16,4,ts) ;
 
     Testeurs<1> ts2 ;
     ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
-    boucle(1,10,1,ts2) ;
+    boucle(1,8,1,ts2) ;
     
     std::cout<<std::endl ;
     return 0 ;

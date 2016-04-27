@@ -48,7 +48,7 @@ tps = [
          {"name": "etape21", "mcx": "mcx_utilitaires.const mcx_framework.const mcx_calculs.const_bits mcx_tests.constructeurs mcx_main.constructeurs", "args": ""},
          {"name": "etape22", "mcx": "mcx_utilitaires.const mcx_framework.const mcx_calculs.affiche mcx_tests.affiche mcx_main.constructeurs", "args": ""},
          {"name": "etape23", "mcx": "mcx_utilitaires.const mcx_framework.conteneur_dedie mcx_calculs.affiche mcx_tests.affiche mcx_main.conteneur_dedie", "args": ""},
-         {"name": "etape24", "mcx": "mcx_utilitaires.const mcx_framework.statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.statiques", "args": ""}
+         {"name": "etape24", "mcx": "mcx_utilitaires.const mcx_framework.statiques mcx_calculs.affiche mcx_tests.constructeurs mcx_main.statiques", "args": ""}
          ]},
     {"name": "tp3_exceptions",
      "etapes": [

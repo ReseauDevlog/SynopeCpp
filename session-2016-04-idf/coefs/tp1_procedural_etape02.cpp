@@ -47,8 +47,7 @@ void approxime( double valeur )
    {
     int num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
     std::cout
-      << valeur << " ~ " << num << "/2^" << exposant
-      << " (" << double(num)/fois_puissance_de_deux(1,exposant) << ")"
+      << valeur << " ~ " << std::setw(3) << num << "/2^" << exposant
       << std::endl ;
    }
  }

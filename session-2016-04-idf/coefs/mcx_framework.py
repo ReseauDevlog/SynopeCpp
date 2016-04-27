@@ -810,6 +810,8 @@ void boucle( int debut, int fin, int inc, Testeurs & ts )
  
 """
 
+opexec = HEADER + testeur_opexec + testeurs_opbrackets + boucle_opexec
+
 gen0 = HEADER + """
 class Testeur
  {
