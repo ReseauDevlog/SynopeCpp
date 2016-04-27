@@ -45,6 +45,7 @@ class Coef
     void approxime( int bits, double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits)+0.5)/2 ;
       while (valeur<min)
        {
@@ -61,8 +62,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte()
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() { return numerateur_ ; }
+    int exposant() { return exposant_ ; }
 
   private :
   
@@ -78,17 +79,16 @@ class Coef
 
 void teste_approxime( int bits, double valeur )
  {
-  int erreur ;
   Coef coef ;
   coef.approxime(bits,valeur) ;
   double approximation = coef.approximation() ;
-  erreur = arrondi(100*(valeur-approximation)/valeur) ;
+  int erreur = arrondi(100*(valeur-approximation)/valeur) ;
   if (erreur<0) { erreur = -erreur ; }
   std::cout
     <<std::right<<std::setw(2)<<bits<<" bits : "
     <<std::left<<valeur<<" ~ "<<std::setw(8)<<arrondi(approximation,6)
     <<" ("<<erreur<<"/100)"
-    <<" ("<<coef.texte()<<")"
+    <<" ("<<coef.numerateur()<<"/2^"<<coef.exposant()<<")"
     <<std::endl ;
  }
 

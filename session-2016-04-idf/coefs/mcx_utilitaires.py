@@ -170,3 +170,93 @@ int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
 """
+
+gen0 = exception
+
+constexpr = """
+//==============================================
+// utilitaires
+//==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
+
+class Echec
+ {
+  public :
+    Echec( unsigned int c, std::string const & comm )
+     : code_(c), commentaire_(comm) {}
+    unsigned int code() const { return code_ ; }
+    std::string const & commentaire() const { return commentaire_ ; }
+  private :
+    unsigned int code_ ;
+	std::string commentaire_ ;
+ } ;
+
+double arrondi( double d, unsigned precision =0 )
+ {
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
+ }
+
+constexpr int fois_puissance_de_deux( int nombre, int exposant )
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
+
+constexpr int entier_max( int nombre_bits )
+ { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+template<typename T>
+constexpr int nombre_bits()
+ { return sizeof(T)*8 ; }
+
+"""
+
+traits = """
+//==============================================
+// utilitaires
+//==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
+
+class Echec
+ {
+  public :
+    Echec( unsigned int c, std::string const & comm )
+     : code_(c), commentaire_(comm) {}
+    unsigned int code() const { return code_ ; }
+    std::string const & commentaire() const { return commentaire_ ; }
+  private :
+    unsigned int code_ ;
+	std::string commentaire_ ;
+ } ;
+
+double arrondi( double d, unsigned precision =0 )
+ {
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
+ }
+
+constexpr int fois_puissance_de_deux( int nombre, int exposant )
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
+
+constexpr int entier_max( int nombre_bits )
+ { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+template<typename T> constexpr bool avec_signe() { return true ; }
+template<> constexpr bool avec_signe<unsigned int>() { return false ; }
+template<> constexpr bool avec_signe<unsigned short>() { return false ; }
+template<> constexpr bool avec_signe<unsigned char>() { return false ; }
+
+template<typename T>
+constexpr int nombre_bits_hors_signe()
+ { return avec_signe<T>()?(sizeof(T)*8-1):(sizeof(T)*8) ; }
+
+"""
+

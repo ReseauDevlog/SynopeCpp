@@ -46,6 +46,7 @@ class Testeur
   protected :
     void erreur( int bits, double exact, double approx )
      {
+      if (exact==0) { echec(1,"division par 0") ; }
       int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
@@ -71,7 +72,7 @@ class Testeurs
      
     static void acquiere( Testeur * t )
      {
-      if (indice__==max__) { echec(1,"trop de testeurs") ; }
+      if (indice__==max__) { echec(2,"trop de testeurs") ; }
       testeurs__[indice__] = t ;
       indice__++ ;
      }
@@ -81,7 +82,7 @@ class Testeurs
      
     static Testeur * testeur( unsigned int i )
      {
-      if (i>=indice__) { echec(1,"indice de testeur incorrect") ; }
+      if (i>=indice__) { echec(3,"indice de testeur incorrect") ; }
       return testeurs__[i] ;
      }
      
@@ -126,43 +127,47 @@ class Coef
  {
   public :
   
-    Coef( unsigned int bits )
+    Coef( int bits )
      : bits_(bits), numerateur_{}, exposant_{}
      {}
-    unsigned int lit_bits() const
+
+    int lit_bits()
      { return bits_ ; }
+    
+    // transformation d'un double en Coef
     void approxime( double valeur )
-      {
-       numerateur_ = exposant_ = 0 ;
-       if (valeur==0) { return ; }
-       double min = (entier_max(bits_)+0.5)/2 ;
-       while (valeur<min)
-        {
-         exposant_ = exposant_ + 1 ;
-     	valeur = valeur * 2 ;
-        }
-       numerateur_ = arrondi(valeur) ;
-      }
-    double approximation() const
-      {
-       if (exposant_<0) { echec(5,"exposant negatif") ; }
-       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
-      }
-    int multiplie( int arg ) const
-     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
-   
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     { return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ; }
+    
+    int multiplie( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
-    unsigned int const bits_ ;
+    int const bits_ ;
     int numerateur_ ;
     int exposant_ ;
+    
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur()<<"/2^"<<c.exposant() ; }
 
 
 //==============================================
@@ -184,7 +189,7 @@ class TesteurCoef : public Testeur
       Coef c(bits) ;
       c.approxime(valeur) ;
       erreur(bits,valeur,arrondi(c.approximation(),6)) ;
-      std::cout<<" ("<<c.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c.numerateur()<<"/2^"<<c.exposant()<<")"<<std::endl ;
      }
  } ;
 

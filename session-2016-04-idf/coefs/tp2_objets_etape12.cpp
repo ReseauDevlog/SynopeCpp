@@ -47,11 +47,12 @@ class Testeur
     
     virtual void execute( int bits )
      { std::cout << "Mais qu'est-ce que je fais la ?" << std::endl ; }
-
+     
   protected :
   
     void erreur( int bits, double exact, double approx )
      {
+      if (exact==0) { echec(1,"division par 0") ; }
       int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
@@ -103,6 +104,7 @@ class Coef
     void approxime( double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits_)+0.5)/2 ;
       while (valeur<min)
        {
@@ -119,8 +121,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte()
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() { return numerateur_ ; }
+    int exposant() { return exposant_ ; }
 
   private :
   
@@ -144,7 +146,7 @@ class TesteurCoef : public Testeur
       c_.approxime(valeur) ;
       double approximation = c_.approximation() ;
       erreur(c_.lit_bits(),valeur,approximation) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      std::cout<<" ("<<c_.numerateur()<<"/2^"<<c_.exposant()<<")"<<std::endl ;
      }
     
     Coef c_ ;

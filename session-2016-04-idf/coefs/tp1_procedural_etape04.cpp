@@ -37,19 +37,39 @@ int entier_max( int nombre_bits )
 
 
 //==============================================
+// calculs
+//==============================================
+
+void approxime( int max, double valeur )
+ {
+  int exposant {}, num ;
+  do
+   {
+    exposant = exposant + 1 ;
+    num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+   } while (num<=max) ;
+  exposant = exposant - 1 ;
+  num = arrondi(valeur*fois_puissance_de_deux(1,exposant))  ;
+  std::cout
+    << valeur << " ~ " << std::setw(3) << num << "/2^" << exposant
+    << " = " << double(num)/fois_puissance_de_deux(1,exposant)
+    << std::endl ;
+ }
+
+
+//==============================================
 // fonction principale
 //==============================================
 
 int main()
  {
-  std::cout<<std::endl ;
-  int exposant ;
-  for ( exposant = 1 ; exposant <= 8 ; exposant = exposant + 1 )
-   {
-    int num = arrondi(0.65*fois_puissance_de_deux(1,exposant))  ;
-    std::cout << "0.65 ~ " << std::setw(3) << num << "/2^" << exposant << std::endl ;
-   }
-  std::cout<<std::endl ;
+  std::cout << std::endl ;
+  approxime(15,0.65) ;
+  approxime(255,0.65) ;
+  std::cout << std::endl ;
+  approxime(15,0.35) ;
+  approxime(255,0.35) ;
+  std::cout << std::endl ;
   return 0 ;
  }
 

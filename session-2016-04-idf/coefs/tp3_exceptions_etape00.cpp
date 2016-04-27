@@ -122,6 +122,7 @@ class Coef
     void approxime( double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits_)+0.5)/2 ;
       while (valeur<min)
        {
@@ -138,8 +139,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -150,7 +151,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur()<<"/2^"<<c.exposant() ; }
 
 
 //==============================================

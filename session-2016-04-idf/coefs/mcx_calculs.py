@@ -233,8 +233,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte()
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() { return numerateur_ ; }
+    int exposant() { return exposant_ ; }
 
   private :
   
@@ -281,8 +281,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte()
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() { return numerateur_ ; }
+    int exposant() { return exposant_ ; }
 
   private :
   
@@ -331,8 +331,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte()
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() { return numerateur_ ; }
+    int exposant() { return exposant_ ; }
 
   private :
   
@@ -381,8 +381,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte()
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() { return numerateur_ ; }
+    int exposant() { return exposant_ ; }
 
   private :
   
@@ -431,8 +431,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -443,7 +443,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur()<<"/2^"<<c.exposant() ; }
 
 """
 
@@ -487,8 +487,8 @@ class Coef
     int multiplie( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -499,7 +499,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur()<<"/2^"<<c.exposant() ; }
 
 """
 
@@ -543,8 +543,8 @@ class Coef
     int operator*( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -555,7 +555,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur()<<"/2^"<<c.exposant() ; }
 
 """
 
@@ -599,8 +599,8 @@ class Coef
     int operator*( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -611,7 +611,7 @@ class Coef
  } ;
 
 void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+ { std::cout << c.numerateur() << "/2^" << c.exposant() ; }
 
 """
 
@@ -655,8 +655,8 @@ class Coef
     int operator*( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -667,7 +667,7 @@ class Coef
  } ;
 
 std::ostream & operator<<( std::ostream & os, Coef const & c )
- { return (os<<c.texte()) ; }
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
 """
 
@@ -711,8 +711,8 @@ class Coef
     int operator*( int e )
      { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
     
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
@@ -723,33 +723,11 @@ class Coef
  } ;
 
 std::ostream & operator<<( std::ostream & os, Coef const & c )
- { return (os<<c.texte()) ; }
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
 """
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-old_const = """
+gen0 = """
 //==============================================
 // calculs
 //==============================================
@@ -758,12 +736,12 @@ class Coef
  {
   public :
   
-    Coef( unsigned int bits )
+    Coef( int bits )
      : bits_(bits), numerateur_{}, exposant_{}
      {}
-    unsigned int lit_bits() const
+    int lit_bits() const
      { return bits_ ; }
-    void approxime( double valeur )
+    void operator=( double valeur )
       {
        numerateur_ = exposant_ = 0 ;
        if (valeur==0) { return ; }
@@ -775,25 +753,277 @@ class Coef
         }
        numerateur_ = arrondi(valeur) ;
       }
-    double approximation() const
+    operator double() const
       {
-       if (exposant_<0) { echec(5,"exposant negatif") ; }
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
        return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
       }
-    int multiplie( int arg ) const
+    int operator*( int arg ) const
      { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
    
-    std::string texte() const
-     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+    int numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
 
   private :
   
-    unsigned int const bits_ ;
+    int const bits_ ;
     int numerateur_ ;
     int exposant_ ;
  } ;
 
-void affiche( Coef const & c )
- { std::cout << c.texte() ; }
+std::ostream & operator<<( std::ostream & os, Coef const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
 
 """
+
+gennum = """
+//==============================================
+// calculs
+//==============================================
+
+template<typename U>
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+    int lit_bits() const
+     { return bits_ ; }
+    void operator=( double valeur )
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        {
+         exposant_ = exposant_ + 1 ;
+     	valeur = valeur * 2 ;
+        }
+       numerateur_ = arrondi(valeur) ;
+      }
+    operator double() const
+      {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+      }
+    int operator*( int arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+   
+    U numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
+
+  private :
+  
+    int const bits_ ;
+    U numerateur_ ;
+    int exposant_ ;
+ } ;
+
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
+"""
+
+coef_genmult = """
+//==============================================
+// calculs
+//==============================================
+
+template<typename U>
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+    int lit_bits() const
+     { return bits_ ; }
+    void operator=( double valeur )
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        {
+         exposant_ = exposant_ + 1 ;
+     	valeur = valeur * 2 ;
+        }
+       numerateur_ = arrondi(valeur) ;
+      }
+    operator double() const
+      {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+      }
+    U operator*( U arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+   
+    U numerateur() const { return numerateur_ ; }
+    int exposant() const { return exposant_ ; }
+
+  private :
+  
+    int const bits_ ;
+    U numerateur_ ;
+    int exposant_ ;
+ } ;
+
+"""
+
+genmult = coef_genmult + """
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
+"""
+
+template = genmult
+
+uchar = coef_genmult + """
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
+template<>
+std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
+ { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
+
+"""
+
+constexpr = """
+//==============================================
+// calculs
+//==============================================
+
+template<typename U>
+class Coef
+ {
+  public :
+  
+    class EchecTropDeBits : public Echec
+     { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
+     
+    explicit Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     { if (bits_>max_bits__) throw EchecTropDeBits() ; }
+     
+    int lit_bits() const
+     { return bits_ ; }
+     
+    void operator=( double valeur )
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        {
+         exposant_ = exposant_ + 1 ;
+     	valeur = valeur * 2 ;
+        }
+       numerateur_ = arrondi(valeur) ;
+      }
+      
+    operator double() const
+      {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+      }
+      
+    U operator*( U arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+   
+    U numerateur() const { return numerateur_ ; }
+    
+    int exposant() const { return exposant_ ; }
+
+  private :
+  
+    int const bits_ ;
+    U numerateur_ ;
+    int exposant_ ;
+    
+    static constexpr int max_bits__
+     = nombre_bits<U>() ;
+ } ;
+
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
+template<>
+std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
+ { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
+
+"""
+
+traits = """
+//==============================================
+// calculs
+//==============================================
+
+template<typename U>
+class Coef
+ {
+  public :
+  
+    class EchecTropDeBits : public Echec
+     { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
+     
+    explicit Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     { if (bits_>max_bits__) throw EchecTropDeBits() ; }
+     
+    int lit_bits() const
+     { return bits_ ; }
+     
+    void operator=( double valeur )
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        {
+         exposant_ = exposant_ + 1 ;
+     	valeur = valeur * 2 ;
+        }
+       numerateur_ = arrondi(valeur) ;
+      }
+      
+    operator double() const
+      {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
+      }
+      
+    U operator*( U arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+   
+    U numerateur() const { return numerateur_ ; }
+    
+    int exposant() const { return exposant_ ; }
+
+  private :
+  
+    int const bits_ ;
+    U numerateur_ ;
+    int exposant_ ;
+    
+    static constexpr int max_bits__
+     = nombre_bits_hors_signe<U>() ;
+ } ;
+
+template<typename U>
+std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
+ { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
+
+template<>
+std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
+ { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
+
+"""
+
+

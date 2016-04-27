@@ -812,3 +812,191 @@ void boucle( int debut, int fin, int inc, Testeurs & ts )
 
 opexec = HEADER + testeur_opexec + testeurs_opbrackets + boucle_opexec
 
+gen0 = HEADER + """
+class Testeur
+ {
+ 
+  public :
+  
+    class EchecDivisionParZero : public Echec
+     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
+  
+    Testeur( int resolution ) : resolution_(resolution) {}
+    virtual void operator()( int bits ) =0 ;
+    virtual ~Testeur() = default ;
+    
+  protected :
+  
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { throw EchecDivisionParZero() ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+
+  private :
+  
+    int const resolution_ ;
+
+ } ;
+
+class Testeurs
+ {
+  public :
+  
+    class EchecTropDeTesteurs : public Echec
+     { public : EchecTropDeTesteurs() : Echec(2,"trop de testeurs") {} } ;
+    
+    class EchecIndiceIncorrect : public Echec
+     { public : EchecIndiceIncorrect() : Echec(3,"indice de testeur incorrect") {} } ;
+    
+    Testeurs( int max )
+     : max_{max}, indice_{}, testeurs_{new Testeur * [max]}
+     {}
+     
+    void acquiere( Testeur * t )
+     {
+      if (indice_==max_) { throw EchecTropDeTesteurs() ; }
+      testeurs_[indice_] = t ;
+      indice_++ ;
+     }
+     
+    unsigned int nb_testeurs() const
+     { return indice_ ; }
+     
+    Testeur * operator[]( unsigned i ) const
+     {
+      if (i>=indice_) { throw EchecIndiceIncorrect() ; }
+      return testeurs_[i] ;
+     }
+     
+    ~Testeurs()
+     {
+      for ( unsigned i=0 ; i<indice_ ; ++i )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
+     }
+     
+  private :
+  
+    int max_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+ } ;
+    
+void boucle( int deb, int fin, int inc, const Testeurs & ts )
+ {
+  for ( int i=0 ; i<ts.nb_testeurs() ; ++i )
+   {
+    try
+     {
+      Testeur & t = *ts[i] ;
+      std::cout<<std::endl ;
+      for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+       { t(bits) ; }
+     }
+    catch ( Echec const & e )
+     { std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ; }
+   }
+ }
+
+"""
+
+template = HEADER + """
+class Testeur
+ {
+ 
+  public :
+  
+    class EchecDivisionParZero : public Echec
+     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
+  
+    Testeur( int resolution ) : resolution_(resolution) {}
+    virtual void operator()( int bits ) =0 ;
+    virtual ~Testeur() = default ;
+    
+  protected :
+  
+    void erreur( int bits, double exact, double approx )
+     {
+      if (exact==0) { throw EchecDivisionParZero() ; }
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     }
+
+  private :
+  
+    int const resolution_ ;
+
+ } ;
+
+template<int SIZE>
+class Testeurs
+ {
+  public :
+  
+    class EchecTropDeTesteurs : public Echec
+     { public : EchecTropDeTesteurs() : Echec(2,"trop de testeurs") {} } ;
+    
+    class EchecIndiceIncorrect : public Echec
+     { public : EchecIndiceIncorrect() : Echec(3,"indice de testeur incorrect") {} } ;
+    
+    Testeurs() : indice_{} { static_assert(SIZE>=0,"nombre négatif de testeurs") ; }
+     
+    void acquiere( Testeur * t )
+     {
+      if (indice_==SIZE) { throw EchecTropDeTesteurs() ; }
+      testeurs_[indice_] = t ;
+      indice_++ ;
+     }
+     
+    unsigned int nb_testeurs() const
+     { return indice_ ; }
+     
+    Testeur * operator[]( unsigned i ) const
+     {
+      if (i>=indice_) { throw EchecIndiceIncorrect() ; }
+      return testeurs_[i] ;
+     }
+     
+    ~Testeurs()
+     {
+      for ( unsigned i=0 ; i<indice_ ; ++i )
+       { delete testeurs_[i] ; }
+     }
+     
+  private :
+  
+    int indice_ ;
+    Testeur * testeurs_[SIZE] ;
+ } ;
+    
+template<int SIZE>
+void boucle( int deb, int fin, int inc, const Testeurs<SIZE> & ts )
+ {
+  for ( int i=0 ; i<ts.nb_testeurs() ; ++i )
+   {
+    try
+     {
+      Testeur & t = *ts[i] ;
+      std::cout<<std::endl ;
+      for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+       { t(bits) ; }
+     }
+    catch ( Echec const & e )
+     { std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ; }
+   }
+ }
+
+"""
+
+
+
