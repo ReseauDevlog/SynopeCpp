@@ -72,11 +72,12 @@ class Boucle
        { echec(10,"trop de testeurs") ; }
       testeurs_[indice_++] = pt ;
      }
-    void execute( int debut, int fin, int inc )
+    void execute( int resolution, int debut, int fin, int inc )
      {
       for ( int i=0; i<indice_ ; i++ )
        {
         std::cout<<std::endl ;
+        testeurs_[i]->init(resolution) ;
         for ( int bits =debut ; bits <= fin ; bits = bits + inc )
          { testeurs_[i]->execute(bits) ; }
        }
@@ -165,22 +166,18 @@ class TesteurCoef : public Testeur
 class TesteurCoef065 : public TesteurCoef
  {
   public :
-    TesteurCoef065( int resolution ) { init(resolution) ; }
     virtual void execute( int bits ) { c_.init(bits) ; teste(0.65) ; }
  } ;
 
 class TesteurCoef035 : public TesteurCoef
  {
   public :
-    TesteurCoef035( int resolution ) { init(resolution) ; }
     virtual void execute( int bits ) { c_.init(bits) ; teste(0.35) ; }
  } ;
 
 class TesteurSomme : public Testeur
  {
   public :
-    TesteurSomme( int resolution )
-     { init(resolution) ; }
     virtual void execute( int bits )
      {
       c1_.init(bits) ;
@@ -211,10 +208,10 @@ int main()
  {
   Boucle boucle ;
   boucle.init(3) ;
-  boucle.acquiere(new TesteurCoef065(1000000)) ;
-  boucle.acquiere(new TesteurCoef035(1000000)) ;
-  boucle.acquiere(new TesteurSomme(1000000)) ;
-  boucle.execute(4,16,4) ;
+  boucle.acquiere(new TesteurCoef065) ;
+  boucle.acquiere(new TesteurCoef035) ;
+  boucle.acquiere(new TesteurSomme) ;
+  boucle.execute(1000000,4,16,4) ;
   boucle.finalise() ;
   std::cout << std::endl ;
   return 0 ;

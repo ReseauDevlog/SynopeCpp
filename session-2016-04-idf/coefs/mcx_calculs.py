@@ -292,6 +292,156 @@ class Coef
 
 """
 
+constructeur = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void approxime( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     { return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ; }
+    
+    int multiplie( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte()
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+"""
+
+const_bits = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void approxime( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     { return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ; }
+    
+    int multiplie( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte()
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+"""
+
+affiche = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void approxime( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     { return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ; }
+    
+    int multiplie( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+void affiche( Coef const & c )
+ { std::cout << c.texte() ; }
+
+"""
+
 const = """
 //==============================================
 // calculs

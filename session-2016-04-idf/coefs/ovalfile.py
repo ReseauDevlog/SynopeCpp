@@ -35,8 +35,20 @@ tps = [
          {"name": "etape08", "mcx": "mcx_utilitaires.compacte mcx_framework.erreur mcx_calculs.coef_bits mcx_tests.erreur mcx_main.testeurs", "args": ""}, 
          {"name": "etape09", "mcx": "mcx_utilitaires.compacte mcx_framework.testeur mcx_calculs.coef_bits mcx_tests.heritage mcx_main.heritage", "args": ""}, 
          {"name": "etape10", "mcx": "mcx_utilitaires.compacte mcx_framework.virtual mcx_calculs.coef_bits mcx_tests.heritage mcx_main.virtual", "args": ""}, 
-         {"name": "etape17", "mcx": "mcx_utilitaires.compacte mcx_framework.classe_boucle mcx_calculs.coef_bits mcx_tests.virtual mcx_main.classe_boucle", "args": ""},
-         {"name": "etape25", "mcx": "mcx_utilitaires.const mcx_framework.constructeurs_et_statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.constructeurs_et_statiques", "args": ""}
+         {"name": "etape11", "mcx": "mcx_utilitaires.compacte mcx_framework.boucle_foncteur mcx_calculs.coef_bits mcx_tests.heritage mcx_main.boucle_foncteur", "args": ""}, 
+         {"name": "etape12", "mcx": "mcx_utilitaires.compacte mcx_framework.boucle_conteneur mcx_calculs.coef_bits mcx_tests.heritage mcx_main.boucle_conteneur", "args": ""}, 
+         {"name": "etape13", "mcx": "mcx_utilitaires.compacte mcx_framework.conteneur_ptr mcx_calculs.coef_bits mcx_tests.heritage mcx_main.conteneur_ptr", "args": ""}, 
+         {"name": "etape14", "mcx": "mcx_utilitaires.compacte mcx_framework.conteneur_indice mcx_calculs.coef_bits mcx_tests.heritage mcx_main.conteneur_indice", "args": ""}, 
+         {"name": "etape15", "mcx": "mcx_utilitaires.compacte mcx_framework.conteneur_dyn mcx_calculs.coef_bits mcx_tests.heritage mcx_main.conteneur_dyn", "args": ""}, 
+         {"name": "etape16", "mcx": "mcx_utilitaires.compacte mcx_framework.conteneur_owner mcx_calculs.coef_bits mcx_tests.virtual mcx_main.conteneur_owner", "args": ""},
+         {"name": "etape17", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs_testeurs_derives mcx_calculs.coef_bits mcx_tests.constructeurs_derives mcx_main.constructeurs_testeurs", "args": ""},
+         {"name": "etape18", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs_testeurs mcx_calculs.coef_bits mcx_tests.constructeurs_testeurs mcx_main.constructeurs_testeurs", "args": ""},
+         {"name": "etape19", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs_testeurs mcx_calculs.constructeur mcx_tests.constructeurs mcx_main.constructeurs_testeurs", "args": ""},
+         {"name": "etape20", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs mcx_calculs.constructeur mcx_tests.constructeurs mcx_main.constructeurs", "args": ""},
+         {"name": "etape21", "mcx": "mcx_utilitaires.compacte mcx_framework.const mcx_calculs.const_bits mcx_tests.constructeurs mcx_main.constructeurs", "args": ""},
+         {"name": "etape22", "mcx": "mcx_utilitaires.compacte mcx_framework.const mcx_calculs.affiche mcx_tests.affiche mcx_main.constructeurs", "args": ""},
+         {"name": "etape23", "mcx": "mcx_utilitaires.compacte mcx_framework.conteneur_dedie mcx_calculs.affiche mcx_tests.affiche mcx_main.conteneur_dedie", "args": ""},
+         {"name": "etape24", "mcx": "mcx_utilitaires.const mcx_framework.statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.statiques", "args": ""}
          ]},
     {"name": "tp3_exceptions",
      "etapes": [

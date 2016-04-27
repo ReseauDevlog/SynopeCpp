@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-pfonctions = """
+HEADER = """
 //==============================================
 // framework general de test
 //==============================================
+"""
 
+pfonctions = HEADER + """
 void boucle( int deb, int fin, int inc, void (*f)( int ) )
  {
   int bits ;
@@ -15,11 +17,7 @@ void boucle( int deb, int fin, int inc, void (*f)( int ) )
 
 """
 
-pfonctions_ostream = """
-//==============================================
-// framework general de test
-//==============================================
-
+pfonctions_ostream = HEADER + """
 std::ostream * sortie {} ;
 
 void boucle( int deb, int fin, int inc, void (*f)( int ) )
@@ -32,11 +30,7 @@ void boucle( int deb, int fin, int inc, void (*f)( int ) )
 
 """
 
-erreur = """
-//==============================================
-// framework general de test
-//==============================================
-
+erreur = HEADER + """
 void erreur( int bits, double exact, double approx, int resolution )
  {
   int erreur = arrondi(resolution*double(exact-approx)/exact) ;
@@ -49,11 +43,7 @@ void erreur( int bits, double exact, double approx, int resolution )
  
 """
 
-testeur = """
-//==============================================
-// framework general de test
-//==============================================
-
+testeur = HEADER + """
 class Testeur
  {
 
@@ -81,11 +71,7 @@ class Testeur
 
 """
 
-virtual = """
-//==============================================
-// framework general de test
-//==============================================
-
+testeur_virtuel_incorrect = """
 class Testeur
  {
 
@@ -95,8 +81,8 @@ class Testeur
      { resolution_ = resolution ; }
     
     virtual void execute( int bits )
-     { std::cout << "Mais qu'est-ce que je fais là ?" << std::endl ; }
-
+     { std::cout << "Mais qu'est-ce que je fais la ?" << std::endl ; }
+     
   protected :
   
     void erreur( int bits, double exact, double approx )
@@ -113,7 +99,9 @@ class Testeur
 
     int resolution_ ;
  } ;
+"""
 
+virtual = HEADER + testeur_virtuel_incorrect + """
 void boucle( Testeur & testeur, int resolution, int debut, int fin, int inc )
  {
   std::cout<<std::endl ;
@@ -124,24 +112,50 @@ void boucle( Testeur & testeur, int resolution, int debut, int fin, int inc )
  
 """
 
-classe_boucle = """
-//==============================================
-// framework general de test
-//==============================================
+boucle_foncteur = HEADER + testeur_virtuel_incorrect + """
+class Boucle
+ {
+  public :
+    void execute( Testeur & t, int resolution, int debut, int fin, int inc )
+     {
+      std::cout<<std::endl ;
+      t.init(resolution) ;
+      for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+       { t.execute(bits) ; }
+     }
+ } ;
+ 
+"""
 
+boucle_conteneur = HEADER + testeur_virtuel_incorrect + """
+class Boucle
+ {
+  public :
+    void copie( int indice, Testeur t )
+     { testeurs_[indice] = t ; }
+    void execute( int resolution, int debut, int fin, int inc )
+     {
+      for ( Testeur t : testeurs_ )
+       {
+        std::cout<<std::endl ;
+        t.init(resolution) ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { t.execute(bits) ; }
+       }
+     }
+  private :
+    Testeur testeurs_[5] ;
+ } ;
+ 
+"""
+
+testeur_abstrait_incorrect = """
 class Testeur
  {
-
   public :
-
-    void init( int resolution )
-     { resolution_ = resolution ; }
-    
-    virtual void execute( int bits )
-     { std::cout << "Mais qu'est-ce que je fais là ?" << std::endl ; }
-
+    void init( int resolution ) { resolution_ = resolution ; }
+    virtual void execute( int bits ) = 0 ;
   protected :
-  
     void erreur( int bits, double exact, double approx )
      {
       int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
@@ -150,13 +164,128 @@ class Testeur
         <<std::right<<std::setw(2)<<bits<<" bits : "
         <<std::left<<exact<<" ~ "<<approx
         <<" ("<<erreur<<"/"<<resolution_<<")" ;
-     }
-    
+     } 
   private :
-
     int resolution_ ;
  } ;
+"""
 
+conteneur_ptr = HEADER + testeur_abstrait_incorrect + """
+class Boucle
+ {
+  public :
+    void init()
+     {
+      for ( Testeur * & pt : testeurs_ )
+       { pt = nullptr ; }
+     }
+    void enregistre( int indice, Testeur * t )
+     { testeurs_[indice] = t ; }
+    void execute( int resolution, int debut, int fin, int inc )
+     {
+      for ( Testeur * pt : testeurs_ )
+       {
+        if (pt==nullptr) continue ;
+        std::cout<<std::endl ;
+        pt->init(resolution) ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { pt->execute(bits) ; }
+       }
+     }
+  private :
+    Testeur * testeurs_[5] ;
+ } ;
+ 
+"""
+
+conteneur_indice = HEADER + testeur_abstrait_incorrect + """
+class Boucle
+ {
+  public :
+    void init()
+     { indice_ = 0 ; }
+    void enregistre( Testeur * t )
+     {
+      if (indice_==5)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = t ;
+     }
+    void execute( int resolution, int debut, int fin, int inc )
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       {
+        std::cout<<std::endl ;
+        testeurs_[i]->init(resolution) ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { testeurs_[i]->execute(bits) ; }
+       }
+     }
+  private :
+    Testeur * testeurs_[5] ;
+    int indice_ ;
+ } ;
+ 
+"""
+
+conteneur_dyn = HEADER + testeur_abstrait_incorrect + """
+class Boucle
+ {
+  public :
+    void init( int taille )
+     {
+      taille_ = taille ;
+      indice_ = 0 ;
+      testeurs_ = new Testeur * [taille_] ;
+     }
+    void enregistre( Testeur * t )
+     {
+      if (indice_==taille_)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = t ;
+     }
+    void execute( int resolution, int debut, int fin, int inc )
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       {
+        std::cout<<std::endl ;
+        testeurs_[i]->init(resolution) ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { testeurs_[i]->execute(bits) ; }
+       }
+     }
+    void finalise()
+     { delete [] testeurs_ ; }
+  private :
+    int taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+ } ;
+ 
+"""
+
+testeur_abstrait_correct = """
+class Testeur
+ {
+  public :
+    void init( int resolution ) { resolution_ = resolution ; }
+    virtual void execute( int bits ) = 0 ;
+    virtual ~Testeur() {} ;
+  protected :
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     } 
+  private :
+    int resolution_ ;
+ } ;
+"""
+
+conteneur_owner = HEADER + testeur_abstrait_correct + """
 class Boucle
  {
   public :
@@ -176,13 +305,10 @@ class Boucle
      {
       for ( int i=0; i<indice_ ; i++ )
        {
-        if (testeurs_[i]!=nullptr)
-         {
-          std::cout<<std::endl ;
-          testeurs_[i]->init(resolution) ;
-          for ( int bits =debut ; bits <= fin ; bits = bits + inc )
-           { testeurs_[i]->execute(bits) ; }
-         }
+        std::cout<<std::endl ;
+        testeurs_[i]->init(resolution) ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { testeurs_[i]->execute(bits) ; }
        }
      }
     void finalise()
@@ -202,43 +328,224 @@ class Boucle
  
 """
 
-constructeurs_et_statiques = """
-//==============================================
-// framework general de test
-//==============================================
+boucle_owner = """
+class Boucle
+ {
+  public :
+    void init( int taille )
+     {
+      taille_ = taille ;
+      indice_ = 0 ;
+      testeurs_ = new Testeur * [taille_] ;
+     }
+    void acquiere( Testeur * pt )
+     {
+      if (indice_==taille_)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = pt ;
+     }
+    void execute( int debut, int fin, int inc )
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       {
+        std::cout<<std::endl ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { testeurs_[i]->execute(bits) ; }
+       }
+     }
+    void finalise()
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
+     }
+    
+  private :
+  
+    int taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+    
+ } ;
+ 
+"""
 
-class Testeur ;
-
+constructeurs_testeurs_derives = HEADER + testeur_abstrait_correct + boucle_owner
+ 
+testeur_construit = """
 class Testeur
  {
   public :
-  
-    Testeur( int resolution )
-     : resolution_(resolution)
-     {}
-    
-    virtual void execute( int bits )
-     { std::cout << "Qu'est-ce que je fais la ??" << std::endl ; }
-        
+    Testeur( int resolution ) { resolution_ = resolution ; }
+    virtual void execute( int bits ) = 0 ;
+    virtual ~Testeur() {} ;
   protected :
-  
     void erreur( int bits, double exact, double approx )
      {
-      if (exact==0) { echec(1,"division par 0") ; }
       int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
         <<std::right<<std::setw(2)<<bits<<" bits : "
         <<std::left<<exact<<" ~ "<<approx
         <<" ("<<erreur<<"/"<<resolution_<<")" ;
-     }
+     } 
+  private :
+    int resolution_ ;
+ } ;
+"""
 
+constructeurs_testeurs = HEADER + testeur_construit + boucle_owner
+
+boucle_construite = """
+class Boucle
+ {
+  public :
+    Boucle( int taille )
+     : taille_{taille}, indice_{0}, testeurs_{new Testeur * [taille]}
+     {}
+    void acquiere( Testeur * pt )
+     {
+      if (indice_==taille_)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = pt ;
+     }
+    void execute( int debut, int fin, int inc )
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       {
+        std::cout<<std::endl ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { testeurs_[i]->execute(bits) ; }
+       }
+     }
+    ~Boucle()
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
+     }
+    
   private :
   
-    int const resolution_ ;
-
+    int taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+    
  } ;
+ 
+"""
 
+constructeurs = HEADER + testeur_construit + boucle_construite
+
+testeur_const = """
+class Testeur
+ {
+  public :
+    Testeur( int resolution ) : resolution_{resolution} {}
+    virtual void execute( int bits ) = 0 ;
+    virtual ~Testeur() {} ;
+  protected :
+    void erreur( int bits, double exact, double approx )
+     {
+      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      if (erreur<0) { erreur = -erreur ; }
+      std::cout
+        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<std::left<<exact<<" ~ "<<approx
+        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+     } 
+  private :
+    int const resolution_ ;
+ } ;
+ 
+"""
+
+const = HEADER + testeur_const + """
+class Boucle
+ {
+  public :
+    Boucle( int taille )
+     : taille_{taille}, indice_{0}, testeurs_{new Testeur * [taille]}
+     {}
+    void acquiere( Testeur * pt )
+     {
+      if (indice_==taille_)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = pt ;
+     }
+    void execute( int debut, int fin, int inc )
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       {
+        std::cout<<std::endl ;
+        for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+         { testeurs_[i]->execute(bits) ; }
+       }
+     }
+    ~Boucle()
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
+     }
+    
+  private :
+  
+    int const taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+    
+ } ;
+ 
+"""
+
+conteneur_dedie = HEADER + testeur_const + """
+class Testeurs
+ {
+  public :
+    Testeurs( int taille )
+     : taille_{taille}, indice_{0}, testeurs_{new Testeur * [taille]}
+     {}
+    void acquiere( Testeur * pt )
+     {
+      if (indice_==taille_)
+       { echec(10,"trop de testeurs") ; }
+      testeurs_[indice_++] = pt ;
+     }
+    int nb_elements() { return indice_ ; }
+    Testeur * element( int indice )
+     {
+      if ((indice<0)||(indice>=indice_))
+       { echec(10,"indice incorrect") ; }
+      return testeurs_[indice] ;
+     }
+    ~Testeurs()
+     {
+      for ( int i=0; i<indice_ ; i++ )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
+     }
+  private :
+    int const taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+    
+ } ;
+ 
+void boucle( int debut, int fin, int inc, Testeurs & ts )
+ {
+  int nb = ts.nb_elements() ;
+  for ( int i=0; i<nb ; i++ )
+   {
+    std::cout<<std::endl ;
+    for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+     { ts.element(i)->execute(bits) ; }
+   }
+ }
+ 
+"""
+
+statiques = HEADER + testeur_const + """
 class Testeurs
  {
   public :

@@ -384,7 +384,115 @@ int main()
  
 """
 
-classe_boucle = """
+boucle_foncteur = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.execute(tc065,1000000,4,16,4) ;
+  boucle.execute(tc035,1000000,4,16,4) ;
+  boucle.execute(ts,1000,1,8,1) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+boucle_conteneur = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.copie(0,tc065) ;
+  boucle.copie(1,tc035) ;
+  boucle.copie(2,ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_ptr = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.init() ;
+  boucle.enregistre(0,&tc065) ;
+  boucle.enregistre(1,&tc035) ;
+  boucle.enregistre(2,&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_indice = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.init() ;
+  boucle.enregistre(&tc065) ;
+  boucle.enregistre(&tc035) ;
+  boucle.enregistre(&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_dyn = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
+  Boucle boucle ;
+  boucle.init(3) ;
+  boucle.enregistre(&tc065) ;
+  boucle.enregistre(&tc035) ;
+  boucle.enregistre(&ts) ;
+  boucle.execute(1000000,4,16,4) ;
+  boucle.finalise() ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_owner = """
 //==============================================
 // fonction principale
 //==============================================
@@ -392,7 +500,7 @@ classe_boucle = """
 int main()
  {
   Boucle boucle ;
-  boucle.init(2) ;
+  boucle.init(3) ;
   boucle.acquiere(new TesteurCoef065) ;
   boucle.acquiere(new TesteurCoef035) ;
   boucle.acquiere(new TesteurSomme) ;
@@ -404,7 +512,63 @@ int main()
  
 """
 
-constructeurs_et_statiques = """
+constructeurs_testeurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Boucle boucle ;
+  boucle.init(3) ;
+  boucle.acquiere(new TesteurCoef065(1000000)) ;
+  boucle.acquiere(new TesteurCoef035(1000000)) ;
+  boucle.acquiere(new TesteurSomme(1000000)) ;
+  boucle.execute(4,16,4) ;
+  boucle.finalise() ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+constructeurs = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Boucle boucle(3) ;
+  boucle.acquiere(new TesteurCoef065(1000000)) ;
+  boucle.acquiere(new TesteurCoef035(1000000)) ;
+  boucle.acquiere(new TesteurSomme(1000000)) ;
+  boucle.execute(4,16,4) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+conteneur_dedie = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Testeurs ts(3) ;
+  ts.acquiere(new TesteurCoef065(1000000)) ;
+  ts.acquiere(new TesteurCoef035(1000000)) ;
+  ts.acquiere(new TesteurSomme(1000000)) ;
+  boucle(4,16,4,ts) ;
+  std::cout << std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+statiques = """
 //==============================================
 // fonction principale
 //==============================================

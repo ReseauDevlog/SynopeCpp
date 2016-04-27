@@ -42,7 +42,6 @@ class Testeur
   public :
     void init( int resolution ) { resolution_ = resolution ; }
     virtual void execute( int bits ) = 0 ;
-    virtual ~Testeur() {} ;
   protected :
     void erreur( int bits, double exact, double approx )
      {
@@ -60,40 +59,27 @@ class Testeur
 class Boucle
  {
   public :
-    void init( int taille )
+    void init()
+     { indice_ = 0 ; }
+    void enregistre( Testeur * t )
      {
-      taille_ = taille ;
-      indice_ = 0 ;
-      testeurs_ = new Testeur * [taille_] ;
-     }
-    void acquiere( Testeur * pt )
-     {
-      if (indice_==taille_)
+      if (indice_==5)
        { echec(10,"trop de testeurs") ; }
-      testeurs_[indice_++] = pt ;
+      testeurs_[indice_++] = t ;
      }
-    void execute( int debut, int fin, int inc )
+    void execute( int resolution, int debut, int fin, int inc )
      {
       for ( int i=0; i<indice_ ; i++ )
        {
         std::cout<<std::endl ;
+        testeurs_[i]->init(resolution) ;
         for ( int bits =debut ; bits <= fin ; bits = bits + inc )
          { testeurs_[i]->execute(bits) ; }
        }
      }
-    void finalise()
-     {
-      for ( int i=0; i<indice_ ; i++ )
-       { delete testeurs_[i] ; }
-      delete [] testeurs_ ;
-     }
-    
   private :
-  
-    int taille_ ;
+    Testeur * testeurs_[5] ;
     int indice_ ;
-    Testeur * * testeurs_ ;
-    
  } ;
  
 
@@ -160,28 +146,27 @@ class TesteurCoef : public Testeur
      }
     
     Coef c_ ;
+
  } ;
  
 class TesteurCoef065 : public TesteurCoef
  {
   public :
-    TesteurCoef065( int resolution ) { init(resolution) ; }
-    virtual void execute( int bits ) { c_.init(bits) ; teste(0.65) ; }
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.65) ;  }
  } ;
-
+ 
 class TesteurCoef035 : public TesteurCoef
  {
   public :
-    TesteurCoef035( int resolution ) { init(resolution) ; }
-    virtual void execute( int bits ) { c_.init(bits) ; teste(0.35) ; }
+    void execute( int bits )
+     { c_.init(bits) ; teste(0.35) ;  }
  } ;
-
+ 
 class TesteurSomme : public Testeur
  {
   public :
-    TesteurSomme( int resolution )
-     { init(resolution) ; }
-    virtual void execute( int bits )
+    void execute( int bits )
      {
       c1_.init(bits) ;
       c2_.init(bits) ;
@@ -209,13 +194,15 @@ class TesteurSomme : public Testeur
 
 int main()
  {
+  TesteurCoef065 tc065 ;
+  TesteurCoef035 tc035 ;
+  TesteurSomme ts ;
   Boucle boucle ;
-  boucle.init(3) ;
-  boucle.acquiere(new TesteurCoef065(1000000)) ;
-  boucle.acquiere(new TesteurCoef035(1000000)) ;
-  boucle.acquiere(new TesteurSomme(1000000)) ;
-  boucle.execute(4,16,4) ;
-  boucle.finalise() ;
+  boucle.init() ;
+  boucle.enregistre(&tc065) ;
+  boucle.enregistre(&tc035) ;
+  boucle.enregistre(&ts) ;
+  boucle.execute(1000000,4,16,4) ;
   std::cout << std::endl ;
   return 0 ;
  }

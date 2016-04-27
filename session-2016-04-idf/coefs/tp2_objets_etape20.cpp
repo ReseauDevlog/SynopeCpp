@@ -40,7 +40,7 @@ int entier_max( int nombre_bits )
 class Testeur
  {
   public :
-    void init( int resolution ) { resolution_ = resolution ; }
+    Testeur( int resolution ) : resolution_{resolution} {}
     virtual void execute( int bits ) = 0 ;
     virtual ~Testeur() {} ;
   protected :
@@ -60,12 +60,9 @@ class Testeur
 class Boucle
  {
   public :
-    void init( int taille )
-     {
-      taille_ = taille ;
-      indice_ = 0 ;
-      testeurs_ = new Testeur * [taille_] ;
-     }
+    Boucle( int taille )
+     : taille_{taille}, indice_{0}, testeurs_{new Testeur * [taille]}
+     {}
     void acquiere( Testeur * pt )
      {
       if (indice_==taille_)
@@ -81,7 +78,7 @@ class Boucle
          { testeurs_[i]->execute(bits) ; }
        }
      }
-    void finalise()
+    ~Boucle()
      {
       for ( int i=0; i<indice_ ; i++ )
        { delete testeurs_[i] ; }
@@ -105,9 +102,10 @@ class Coef
  {
   public :
   
-    void init( int bits )
-     { bits_ = bits ; }
-    
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
     int lit_bits()
      { return bits_ ; }
     
@@ -149,57 +147,60 @@ class Coef
 
 class TesteurCoef : public Testeur
  {
+  public :
+  
+    TesteurCoef( int resolution )
+     : Testeur(resolution)
+     {}
+
   protected :
   
-    void teste( double valeur )
+    void teste( int bits, double valeur )
      {
-      c_.approxime(valeur) ;
-      double approximation = c_.approximation() ;
-      erreur(c_.lit_bits(),valeur,approximation) ;
-      std::cout<<" ("<<c_.texte()<<")"<<std::endl ;
+      Coef c(bits) ;
+      c.approxime(valeur) ;
+      erreur(bits,valeur,arrondi(c.approximation(),6)) ;
+      std::cout<<" ("<<c.texte()<<")"<<std::endl ;
      }
-    
-    Coef c_ ;
  } ;
- 
+
 class TesteurCoef065 : public TesteurCoef
  {
   public :
-    TesteurCoef065( int resolution ) { init(resolution) ; }
-    virtual void execute( int bits ) { c_.init(bits) ; teste(0.65) ; }
+    TesteurCoef065( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.65) ; }
  } ;
 
 class TesteurCoef035 : public TesteurCoef
  {
   public :
-    TesteurCoef035( int resolution ) { init(resolution) ; }
-    virtual void execute( int bits ) { c_.init(bits) ; teste(0.35) ; }
+    TesteurCoef035( int resolution ) : TesteurCoef(resolution) {}
+    virtual void execute( int bits ) { teste(bits,0.35) ; }
  } ;
 
 class TesteurSomme : public Testeur
  {
   public :
+
     TesteurSomme( int resolution )
-     { init(resolution) ; }
+     : Testeur(resolution)
+     {}
+
     virtual void execute( int bits )
-     {
-      c1_.init(bits) ;
-      c2_.init(bits) ;
-      teste(0.65,3515,0.35,4832) ;
-     }
+     { teste(bits,0.65,3515,0.35,4832) ; }
+
   private :
-    void teste( double c1, int e1, double c2, int e2 )
+  
+    void teste( int bits, double c1, int e1, double c2, int e2 )
      {
-      c1_.approxime(c1) ;
-      c2_.approxime(c2) ;
-      int exact, approx ;
-      exact = arrondi(c1*e1+c2*e2) ;
-      approx = c1_.multiplie(e1) + c2_.multiplie(e2) ;
-      erreur(c1_.lit_bits(),exact,approx) ;
+      int exact = arrondi(c1*e1+c2*e2) ;
+      Coef coef1(bits), coef2(bits) ;
+      coef1.approxime(c1) ;
+      coef2.approxime(c2) ;
+      int approx = coef1.multiplie(e1) + coef2.multiplie(e2) ;
+      erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
-    Coef c1_ ;
-    Coef c2_ ;
  } ;
 
 
@@ -209,13 +210,11 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  Boucle boucle ;
-  boucle.init(3) ;
+  Boucle boucle(3) ;
   boucle.acquiere(new TesteurCoef065(1000000)) ;
   boucle.acquiere(new TesteurCoef035(1000000)) ;
   boucle.acquiere(new TesteurSomme(1000000)) ;
   boucle.execute(4,16,4) ;
-  boucle.finalise() ;
   std::cout << std::endl ;
   return 0 ;
  }
