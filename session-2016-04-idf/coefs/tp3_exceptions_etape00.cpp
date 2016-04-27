@@ -1,25 +1,18 @@
-
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <cstdlib>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
 
-class Echec
+#include <iostream>
+#include <iomanip>
+#include <string>
+
+void echec( unsigned int code, std::string const & commentaire )
  {
-  public :
-    Echec( unsigned int c, std::string const & comm )
-     : code_(c), commentaire_(comm) {}
-    unsigned int code() const { return code_ ; }
-    std::string const & commentaire() const { return commentaire_ ; }
-  private :
-    unsigned int code_ ;
-	  std::string commentaire_ ;
- } ;
+  std::cout<<"[ERREUR "<<code<<" : "<<commentaire<<"]"<<std::endl ;
+  exit(code) ;
+ }
 
 int fois_puissance_de_deux( int nombre, int exposant )
  {
@@ -47,122 +40,113 @@ int entier_max( int nombre_bits )
 class Testeur
  {
   public :
-  
-    Testeur( int resolution )  : resolution_(resolution) {}
-    virtual void execute( int bits ) =0 ;
+    Testeur( int resolution ) : resolution_{resolution} {}
+    virtual void execute( int bits ) = 0 ;
     virtual ~Testeur() {} ;
-    
   protected :
-  
     void erreur( int bits, double exact, double approx )
      {
-      if (exact==0) { throw Echec(1,"division par 0") ; }
+      if (exact==0) { echec(1,"division par 0") ; }
       int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
         <<std::right<<std::setw(2)<<bits<<" bits : "
         <<std::left<<exact<<" ~ "<<approx
         <<" ("<<erreur<<"/"<<resolution_<<")" ;
-     }
-
+     } 
   private :
-  
     int const resolution_ ;
-
  } ;
+ 
 
 class Testeurs
  {
   public :
-  
-    Testeurs( unsigned int max )
-     : max__{max}, indice__{}, testeurs__{new Testeur * [max__]}
+    Testeurs( int taille )
+     : taille_{taille}, indice_{0}, testeurs_{new Testeur * [taille]}
      {}
-     
-    void acquiere( Testeur * t )
+    void acquiere( Testeur * pt )
      {
-      if (indice__==max__) { throw Echec(2,"trop de testeurs") ; }
-      testeurs__[indice__] = t ;
-      indice__++ ;
+      if (indice_==taille_)
+       { echec(2,"trop de testeurs") ; }
+      testeurs_[indice_++] = pt ;
      }
-     
-    unsigned int nb_testeurs() const
-     { return indice__ ; }
-     
-    Testeur * testeur( unsigned i ) const
+    int nb_elements() { return indice_ ; }
+    Testeur * element( int indice )
      {
-      if (i>=indice__) { throw Echec(3,"indice de testeur incorrect") ; }
-      return testeurs__[i] ;
+      if ((indice<0)||(indice>=indice_))
+       { echec(3,"indice incorrect") ; }
+      return testeurs_[indice] ;
      }
-     
     ~Testeurs()
      {
-      for ( unsigned i=0 ; i<max__ ; ++i )
-       { delete testeurs__[i] ; }
-      delete [] testeurs__ ;
+      for ( int i=0; i<indice_ ; i++ )
+       { delete testeurs_[i] ; }
+      delete [] testeurs_ ;
      }
-     
   private :
-  
-    unsigned int max__ ;
-    unsigned int indice__ ;
-    Testeur * * testeurs__ ;
+    int const taille_ ;
+    int indice_ ;
+    Testeur * * testeurs_ ;
+    
  } ;
-
-void boucle( int deb, int fin, int inc, const Testeurs & ts )
+ 
+void boucle( int debut, int fin, int inc, Testeurs & ts )
  {
-  unsigned int i ;
-  for ( i=0 ; i<ts.nb_testeurs() ; ++i )
+  int nb = ts.nb_elements() ;
+  for ( int i=0; i<nb ; i++ )
    {
-    Testeur * t = ts.testeur(i) ;
     std::cout<<std::endl ;
-    int bits ;
-    for ( bits = deb ; bits <= fin ; bits = bits + inc )
-     { t->execute(bits) ; }
+    for ( int bits =debut ; bits <= fin ; bits = bits + inc )
+     { ts.element(i)->execute(bits) ; }
    }
  }
-
+ 
 
 //==============================================
-// Coef
+// calculs
 //==============================================
 
 class Coef
  {
   public :
   
-    Coef( unsigned int bits )
+    Coef( int bits )
      : bits_(bits), numerateur_{}, exposant_{}
      {}
-    unsigned int lit_bits() const
+
+    int lit_bits()
      { return bits_ ; }
+    
+    // transformation d'un double en Coef
     void approxime( double valeur )
-      {
-       numerateur_ = exposant_ = 0 ;
-       if (valeur==0) { return ; }
-       double min = (entier_max(bits_)+0.5)/2 ;
-       while (valeur<min)
-        {
-         exposant_ = exposant_ + 1 ;
-     	valeur = valeur * 2 ;
-        }
-       numerateur_ = arrondi(valeur) ;
-      }
-    double approximation() const
-      {
-       if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
-       return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
-      }
-    int multiplie( int arg ) const
-     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+     {
+      numerateur_ = exposant_ = 0 ;
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     { return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ; }
+    
+    int multiplie( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
     std::string texte() const
      { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
 
   private :
   
-    unsigned int const bits_ ;
+    int const bits_ ;
     int numerateur_ ;
     int exposant_ ;
+    
  } ;
 
 void affiche( Coef const & c )
@@ -170,7 +154,7 @@ void affiche( Coef const & c )
 
 
 //==============================================
-// Testeurs dedies a Coef
+// tests
 //==============================================
 
 class TesteurCoef : public Testeur
@@ -187,7 +171,7 @@ class TesteurCoef : public Testeur
      {
       Coef c(bits) ;
       c.approxime(valeur) ;
-      erreur(bits,valeur,c.approximation()) ;
+      erreur(bits,valeur,arrondi(c.approximation(),6)) ;
       std::cout<<" (" ;
       affiche(c) ;
       std::cout<<")"<<std::endl ;
@@ -223,12 +207,11 @@ class TesteurSomme : public Testeur
   
     void teste( int bits, double c1, int e1, double c2, int e2 )
      {
+      int exact = arrondi(c1*e1+c2*e2) ;
       Coef coef1(bits), coef2(bits) ;
-      int exact, approx ;
-      exact = arrondi(c1*e1+c2*e2) ;
       coef1.approxime(c1) ;
       coef2.approxime(c2) ;
-      approx = coef1.multiplie(e1) + coef2.multiplie(e2) ;
+      int approx = coef1.multiplie(e1) + coef2.multiplie(e2) ;
       erreur(bits,exact,approx) ;
       std::cout<<std::endl ;
      }
@@ -241,21 +224,12 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  try
-   {
-    Testeurs ts(5) ;
-    ts.acquiere(new TesteurCoef065(1000000)) ;
-    ts.acquiere(new TesteurCoef035(1000000)) ;
-    ts.acquiere(new TesteurSomme(1000000)) ;
-    boucle(4,16,4,ts) ;
-    std::cout<<std::endl ;
-    return 0 ;
-   }
-  catch ( Echec const & e )
-   {
-    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
-	return e.code() ;
-   }
+  Testeurs ts(3) ;
+  ts.acquiere(new TesteurCoef065(1000000)) ;
+  ts.acquiere(new TesteurCoef035(1000000)) ;
+  ts.acquiere(new TesteurSomme(1000000)) ;
+  boucle(4,16,4,ts) ;
+  std::cout << std::endl ;
+  return 0 ;
  }
-
-
+ 

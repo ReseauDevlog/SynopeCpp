@@ -587,3 +587,55 @@ int main()
 
 """
 
+catch_check = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs ts(1) ;
+    ts.acquiere(new TesteurCoef065(1000000)) ;
+    ts.acquiere(new TesteurCoef035(1000000)) ;
+    ts.acquiere(new TesteurSomme(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+
+catch = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  try
+   {
+    Testeurs ts(5) ;
+    ts.acquiere(new TesteurCoef065(1000000)) ;
+    ts.acquiere(new TesteurCoef035(1000000)) ;
+    ts.acquiere(new TesteurSomme(1000000)) ;
+    boucle(4,16,4,ts) ;
+    std::cout<<std::endl ;
+    return 0 ;
+   }
+  catch ( Echec const & e )
+   {
+    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
+	return e.code() ;
+   }
+ }
+ 
+"""
+

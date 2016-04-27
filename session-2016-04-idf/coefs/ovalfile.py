@@ -45,16 +45,22 @@ tps = [
          {"name": "etape18", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs_testeurs mcx_calculs.coef_bits mcx_tests.constructeurs_testeurs mcx_main.constructeurs_testeurs", "args": ""},
          {"name": "etape19", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs_testeurs mcx_calculs.constructeur mcx_tests.constructeurs mcx_main.constructeurs_testeurs", "args": ""},
          {"name": "etape20", "mcx": "mcx_utilitaires.compacte mcx_framework.constructeurs mcx_calculs.constructeur mcx_tests.constructeurs mcx_main.constructeurs", "args": ""},
-         {"name": "etape21", "mcx": "mcx_utilitaires.compacte mcx_framework.const mcx_calculs.const_bits mcx_tests.constructeurs mcx_main.constructeurs", "args": ""},
-         {"name": "etape22", "mcx": "mcx_utilitaires.compacte mcx_framework.const mcx_calculs.affiche mcx_tests.affiche mcx_main.constructeurs", "args": ""},
-         {"name": "etape23", "mcx": "mcx_utilitaires.compacte mcx_framework.conteneur_dedie mcx_calculs.affiche mcx_tests.affiche mcx_main.conteneur_dedie", "args": ""},
+         {"name": "etape21", "mcx": "mcx_utilitaires.const mcx_framework.const mcx_calculs.const_bits mcx_tests.constructeurs mcx_main.constructeurs", "args": ""},
+         {"name": "etape22", "mcx": "mcx_utilitaires.const mcx_framework.const mcx_calculs.affiche mcx_tests.affiche mcx_main.constructeurs", "args": ""},
+         {"name": "etape23", "mcx": "mcx_utilitaires.const mcx_framework.conteneur_dedie mcx_calculs.affiche mcx_tests.affiche mcx_main.conteneur_dedie", "args": ""},
          {"name": "etape24", "mcx": "mcx_utilitaires.const mcx_framework.statiques mcx_calculs.const mcx_tests.constructeurs mcx_main.statiques", "args": ""}
          ]},
     {"name": "tp3_exceptions",
      "etapes": [
-         {"name": "etape0", "mcx": "mcx_utilitaires.simple", "args": ""},
-         {"name": "etape1", "mcx": "mcx_utilitaires.simple", "args": ""},
-         {"name": "etapeN", "mcx": "mcx_utilitaires.simple", "args": ""}
+         {"name": "etape00", "mcx": "mcx_utilitaires.const mcx_framework.conteneur_dedie mcx_calculs.affiche mcx_tests.affiche mcx_main.conteneur_dedie", "args": ""},
+         {"name": "etape01", "mcx": "mcx_utilitaires.exception mcx_framework.throw mcx_calculs.throw mcx_tests.affiche mcx_main.catch_check", "args": ""},
+         {"name": "etape02", "mcx": "mcx_utilitaires.exception mcx_framework.catch mcx_calculs.throw mcx_tests.bug mcx_main.catch", "args": ""},
+         {"name": "etape03", "mcx": "mcx_utilitaires.exception mcx_framework.catch mcx_calculs.opmult mcx_tests.opmult mcx_main.catch", "args": ""},
+         {"name": "etape04", "mcx": "mcx_utilitaires.exception mcx_framework.opbrackets mcx_calculs.opmult mcx_tests.opmult mcx_main.catch", "args": ""},
+         {"name": "etape05", "mcx": "mcx_utilitaires.exception mcx_framework.opbrackets mcx_calculs.opaffect mcx_tests.opaffect mcx_main.catch", "args": ""},
+         {"name": "etape06", "mcx": "mcx_utilitaires.exception mcx_framework.opbrackets mcx_calculs.ostream mcx_tests.ostream mcx_main.catch", "args": ""},
+         {"name": "etape07", "mcx": "mcx_utilitaires.exception mcx_framework.opbrackets mcx_calculs.opdouble mcx_tests.opdouble mcx_main.catch", "args": ""},
+         {"name": "etape08", "mcx": "mcx_utilitaires.exception mcx_framework.opexec mcx_calculs.opdouble mcx_tests.opexec mcx_main.catch", "args": ""},
          ]},
     {"name": "tp4_generique",
      "etapes": [

@@ -216,6 +216,7 @@ class Coef
     void approxime( int bits, double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits)+0.5)/2 ;
       while (valeur<min)
        {
@@ -263,6 +264,7 @@ class Coef
     void approxime( double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits_)+0.5)/2 ;
       while (valeur<min)
        {
@@ -312,6 +314,7 @@ class Coef
     void approxime( double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits_)+0.5)/2 ;
       while (valeur<min)
        {
@@ -361,6 +364,7 @@ class Coef
     void approxime( double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits_)+0.5)/2 ;
       while (valeur<min)
        {
@@ -410,6 +414,7 @@ class Coef
     void approxime( double valeur )
      {
       numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
       double min = (entier_max(bits_)+0.5)/2 ;
       while (valeur<min)
        {
@@ -442,7 +447,309 @@ void affiche( Coef const & c )
 
 """
 
-const = """
+throw = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void approxime( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+      return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ;
+     }
+    
+    int multiplie( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+void affiche( Coef const & c )
+ { std::cout << c.texte() ; }
+
+"""
+
+opmult = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void approxime( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+      return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ;
+     }
+    
+    int operator*( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+void affiche( Coef const & c )
+ { std::cout << c.texte() ; }
+
+"""
+
+opaffect = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void operator=( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+      return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ;
+     }
+    
+    int operator*( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+void affiche( Coef const & c )
+ { std::cout << c.texte() ; }
+
+"""
+
+ostream = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void operator=( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    double approximation()
+     {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+      return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ;
+     }
+    
+    int operator*( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+std::ostream & operator<<( std::ostream & os, Coef const & c )
+ { return (os<<c.texte()) ; }
+
+"""
+
+opdouble = """
+//==============================================
+// calculs
+//==============================================
+
+class Coef
+ {
+  public :
+  
+    Coef( int bits )
+     : bits_(bits), numerateur_{}, exposant_{}
+     {}
+
+    int lit_bits()
+     { return bits_ ; }
+    
+    // transformation d'un double en Coef
+    void operator=( double valeur )
+     {
+      numerateur_ = exposant_ = 0 ;
+      if (valeur==0) { return ; }
+      double min = (entier_max(bits_)+0.5)/2 ;
+      while (valeur<min)
+       {
+        exposant_ = exposant_ + 1 ;
+        valeur = valeur * 2 ;
+       }
+      numerateur_ = arrondi(valeur) ;
+     }
+    
+    // transformation d'un Coef en double
+    operator double()
+     {
+      if (exposant_<0) { throw Echec(4,"exposant negatif") ; }
+      return double(numerateur_)/fois_puissance_de_deux(1,exposant_) ;
+     }
+    
+    int operator*( int e )
+     { return fois_puissance_de_deux(numerateur_*e,-exposant_) ; }
+    
+    std::string texte() const
+     { return std::to_string(numerateur_)+"/2^"+std::to_string(exposant_) ; }
+
+  private :
+  
+    int const bits_ ;
+    int numerateur_ ;
+    int exposant_ ;
+    
+ } ;
+
+std::ostream & operator<<( std::ostream & os, Coef const & c )
+ { return (os<<c.texte()) ; }
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+old_const = """
 //==============================================
 // calculs
 //==============================================
