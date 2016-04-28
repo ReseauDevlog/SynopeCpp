@@ -1600,4 +1600,53 @@ class TesteurSomme : public Testeur
 
 """
 
+#=====================================================================
+# TP BIBLIO
+#=====================================================================
+
+biblio = """
+//==============================================
+// tests
+//==============================================
+
+template<typename U>
+class TesteurRandCoefs : public Testeur
+ {
+  public :
+    TesteurRandCoefs( int resolution, int nbcoefs )
+     : Testeur(resolution,8), nbcoefs_{nbcoefs}
+     { exact_ = new_rand_coefs(nbcoefs_) ; approx_ = new double [nbcoefs_] ; }
+    virtual void execute( int bits )
+     {
+      Coef<U> c(bits) ;
+      for ( int i=0 ; i<nbcoefs_ ; ++i )
+       { c = exact_[i] ; approx_[i] = arrondi(c,6) ; }
+      erreur(bits,exact_,approx_,nbcoefs_) ;
+     }
+    virtual ~TesteurRandCoefs()
+     { delete [] exact_ ; delete [] approx_ ; }
+  private :
+    int nbcoefs_ ;
+    double * exact_ ;
+    double * approx_ ;
+ } ;
+
+template<typename U>
+class TesteurSomme : public Testeur
+ {
+  public :
+    TesteurSomme( int resolution )
+     : Testeur(resolution,3) {}
+    virtual void execute( int bits )
+     {
+      Coef<U> coef1(bits), coef2(bits) ;
+      coef1 = 0.65 ; coef2 = 0.35 ;
+      double exact = 100 ;
+      double approx = coef1*U(exact) + coef2*U(exact) ;
+      erreur(bits,&exact,&approx,1) ;
+     }
+ } ;
+
+"""
+
 

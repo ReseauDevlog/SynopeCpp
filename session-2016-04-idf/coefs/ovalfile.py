@@ -76,8 +76,13 @@ tps = [
          ]},
     {"name": "tp5_biblio",
      "etapes": [
-         {"name": "etape00", "mcx": "mcx_utilitaires.simple", "args": ""},
-         {"name": "etapeNN", "mcx": "mcx_utilitaires.simple", "args": ""}
+         {"name": "etape00", "mcx": "mcx_utilitaires.biblio mcx_framework.biblio0 mcx_calculs.biblio mcx_tests.biblio mcx_main.biblio0", "args": ""},
+         {"name": "etape01", "mcx": "mcx_utilitaires.biblio mcx_framework.vector mcx_calculs.biblio mcx_tests.biblio mcx_main.vector", "args": ""},
+         {"name": "etape02", "mcx": "mcx_utilitaires.pointeur_bavard mcx_framework.pointeur_bavard mcx_calculs.biblio mcx_tests.biblio mcx_main.vector_bavard", "args": ""},
+         {"name": "etape03", "mcx": "mcx_utilitaires.auto_pointeur mcx_framework.auto_pointeur mcx_calculs.biblio mcx_tests.biblio mcx_main.vector", "args": ""},
+         {"name": "etape04", "mcx": "mcx_utilitaires.biblio mcx_framework.shared mcx_calculs.biblio mcx_tests.biblio mcx_main.shared", "args": ""},
+         {"name": "etape05", "mcx": "mcx_utilitaires.biblio mcx_framework.unique mcx_calculs.biblio mcx_tests.biblio mcx_main.unique", "args": ""},
+         {"name": "etape06", "mcx": "mcx_utilitaires.biblio mcx_framework.direct mcx_calculs.biblio mcx_tests.biblio mcx_main.direct", "args": ""}
          ]},
     {"name": "tp6_parallele",
      "etapes": [

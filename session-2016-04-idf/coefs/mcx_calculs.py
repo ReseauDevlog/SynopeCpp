@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-approxime_for = """
+HEADER = """
 //==============================================
 // calculs
 //==============================================
+"""
 
+approxime_for = HEADER + """
 void approxime( double valeur )
  {
   int exposant ;
@@ -19,11 +21,7 @@ void approxime( double valeur )
 
 """
 
-approxime_for_approximation = """
-//==============================================
-// calculs
-//==============================================
-
+approxime_for_approximation = HEADER + """
 void approxime( double valeur )
  {
   int exposant ;
@@ -39,11 +37,7 @@ void approxime( double valeur )
 
 """
 
-approxime_max = """
-//==============================================
-// calculs
-//==============================================
-
+approxime_max = HEADER + """
 void approxime( int max, double valeur )
  {
   int exposant {}, num ;
@@ -62,11 +56,7 @@ void approxime( int max, double valeur )
 
 """
 
-approxime_bits = """
-//==============================================
-// calculs
-//==============================================
-
+approxime_bits = HEADER + """
 void approxime( int bits, double valeur )
  {
   int max = entier_max(bits) ;
@@ -87,11 +77,7 @@ void approxime( int bits, double valeur )
 
 """
 
-approxime_ref = """
-//==============================================
-// calculs
-//==============================================
-
+approxime_ref = HEADER + """
 void approxime( int bits, double valeur, int & numerateur, int & exposant )
  {
   numerateur = exposant = 0 ;
@@ -107,11 +93,7 @@ void approxime( int bits, double valeur, int & numerateur, int & exposant )
 
 """
 
-simple = """
-//==============================================
-// calculs
-//==============================================
-
+simple = HEADER + """
 void approxime( int bits, double valeur, int & numerateur, int & exposant )
  {
   numerateur = exposant = 0 ;
@@ -134,11 +116,7 @@ int multiplie( int bits, double c, int e )
 
 """
 
-struct = """
-//==============================================
-// calculs
-//==============================================
-
+struct = HEADER + """
 class Coef
  {
   public :
@@ -168,11 +146,7 @@ int multiplie( int bits, double c, int e )
 
 """
 
-retour = """
-//==============================================
-// calculs
-//==============================================
-
+retour = HEADER + """
 class Coef
  {
   public :
@@ -203,11 +177,7 @@ int multiplie( int bits, double c, int e )
 
 """
 
-classe = """
-//==============================================
-// calculs
-//==============================================
-
+classe = HEADER + """
 class Coef
  {
   public :
@@ -245,11 +215,7 @@ class Coef
 
 """
 
-coef_bits = """
-//==============================================
-// calculs
-//==============================================
-
+coef_bits = HEADER + """
 class Coef
  {
   public :
@@ -294,11 +260,7 @@ class Coef
 
 """
 
-constructeur = """
-//==============================================
-// calculs
-//==============================================
-
+constructeur = HEADER + """
 class Coef
  {
   public :
@@ -344,11 +306,7 @@ class Coef
 
 """
 
-const_bits = """
-//==============================================
-// calculs
-//==============================================
-
+const_bits = HEADER + """
 class Coef
  {
   public :
@@ -394,11 +352,7 @@ class Coef
 
 """
 
-affiche = """
-//==============================================
-// calculs
-//==============================================
-
+affiche = HEADER + """
 class Coef
  {
   public :
@@ -447,11 +401,7 @@ void affiche( Coef const & c )
 
 """
 
-throw = """
-//==============================================
-// calculs
-//==============================================
-
+throw = HEADER + """
 class Coef
  {
   public :
@@ -503,11 +453,7 @@ void affiche( Coef const & c )
 
 """
 
-opmult = """
-//==============================================
-// calculs
-//==============================================
-
+opmult = HEADER + """
 class Coef
  {
   public :
@@ -559,11 +505,7 @@ void affiche( Coef const & c )
 
 """
 
-opaffect = """
-//==============================================
-// calculs
-//==============================================
-
+opaffect = HEADER + """
 class Coef
  {
   public :
@@ -615,11 +557,7 @@ void affiche( Coef const & c )
 
 """
 
-ostream = """
-//==============================================
-// calculs
-//==============================================
-
+ostream = HEADER + """
 class Coef
  {
   public :
@@ -671,11 +609,7 @@ std::ostream & operator<<( std::ostream & os, Coef const & c )
 
 """
 
-opdouble = """
-//==============================================
-// calculs
-//==============================================
-
+opdouble = HEADER + """
 class Coef
  {
   public :
@@ -727,11 +661,7 @@ std::ostream & operator<<( std::ostream & os, Coef const & c )
 
 """
 
-gen0 = """
-//==============================================
-// calculs
-//==============================================
-
+gen0 = HEADER + """
 class Coef
  {
   public :
@@ -776,11 +706,7 @@ std::ostream & operator<<( std::ostream & os, Coef const & c )
 
 """
 
-gennum = """
-//==============================================
-// calculs
-//==============================================
-
+gennum = HEADER + """
 template<typename U>
 class Coef
  {
@@ -827,11 +753,7 @@ std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
 
 """
 
-coef_genmult = """
-//==============================================
-// calculs
-//==============================================
-
+coef_genmult = HEADER + """
 template<typename U>
 class Coef
  {
@@ -894,11 +816,7 @@ std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
 
 """
 
-constexpr = """
-//==============================================
-// calculs
-//==============================================
-
+constexpr = HEADER + """
 template<typename U>
 class Coef
  {
@@ -960,11 +878,7 @@ std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
 
 """
 
-traits = """
-//==============================================
-// calculs
-//==============================================
-
+traits = HEADER + """
 template<typename U>
 class Coef
  {
@@ -1023,6 +937,38 @@ std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
 template<>
 std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
  { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
+
+"""
+
+#=====================================================================
+# TP BIBLIO
+#=====================================================================
+
+biblio = HEADER + """
+template<typename U>
+class Coef
+ {
+  public :
+    Coef( int bits ) : bits_(bits), numerateur_{}, exposant_{} {}  
+    int lit_bits() const { return bits_ ; }
+    void operator=( double valeur )
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        { exposant_ += 1 ; valeur *= 2 ; }
+       numerateur_ = arrondi(valeur) ;
+      }   
+    operator double() const
+      { return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ; }
+    U operator*( U arg ) const
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
+  private :
+    int const bits_ ;
+    U numerateur_ ;
+    int exposant_ ;
+ } ;
 
 """
 

@@ -45,32 +45,6 @@ double * new_rand_coefs( int taille )
  }
 
 
-template<typename Valeur>
-class Pointeur
- {
-  public :
-    Pointeur( Valeur * val ) : val_{val}
-     { std::cout<<"(pointeur : construit "<<this<<"->"<<val_<<")"<<std::endl ; }
-    Pointeur( Pointeur const & ptr ) : val_{ptr.val_}
-     { std::cout<<"(pointeur : copie "<<(&ptr)<<"->"<<val_<<" vers "<<this<<"->"<<val_<<")"<<std::endl ; }
-    void operator=( Pointeur const & ptr )
-     {
-      val_ = ptr.val_ ;
-      std::cout<<"(pointeur : affecte "<<(&ptr)<<"->"<<val_<<" vers "<<this<<"->"<<val_<<")"<<std::endl ;
-     }
-    Valeur & operator*() const
-     { std::cout<<"(pointeur : accede "<<this<<"->"<<val_<<")"<<std::endl ; return *val_ ; } 
-    Valeur * operator->() const 
-     { std::cout<<"(pointeur : accede "<<this<<"->"<<val_<<")"<<std::endl ; return val_ ; } 
-    Valeur * get() const
-     { return val_ ; } 
-    ~Pointeur()
-     {  std::cout<<"(pointeur : detruit "<<this<<"->"<<val_<<")"<<std::endl ; /*delete val_*/ ; }
-  private :
-    Valeur * val_ ;
- } ;
- 
-
 //==============================================
 // framework general de test
 //==============================================
@@ -110,21 +84,18 @@ class Testeur
  } ;
 
 
+#include <memory>
+
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { std::cout<<"(testeurs : acquiere "<<t<<")"<<std::endl ; testeurs_.push_back(t) ; }
+    void acquiere( std::unique_ptr<Testeur> && t ) { testeurs_.push_back(std::move(t)) ; }
     int nb_elements() { return testeurs_.size() ; }
-    Pointeur<Testeur> operator[]( int i )
-     {
-      std::cout<<"(testeurs : accede "<<i<<"->"<<testeurs_.at(i).get()<<")"<<std::endl ;
-      return testeurs_.at(i) ;
-     }
-    ~Testeurs() { std::cout<<"(testeurs : libere"<<")"<<std::endl ; }
+    std::unique_ptr<Testeur> & operator[]( int i ) { return testeurs_.at(i) ; }
   private :
-    std::vector<Pointeur<Testeur>> testeurs_ ;
+    std::vector<std::unique_ptr<Testeur>> testeurs_ ;
  } ;
-
+    
 
 void boucle( int deb, int fin, int inc, Testeurs & ts )
  {
@@ -216,16 +187,11 @@ class TesteurSomme : public Testeur
 
 int main()
  {
-  std::cout<<"===== Debut"<<std::endl ;
   Testeurs ts ;
-  std::cout<<"===== TesteurRandCoefs"<<std::endl ;
-  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
-  std::cout<<"===== TesteurSomme"<<std::endl ;
-  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
-  std::cout<<"===== Boucle"<<std::endl ;
+  ts.acquiere(std::make_unique<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
+  ts.acquiere(std::make_unique<TesteurSomme<unsigned char>>(100)) ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
-  std::cout<<"===== Fin"<<std::endl ;
   return 0 ;
  }
  

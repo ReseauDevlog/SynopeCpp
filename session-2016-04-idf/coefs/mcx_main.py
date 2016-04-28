@@ -821,3 +821,114 @@ int main()
  
 """
 
+#=====================================================================
+# TP BIBLIO
+#=====================================================================
+
+biblio0 = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Testeurs<2> ts ;
+  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
+  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+vector = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Testeurs ts ;
+  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
+  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+vector_bavard = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  std::cout<<"===== Debut"<<std::endl ;
+  Testeurs ts ;
+  std::cout<<"===== TesteurRandCoefs"<<std::endl ;
+  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
+  std::cout<<"===== TesteurSomme"<<std::endl ;
+  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  std::cout<<"===== Boucle"<<std::endl ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  std::cout<<"===== Fin"<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+shared = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Testeurs ts ;
+  ts.acquiere(std::make_shared<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
+  ts.acquiere(std::make_shared<TesteurSomme<unsigned char>>(100)) ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+unique = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  Testeurs ts ;
+  ts.acquiere(std::make_unique<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
+  ts.acquiere(std::make_unique<TesteurSomme<unsigned char>>(100)) ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+direct = """
+//==============================================
+// fonction principale
+//==============================================
+
+int main()
+ {
+  std::vector<std::unique_ptr<Testeur>> ts ;
+  ts.push_back(std::make_unique<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
+  ts.push_back(std::make_unique<TesteurSomme<unsigned char>>(100)) ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
