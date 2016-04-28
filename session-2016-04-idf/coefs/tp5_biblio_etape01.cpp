@@ -1,26 +1,21 @@
-
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <random>
-
+// -*- coding: utf-8 -*-
 
 //==============================================
 // utilitaires
 //==============================================
 
-class Echec
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <random>
+
+// émule la fonction std::make_unique qui apparait en C++14
+namespace std
  {
-  public :
-    Echec( unsigned int c, std::string const & comm )
-     : code_(c), commentaire_(comm) {}
-      unsigned int code() const { return code_ ; }
-      std::string const & commentaire() const { return commentaire_ ; }
-  private :
-    unsigned int code_ ;
-      std::string commentaire_ ;
- } ;
+  template<typename T, typename... Args>
+  std::unique_ptr<T> make_unique(Args&&... args)
+   { return std::unique_ptr<T>(new T(std::forward<Args>(args)...)) ; }
+ }
 
 double arrondi( double d, unsigned precision =0 )
  {
@@ -36,24 +31,15 @@ constexpr int fois_puissance_de_deux( int nombre, int exposant )
 constexpr int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
-template<typename T> constexpr bool avec_signe() { return true ; }
-template<> constexpr bool avec_signe<unsigned int>() { return false ; }
-template<> constexpr bool avec_signe<unsigned short>() { return false ; }
-template<> constexpr bool avec_signe<unsigned char>() { return false ; }
-
-template<typename T>
-constexpr int nombre_bits_hors_signe()
- { return avec_signe<T>()?(sizeof(T)*8-1):(sizeof(T)*8) ; }
-
+// crée sur le tas un tableau dynamique de coefficients
 double * new_rand_coefs( int taille )
  {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0,1);
+  std::random_device rd ;
+  std::mt19937 gen(rd()) ;
+  std::uniform_real_distribution<> dis(0,1) ;
   
   double * res = new double [taille] ;
-  int i ;
-  for ( i=0 ; i<taille ; i++ )
+  for ( int i=0 ; i<taille ; i++ )
    { res[i] = dis(gen) ; }
   return res ;
  }
@@ -65,225 +51,132 @@ double * new_rand_coefs( int taille )
 
 class Testeur
  {
- 
   public :
-  
-    class EchecDivisionParZero : public Echec
-     { public : EchecDivisionParZero() : Echec(1,"division par 0") {} } ;
-  
-    Testeur( int resolution ) : resolution_(resolution) {}
-    virtual void operator()( int bits ) =0 ;
-    virtual ~Testeur() {} ;
-    
-  protected :
-  
-    void erreur( int bits, double exact, double approx )
+    Testeur( int resolution, int width )
+     : resolution_(resolution), width_(width) {}
+    Testeur( Testeur const & ) = delete ;
+    Testeur & operator=( Testeur const & ) = delete ;
+    virtual void execute( int bits ) =0 ;
+    virtual ~Testeur() = default ;
+  protected : 
+    // recoit des tableaux de valeurs exactes et approximations
+    void erreur( int bits, double * exact, double * approx, int nb )
      {
-      if (exact==0) { throw EchecDivisionParZero() ; }
-      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
-      if (erreur<0) { erreur = -erreur ; }
+      double exacts {}, approxs {}, erreurs {} ;
+      for ( int i=0 ; i<nb ; ++i )
+       {
+        exacts += exact[i] ;
+        approxs += approx[i] ;
+        erreurs += fabs(exact[i]-approx[i])/exact[i] ;
+       }
+      exacts /= nb ;
+      approxs /= nb ;
+      erreurs *= (resolution_/nb) ;
       std::cout
         <<std::right<<std::setw(2)<<bits<<" bits : "
-        <<std::left<<exact<<" ~ "<<approx
-        <<" ("<<erreur<<"/"<<resolution_<<")" ;
+        <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+        <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+        <<std::endl ;
      }
-
   private :
-  
     int const resolution_ ;
-
+    int const width_ ;
  } ;
+
 
 class Testeurs
  {
   public :
-    using container = std::vector<Testeur *> ;
-    using const_iterator = container::const_iterator ;
-    void acquiere( Testeur * t ) { testeurs__.push_back(t) ; }
-    const_iterator begin() const { return testeurs__.begin() ; }
-    const_iterator end() const { return testeurs__.end() ; }
-    ~Testeurs() { for ( Testeur * t : testeurs__ ) delete t ; } 
+    void acquiere( Testeur * t ) { testeurs_.push_back(t) ; }
+    int nb_elements() const { return testeurs_.size() ; }
+    Testeur * operator[]( int i ) { return testeurs_.at(i) ; }
+    ~Testeurs() { for ( Testeur * t : testeurs_ ) delete t ; } 
   private :
-    container testeurs__ ;
+    std::vector<Testeur *> testeurs_ ;
  } ;
     
-void boucle( int deb, int fin, int inc, const Testeurs & ts )
+
+void boucle( int deb, int fin, int inc, Testeurs & ts )
  {
-  for ( Testeur * t : ts )
+  for ( int i=0 ; i<ts.nb_elements() ; ++i )
    {
-    try
-     {
-      std::cout<<std::endl ;
-      int bits ;
-      for ( bits = deb ; bits <= fin ; bits = bits + inc )
-       { (*t)(bits) ; }
-     }
-    catch ( Echec const & e )
-     { std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ; }
+    std::cout<<std::endl ;
+    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+     { ts[i]->execute(bits) ; }
    }
  }
 
 
 //==============================================
-// Coef
+// calculs
 //==============================================
 
 template<typename U>
 class Coef
  {
   public :
-  
-    class EchecTropDeBits : public Echec
-     { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
-     
-    explicit Coef( unsigned int bits )
-     : bits_{bits}, numerateur_{0}, exposant_{0}
-     { if (bits_>max_bits__) throw EchecTropDeBits() ; }
-    unsigned int lit_bits() const
-     { return bits_ ; }
+    Coef( int bits ) : bits_(bits), numerateur_{}, exposant_{} {}  
+    int lit_bits() const { return bits_ ; }
     void operator=( double valeur )
-     {
-      numerateur_ = exposant_ = 0 ;
-      if (valeur==0) { return ; }
-      double min = (entier_max(bits_)+0.5)/2 ;
-      while (valeur<min)
-       {
-          exposant_ = exposant_ + 1 ;
-          valeur = valeur * 2 ;
-       }
-      numerateur_ = arrondi(valeur) ;
-     }
+      {
+       numerateur_ = exposant_ = 0 ;
+       if (valeur==0) { return ; }
+       double min = (entier_max(bits_)+0.5)/2 ;
+       while (valeur<min)
+        { exposant_ += 1 ; valeur *= 2 ; }
+       numerateur_ = arrondi(valeur) ;
+      }   
     operator double() const
-     {
-      if (exposant_<0) { throw Echec(5,"exposant negatif") ; }
-      return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ;
-     }
+      { return (double(numerateur_)/fois_puissance_de_deux(1,exposant_)) ; }
     U operator*( U arg ) const
-     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }   
-    U numerateur() const
-     { return numerateur_ ; }
-    int exposant() const
-     { return exposant_ ; }
-
+     { return fois_puissance_de_deux(numerateur_*arg,-exposant_) ; }
   private :
-  
-    const unsigned int bits_ ;
+    int const bits_ ;
     U numerateur_ ;
     int exposant_ ;
-    
-    static constexpr unsigned int max_bits__
-     = nombre_bits_hors_signe<U>() ;
-    
  } ;
 
-template<typename U>
-std::ostream & operator<<( std::ostream & os, Coef<U> const & c )
- { return (os<<c.numerateur()<<"/2^"<<c.exposant()) ; }
-
-template<>
-std::ostream & operator<<( std::ostream & os, Coef<unsigned char> const & c )
- { return (os<<int(c.numerateur())<<"/2^"<<c.exposant()) ; }
-
 
 //==============================================
-// Testeurs dedies a Coef
+// tests
 //==============================================
 
 template<typename U>
-class TesteurCoef : public Testeur
+class TesteurRandCoefs : public Testeur
  {
   public :
-  
-    TesteurCoef( int resolution )
-     : Testeur(resolution)
-     {}
-
-  protected :
-  
-    void teste( int bits, double valeur )
+    TesteurRandCoefs( int resolution, int nbcoefs )
+     : Testeur(resolution,8), nbcoefs_{nbcoefs}
+     { exact_ = new_rand_coefs(nbcoefs_) ; approx_ = new double [nbcoefs_] ; }
+    virtual void execute( int bits )
      {
       Coef<U> c(bits) ;
-      c = valeur ;
-      erreur(bits,valeur,c) ;
-      std::cout<<" ("<<c<<")"<<std::endl ;
+      for ( int i=0 ; i<nbcoefs_ ; ++i )
+       { c = exact_[i] ; approx_[i] = arrondi(c,6) ; }
+      erreur(bits,exact_,approx_,nbcoefs_) ;
      }
- } ;
-
-
-template<typename U>
-class TesteurCoef065 : public TesteurCoef<U>
- {
-  public :
-    TesteurCoef065( int resolution ) : TesteurCoef<U>(resolution) {}
-    virtual void operator()( int bits ) { this->teste(bits,0.65) ; }
- } ;
-
-template<typename U>
-class TesteurCoef035 : public TesteurCoef<U>
- {
-  public :
-    TesteurCoef035( int resolution ) : TesteurCoef<U>(resolution) {}
-    virtual void operator()( int bits ) { this->teste(bits,0.35) ; }
+    virtual ~TesteurRandCoefs()
+     { delete [] exact_ ; delete [] approx_ ; }
+  private :
+    int nbcoefs_ ;
+    double * exact_ ;
+    double * approx_ ;
  } ;
 
 template<typename U>
 class TesteurSomme : public Testeur
  {
   public :
-
     TesteurSomme( int resolution )
-     : Testeur(resolution)
-     {}
-
-    virtual void operator()( int bits )
-     { teste(bits,0.65,3515,0.35,4832) ; }
-
-  private :
-  
-    void teste( int bits, double c1, U e1, double c2, U e2 )
+     : Testeur(resolution,3) {}
+    virtual void execute( int bits )
      {
       Coef<U> coef1(bits), coef2(bits) ;
-      int exact, approx ;
-      exact = (U)(c1*e1+c2*e2) ;
-      coef1 = c1 ;
-      coef2 = c2 ;
-      approx = coef1*e1 + coef2*e2 ;
-      erreur(bits,exact,approx) ;
-      std::cout<<std::endl ;
+      coef1 = 0.65 ; coef2 = 0.35 ;
+      double exact = 100 ;
+      double approx = coef1*U(exact) + coef2*U(exact) ;
+      erreur(bits,&exact,&approx,1) ;
      }
- } ;
-
-template<typename U>
-class TesteurRandCoefs : public Testeur
- {
-  public :
-
-    TesteurRandCoefs( int nbcoefs, int resolution )
-     : Testeur(resolution), nbcoefs_{nbcoefs}
-     { coefs_ = new_rand_coefs(nbcoefs_) ; }
-
-    virtual void operator()( int bits )
-     {
-      for ( int i=0 ; i<nbcoefs_ ; ++i )
-       { teste(bits,coefs_[i]) ; }
-     }
-    
-    virtual ~TesteurRandCoefs()
-     { delete [] coefs_ ; }
-
-  private :
-  
-    void teste( int bits, double valeur )
-     {
-      Coef<U> c(bits) ;
-      c = valeur ;
-      erreur(bits,arrondi(valeur,2),c) ;
-      std::cout<<" ("<<c<<")"<<std::endl ;
-     }
-    
-    int nbcoefs_ ;
-    double * coefs_ ;
-    
  } ;
 
 
@@ -293,31 +186,11 @@ class TesteurRandCoefs : public Testeur
 
 int main()
  {
-  try
-   {
-   
   Testeurs ts ;
-  ts.acquiere(new TesteurCoef065<short>(1000000)) ;
-  ts.acquiere(new TesteurCoef035<short>(1000000)) ;
-  ts.acquiere(new TesteurCoef065<int>(1000000)) ;
-  ts.acquiere(new TesteurCoef035<int>(1000000)) ;
-  ts.acquiere(new TesteurSomme<int>(1000000)) ;
-  boucle(4,16,4,ts) ;
-  std::cout<<std::endl ;
-  Testeurs ts2 ;
-  ts2.acquiere(new TesteurCoef065<unsigned char>(1000)) ;
-  ts2.acquiere(new TesteurCoef035<unsigned char>(1000)) ;
-  ts2.acquiere(new TesteurRandCoefs<unsigned char>(10,1000)) ;
-  boucle(1,8,1,ts2) ;
+  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
+  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
   return 0 ;
-    
-   }
-  catch ( Echec const & e )
-   {
-    std::cout<<"[ERREUR "<<e.code()<<" : "<<e.commentaire()<<"]"<<std::endl ;
-	return e.code() ;
-   }
  }
-
-
+ 

@@ -260,3 +260,145 @@ constexpr int nombre_bits_hors_signe()
 
 """
 
+biblio = """
+//==============================================
+// utilitaires
+//==============================================
+
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <random>
+
+// émule la fonction std::make_unique qui apparait en C++14
+namespace std
+ {
+  template<typename T, typename... Args>
+  std::unique_ptr<T> make_unique(Args&&... args)
+   { return std::unique_ptr<T>(new T(std::forward<Args>(args)...)) ; }
+ }
+
+double arrondi( double d, unsigned precision =0 )
+ {
+  double mult {1.} ;
+  while (precision-->0) mult *= 10. ;
+  if (d>0) { return int(d*mult+.5)/mult ; }
+  else { return int(d*mult-.5)/mult ; }
+ }
+
+constexpr int fois_puissance_de_deux( int nombre, int exposant )
+ { return (exposant>0)?(nombre<<exposant):(nombre>>(-exposant)) ; }
+
+constexpr int entier_max( int nombre_bits )
+ { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+
+// crée sur le tas un tableau dynamique de coefficients
+double * new_rand_coefs( int taille )
+ {
+  std::random_device rd ;
+  std::mt19937 gen(rd()) ;
+  std::uniform_real_distribution<> dis(0,1) ;
+  
+  double * res = new double [taille] ;
+  for ( int i=0 ; i<taille ; i++ )
+   { res[i] = dis(gen) ; }
+  return res ;
+ }
+
+"""
+
+pointeur = biblio + """
+template<typename Valeur>
+class Pointeur
+ {
+  public :
+    Pointeur( Valeur * val ) : val_{val} {}
+    Valeur & operator*() const { return *val_ ; } 
+    Valeur * operator->() const { return val_ ; } 
+    ~Pointeur() { delete val_ ; }
+  private :
+    Valeur * val_ ;
+ } ;
+ 
+"""
+
+pointeur_bavard = biblio + """
+template<typename Valeur>
+class Pointeur
+ {
+  public :
+    Pointeur( Valeur * val ) : val_{val}
+     { std::cout<<"(pointeur : construit "<<this<<"->"<<val_<<")"<<std::endl ; }
+    Pointeur( Pointeur const & ptr ) : val_{ptr.val_}
+     { std::cout<<"(pointeur : copie "<<(&ptr)<<"->"<<val_<<" vers "<<this<<"->"<<val_<<")"<<std::endl ; }
+    void operator=( Pointeur const & ptr )
+     {
+      val_ = ptr.val_ ;
+      std::cout<<"(pointeur : affecte "<<(&ptr)<<"->"<<val_<<" vers "<<this<<"->"<<val_<<")"<<std::endl ;
+     }
+    Valeur & operator*() const
+     { std::cout<<"(pointeur : accede "<<this<<"->"<<val_<<")"<<std::endl ; return *val_ ; } 
+    Valeur * operator->() const 
+     { std::cout<<"(pointeur : accede "<<this<<"->"<<val_<<")"<<std::endl ; return val_ ; } 
+    Valeur * get() const
+     { return val_ ; } 
+    ~Pointeur()
+     {  std::cout<<"(pointeur : detruit "<<this<<"->"<<val_<<")"<<std::endl ; /*delete val_*/ ; }
+  private :
+    Valeur * val_ ;
+ } ;
+ 
+"""
+
+auto_pointeur = biblio + """
+template<typename Valeur>
+class Pointeur
+ {
+  public :
+    Pointeur( Valeur * val ) : val_{val} {}
+    Pointeur( Pointeur const & ptr ) = delete ;
+    void operator=( Pointeur const & ptr ) = delete ;
+    Pointeur( Pointeur && ptr ) : val_{ptr.val_} { ptr.val_ = nullptr ; }
+    void operator=( Pointeur && ptr ) { val_ = ptr.val_ ; ptr.val_ = nullptr ; }
+    Valeur & operator*() const { return *val_ ; } 
+    Valeur * operator->() const { return val_ ; } 
+    ~Pointeur() { delete val_ ; }
+  private :
+    Valeur * val_ ;
+ } ;
+ 
+"""
+
+auto_pointeur_bavard = biblio + """
+template<typename Valeur>
+class Pointeur
+ {
+  public :
+    Pointeur( Valeur * val ) : val_{val}
+     { std::cout<<"(pointeur : construit "<<this<<"->"<<val_<<")"<<std::endl ; }
+    Pointeur( Pointeur const & ptr ) = delete ;
+    void operator=( Pointeur const & ptr ) = delete ;
+    Pointeur( Pointeur && ptr ) : val_{ptr.val_}
+     {
+      ptr.val_ = nullptr ;
+      std::cout<<"(pointeur : deplace "<<(&ptr)<<"->"<<val_<<" vers "<<this<<"->"<<val_<<")"<<std::endl ;
+     }
+    void operator=( Pointeur && ptr )
+     {
+      val_ = ptr.val_ ; ptr.val_ = nullptr ;
+      std::cout<<"(pointeur : deplace "<<(&ptr)<<"->"<<val_<<" vers "<<this<<"->"<<val_<<")"<<std::endl ;
+     }
+    Valeur & operator*() const
+     { std::cout<<"(pointeur : accede "<<this<<"->"<<val_<<")"<<std::endl ; return *val_ ; } 
+    Valeur * operator->() const 
+     { std::cout<<"(pointeur : accede "<<this<<"->"<<val_<<")"<<std::endl ; return val_ ; } 
+    Valeur * get() const
+     { return val_ ; } 
+    ~Pointeur()
+     {  std::cout<<"(pointeur : detruit "<<this<<"->"<<val_<<")"<<std::endl ; /*delete val_*/ ; }
+  private :
+    Valeur * val_ ;
+ } ;
+ 
+"""
+
