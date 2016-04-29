@@ -210,6 +210,7 @@ class TesteurSomme : public Testeur
 // fonction principale
 //==============================================
 
+
 int main()
  {
   Boucle boucle(3) ;

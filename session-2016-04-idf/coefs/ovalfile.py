@@ -76,7 +76,7 @@ tps = [
          ]},
     {"name": "tp5_biblio",
      "etapes": [
-         {"name": "etape00", "mcx": "mcx_utilitaires.biblio mcx_framework.biblio0 mcx_calculs.biblio mcx_tests.biblio mcx_main.biblio0", "args": ""},
+         {"name": "etape00", "mcx": "mcx_utilitaires.biblio mcx_framework.biblio mcx_calculs.biblio mcx_tests.biblio mcx_main.biblio", "args": ""},
          {"name": "etape01", "mcx": "mcx_utilitaires.biblio mcx_framework.vector mcx_calculs.biblio mcx_tests.biblio mcx_main.vector", "args": ""},
          {"name": "etape02", "mcx": "mcx_utilitaires.pointeur_bavard mcx_framework.pointeur_bavard mcx_calculs.biblio mcx_tests.biblio mcx_main.vector_bavard", "args": ""},
          {"name": "etape03", "mcx": "mcx_utilitaires.auto_pointeur mcx_framework.auto_pointeur mcx_calculs.biblio mcx_tests.biblio mcx_main.vector", "args": ""},
@@ -86,8 +86,14 @@ tps = [
          ]},
     {"name": "tp6_parallele",
      "etapes": [
-         {"name": "etape00", "mcx": "mcx_utilitaires.simple", "args": ""},
-         {"name": "etapeNN", "mcx": "mcx_utilitaires.simple", "args": ""}
+         {"name": "etape00", "mcx": "mcx_utilitaires.parallele mcx_framework.parallele mcx_calculs.biblio mcx_tests.parallele mcx_main.parallele", "args": ""},
+         {"name": "etape01", "mcx": "mcx_utilitaires.parallele mcx_framework.auto mcx_calculs.biblio mcx_tests.parallele mcx_main.auto", "args": ""},
+         {"name": "etape02", "mcx": "mcx_utilitaires.parallele mcx_framework.lambdas mcx_calculs.biblio mcx_tests.parallele mcx_main.auto", "args": ""},
+         {"name": "etape03", "mcx": "mcx_utilitaires.parallele mcx_framework.forgen mcx_calculs.biblio mcx_tests.parallele mcx_main.auto", "args": ""},
+         {"name": "etape04", "mcx": "mcx_utilitaires.parallele mcx_framework.threads mcx_calculs.biblio mcx_tests.parallele mcx_main.auto", "args": ""},
+         {"name": "etape05", "mcx": "mcx_utilitaires.parallele mcx_framework.stress mcx_calculs.biblio mcx_tests.parallele mcx_main.stress", "args": ""},
+         {"name": "etape06", "mcx": "mcx_utilitaires.parallele mcx_framework.sharedmem mcx_calculs.biblio mcx_tests.parallele mcx_main.mutex", "args": ""},
+         {"name": "etape07", "mcx": "mcx_utilitaires.parallele mcx_framework.async mcx_calculs.biblio mcx_tests.parallele mcx_main.auto", "args": ""}
          ]},
 ]
 

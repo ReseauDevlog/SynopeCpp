@@ -63,7 +63,7 @@ class Testeurs
  {
   public :
   
-    static void init( unsigned int max )
+    static void init( int max )
      {
       max__ = max ;
       indice__ = 0 ;
@@ -77,10 +77,10 @@ class Testeurs
       indice__++ ;
      }
      
-    static unsigned int nb_testeurs()
+    static int nb_testeurs()
      { return indice__ ; }
      
-    static Testeur * testeur( unsigned int i )
+    static Testeur * testeur( int i )
      {
       if (i>=indice__) { echec(3,"indice de testeur incorrect") ; }
       return testeurs__[i] ;
@@ -88,7 +88,7 @@ class Testeurs
      
     static void finalise()
      {
-      for ( unsigned int i=0 ; i<indice__ ; ++i )
+      for ( int i=0 ; i<indice__ ; ++i )
        { delete testeurs__[i] ; }
       delete [] testeurs__ ;
      }
@@ -96,18 +96,18 @@ class Testeurs
   private :
   
     static Testeur * * testeurs__ ;
-    static unsigned int max__ ;
-    static unsigned int indice__ ;
+    static int max__ ;
+    static int indice__ ;
 
  } ;
 
 Testeur * * Testeurs::testeurs__ {} ;
-unsigned int Testeurs::max__ {} ;
-unsigned int Testeurs::indice__ {} ;
+int Testeurs::max__ {} ;
+int Testeurs::indice__ {} ;
 
 void boucle( int deb, int fin, int inc )
  {
-  unsigned int i ;
+  int i ;
   for ( i=0 ; i<Testeurs::nb_testeurs() ; ++i )
    {
     Testeur * t = Testeurs::testeur(i) ;
@@ -236,6 +236,7 @@ class TesteurSomme : public Testeur
 //==============================================
 // fonction principale
 //==============================================
+
 
 int main()
  {

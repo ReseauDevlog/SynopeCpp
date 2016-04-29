@@ -66,31 +66,34 @@ class Pointeur
 // framework general de test
 //==============================================
 
-class Testeur
+class RandTesteur
  {
   public :
-    Testeur( int resolution, int width )
-     : resolution_(resolution), width_(width) {}
-    Testeur( Testeur const & ) = delete ;
-    Testeur & operator=( Testeur const & ) = delete ;
+    RandTesteur( int nb, int resolution, int width )
+     : nb_{nb}, num_{new_rand_coefs(nb)}, 
+       exact_{new double [nb]}, approx_{new double [nb]},
+       resolution_{resolution}, width_{width}
+     {}
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
     virtual void execute( int bits ) =0 ;
-    virtual ~Testeur() = default ;
+    virtual ~RandTesteur()
+     { delete [] num_ ; delete [] exact_ ; delete [] approx_ ; }
   protected : 
-    // recoit des tableaux de valeurs exactes et approximations
-    void erreur( int bits, double * exact, double * approx, int nb )
+    int nb_ ;
+    double * num_, * exact_, * approx_ ;
+    void erreur( int bits )
      {
       double exacts {}, approxs {}, erreurs {} ;
-      for ( int i=0 ; i<nb ; ++i )
+      for ( int i=0 ; i<nb_ ; ++i )
        {
-        exacts += exact[i] ;
-        approxs += approx[i] ;
-        erreurs += fabs(exact[i]-approx[i])/exact[i] ;
+        exacts += exact_[i] ; approxs += approx_[i] ;
+        erreurs += fabs(exact_[i]-approx_[i])/exact_[i] ;
        }
-      exacts /= nb ;
-      approxs /= nb ;
-      erreurs *= (resolution_/nb) ;
+      exacts /= nb_ ; approxs /= nb_ ; erreurs /= nb_ ;
+      erreurs *= resolution_ ;
       std::cout
-        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<bits<<" bits : "
         <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
         <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
         <<std::endl ;
@@ -104,11 +107,11 @@ class Testeur
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { testeurs_.push_back(t) ; }
+    void acquiere( RandTesteur * t ) { testeurs_.push_back(t) ; }
     int nb_elements() { return testeurs_.size() ; }
-    Pointeur<Testeur> & operator[]( int i ) { return testeurs_.at(i) ; }
+    Pointeur<RandTesteur> & operator[]( int i ) { return testeurs_.at(i) ; }
   private :
-    std::vector<Pointeur<Testeur>> testeurs_ ;
+    std::vector<Pointeur<RandTesteur>> testeurs_ ;
  } ;
     
 
@@ -158,40 +161,40 @@ class Coef
 //==============================================
 
 template<typename U>
-class TesteurRandCoefs : public Testeur
+class TesteurCoefs : public RandTesteur
  {
   public :
-    TesteurRandCoefs( int resolution, int nbcoefs )
-     : Testeur(resolution,8), nbcoefs_{nbcoefs}
-     { exact_ = new_rand_coefs(nbcoefs_) ; approx_ = new double [nbcoefs_] ; }
+    TesteurCoefs( int nb, int resolution )
+     : RandTesteur(nb,resolution,8) {}
     virtual void execute( int bits )
      {
       Coef<U> c(bits) ;
-      for ( int i=0 ; i<nbcoefs_ ; ++i )
-       { c = exact_[i] ; approx_[i] = arrondi(c,6) ; }
-      erreur(bits,exact_,approx_,nbcoefs_) ;
+      for ( int i=0 ; i<nb_ ; ++i )
+       {
+        c = num_[i] ;
+        exact_[i] = num_[i] ;
+        approx_[i] = arrondi(c,6) ;
+       }
+      erreur(bits) ;
      }
-    virtual ~TesteurRandCoefs()
-     { delete [] exact_ ; delete [] approx_ ; }
-  private :
-    int nbcoefs_ ;
-    double * exact_ ;
-    double * approx_ ;
  } ;
 
 template<typename U>
-class TesteurSomme : public Testeur
+class TesteurSommes : public RandTesteur
  {
   public :
-    TesteurSomme( int resolution )
-     : Testeur(resolution,3) {}
+    TesteurSommes( int nb, int resolution )
+     : RandTesteur(nb,resolution,7) {}
     virtual void execute( int bits )
      {
       Coef<U> coef1(bits), coef2(bits) ;
-      coef1 = 0.65 ; coef2 = 0.35 ;
-      double exact = 100 ;
-      double approx = coef1*U(exact) + coef2*U(exact) ;
-      erreur(bits,&exact,&approx,1) ;
+      for ( int i=0 ; i<nb_ ; ++i )
+       {
+        coef1 = num_[i] ; coef2 = (1-num_[i]) ;
+        exact_[i] = 200. ;
+        approx_[i] = arrondi(coef1*U(exact_[i]) + coef2*U(exact_[i]),3) ;
+       }
+      erreur(bits) ;
      }
  } ;
 
@@ -200,11 +203,12 @@ class TesteurSomme : public Testeur
 // fonction principale
 //==============================================
 
+
 int main()
  {
   Testeurs ts ;
-  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
-  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  ts.acquiere(new TesteurCoefs<unsigned char>(1000,1000)) ;
+  ts.acquiere(new TesteurSommes<unsigned char>(1000,1000)) ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
   return 0 ;

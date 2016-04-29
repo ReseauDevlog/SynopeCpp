@@ -185,6 +185,7 @@ class TesteurSomme : public Testeur
 // fonction principale
 //==============================================
 
+
 int main()
  {
   TesteurCoef065 tc065 ;

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
-test_utilitaires = """
+HEADER = """
 //==============================================
 // fonction principale
 //==============================================
 
+"""
+
+test_utilitaires = HEADER + """
 int main()
  {
   // tests sur arrondi()
@@ -55,11 +58,7 @@ int main()
 
 """
 
-boucle_exposant = """
-//==============================================
-// fonction principale
-//==============================================
-
+boucle_exposant = HEADER + """
 int main()
  {
   std::cout<<std::endl ;
@@ -75,11 +74,7 @@ int main()
 
 """
 
-approxime = """
-//==============================================
-// fonction principale
-//==============================================
-
+approxime = HEADER + """
 int main()
  {
   std::cout << std::endl ;
@@ -92,11 +87,7 @@ int main()
 
 """
 
-approxime_max = """
-//==============================================
-// fonction principale
-//==============================================
-
+approxime_max = HEADER + """
 int main()
  {
   std::cout << std::endl ;
@@ -111,11 +102,7 @@ int main()
 
 """
 
-approxime_bits = """
-//==============================================
-// fonction principale
-//==============================================
-
+approxime_bits = HEADER + """
 int main()
  {
   int bits ;
@@ -134,11 +121,7 @@ int main()
 
 """
 
-teste_approxime = """
-//==============================================
-// fonction principale
-//==============================================
-
+teste_approxime = HEADER + """
 int main()
  {
   int bits ;
@@ -157,11 +140,7 @@ int main()
 
 """
 
-multiplie = """
-//==============================================
-// fonction principale
-//==============================================
-
+multiplie = HEADER + """
 int main()
  {
   int bits ;
@@ -188,11 +167,7 @@ int main()
 
 """
 
-simple = """
-//==============================================
-// fonction principale
-//==============================================
-
+simple = HEADER + """
 int main()
  {
   int bits ;
@@ -215,11 +190,7 @@ int main()
 
 """
 
-pfonctions = """
-//==============================================
-// fonction principale
-//==============================================
-
+pfonctions = HEADER + """
 int main()
  {
   std::cout<<std::endl ;
@@ -231,11 +202,7 @@ int main()
 
 """
 
-pfonctions_rand = """
-//==============================================
-// fonction principale
-//==============================================
-
+pfonctions_rand = HEADER + """
 #include <cstdlib>  // for atoi
 
 int main( int argc, char *argv[] )
@@ -255,11 +222,7 @@ int main( int argc, char *argv[] )
 
 """
 
-pfonctions_ostream = """
-//==============================================
-// fonction principale
-//==============================================
-
+pfonctions_ostream = HEADER + """
 #include <fstream>
 
 int main( int argc, char *argv[] )
@@ -283,11 +246,7 @@ int main( int argc, char *argv[] )
 
 """
 
-tcoef = """
-//==============================================
-// fonction principale
-//==============================================
-
+tcoef = HEADER + """
 int main()
  {
   int bits ;
@@ -307,11 +266,7 @@ int main()
 
 """
 
-testeurs = """
-//==============================================
-// fonction principale
-//==============================================
-
+testeurs = HEADER + """
 int main()
  {
   int bits ;
@@ -332,11 +287,7 @@ int main()
  
 """
 
-heritage = """
-//==============================================
-// fonction principale
-//==============================================
-
+heritage = HEADER + """
 int main()
  {
   int bits ;
@@ -365,11 +316,7 @@ int main()
  
 """
 
-virtual = """
-//==============================================
-// fonction principale
-//==============================================
-
+virtual = HEADER + """
 int main()
  {
   TesteurCoef065 tc065 ;
@@ -384,11 +331,7 @@ int main()
  
 """
 
-boucle_foncteur = """
-//==============================================
-// fonction principale
-//==============================================
-
+boucle_foncteur = HEADER + """
 int main()
  {
   TesteurCoef065 tc065 ;
@@ -404,11 +347,7 @@ int main()
  
 """
 
-boucle_conteneur = """
-//==============================================
-// fonction principale
-//==============================================
-
+boucle_conteneur = HEADER + """
 int main()
  {
   TesteurCoef065 tc065 ;
@@ -425,11 +364,7 @@ int main()
  
 """
 
-conteneur_ptr = """
-//==============================================
-// fonction principale
-//==============================================
-
+conteneur_ptr = HEADER + """
 int main()
  {
   TesteurCoef065 tc065 ;
@@ -447,11 +382,7 @@ int main()
  
 """
 
-conteneur_indice = """
-//==============================================
-// fonction principale
-//==============================================
-
+conteneur_indice = HEADER + """
 int main()
  {
   TesteurCoef065 tc065 ;
@@ -469,11 +400,7 @@ int main()
  
 """
 
-conteneur_dyn = """
-//==============================================
-// fonction principale
-//==============================================
-
+conteneur_dyn = HEADER + """
 int main()
  {
   TesteurCoef065 tc065 ;
@@ -492,11 +419,7 @@ int main()
  
 """
 
-conteneur_owner = """
-//==============================================
-// fonction principale
-//==============================================
-
+conteneur_owner = HEADER + """
 int main()
  {
   Boucle boucle ;
@@ -512,11 +435,7 @@ int main()
  
 """
 
-constructeurs_testeurs = """
-//==============================================
-// fonction principale
-//==============================================
-
+constructeurs_testeurs = HEADER + """
 int main()
  {
   Boucle boucle ;
@@ -532,11 +451,7 @@ int main()
  
 """
 
-constructeurs = """
-//==============================================
-// fonction principale
-//==============================================
-
+constructeurs = HEADER + """
 int main()
  {
   Boucle boucle(3) ;
@@ -550,11 +465,7 @@ int main()
  
 """
 
-conteneur_dedie = """
-//==============================================
-// fonction principale
-//==============================================
-
+conteneur_dedie = HEADER + """
 int main()
  {
   Testeurs ts(3) ;
@@ -568,11 +479,7 @@ int main()
  
 """
 
-statiques = """
-//==============================================
-// fonction principale
-//==============================================
-
+statiques = HEADER + """
 int main()
  {
   Testeurs::init(3) ;
@@ -587,11 +494,7 @@ int main()
 
 """
 
-catch_check = """
-//==============================================
-// fonction principale
-//==============================================
-
+catch_check = HEADER + """
 int main()
  {
   try
@@ -613,11 +516,7 @@ int main()
  
 """
 
-catch = """
-//==============================================
-// fonction principale
-//==============================================
-
+catch = HEADER + """
 int main()
  {
   try
@@ -641,11 +540,7 @@ int main()
 
 gen0 = catch
 
-template = """
-//==============================================
-// fonction principale
-//==============================================
-
+template = HEADER + """
 int main()
  {
   try
@@ -667,11 +562,7 @@ int main()
  
 """
 
-shortsomme = """
-//==============================================
-// fonction principale
-//==============================================
-
+shortsomme = HEADER + """
 int main()
  {
   try
@@ -694,11 +585,7 @@ int main()
  
 """
 
-shortcoef = """
-//==============================================
-// fonction principale
-//==============================================
-
+shortcoef = HEADER + """
 int main()
  {
   try
@@ -722,11 +609,7 @@ int main()
  
 """
 
-uchar = """
-//==============================================
-// fonction principale
-//==============================================
-
+uchar = HEADER + """
 int main()
  {
   try
@@ -755,11 +638,7 @@ int main()
  
 """
 
-gentesteurs = """
-//==============================================
-// fonction principale
-//==============================================
-
+gentesteurs = HEADER + """
 int main()
  {
   try
@@ -788,11 +667,7 @@ int main()
  
 """
 
-traits = """
-//==============================================
-// fonction principale
-//==============================================
-
+traits = HEADER + """
 int main()
  {
   try
@@ -825,16 +700,12 @@ int main()
 # TP BIBLIO
 #=====================================================================
 
-biblio0 = """
-//==============================================
-// fonction principale
-//==============================================
-
+biblio = HEADER + """
 int main()
  {
   Testeurs<2> ts ;
-  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
-  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  ts.acquiere(new TesteurCoefs<unsigned char>(1000,1000)) ;
+  ts.acquiere(new TesteurSommes<unsigned char>(1000,1000)) ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
   return 0 ;
@@ -842,16 +713,12 @@ int main()
  
 """
 
-vector = """
-//==============================================
-// fonction principale
-//==============================================
-
+vector = HEADER + """
 int main()
  {
   Testeurs ts ;
-  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
-  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  ts.acquiere(new TesteurCoefs<unsigned char>(1000,1000)) ;
+  ts.acquiere(new TesteurSommes<unsigned char>(1000,1000)) ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
   return 0 ;
@@ -859,19 +726,15 @@ int main()
  
 """
 
-vector_bavard = """
-//==============================================
-// fonction principale
-//==============================================
-
+vector_bavard = HEADER + """
 int main()
  {
   std::cout<<"===== Debut"<<std::endl ;
   Testeurs ts ;
-  std::cout<<"===== TesteurRandCoefs"<<std::endl ;
-  ts.acquiere(new TesteurRandCoefs<unsigned char>(1000,1000)) ;
-  std::cout<<"===== TesteurSomme"<<std::endl ;
-  ts.acquiere(new TesteurSomme<unsigned char>(100)) ;
+  std::cout<<"===== TesteurCoefs"<<std::endl ;
+  ts.acquiere(new TesteurCoefs<unsigned char>(1000,1000)) ;
+  std::cout<<"===== TesteurSommes"<<std::endl ;
+  ts.acquiere(new TesteurSommes<unsigned char>(1000,1000)) ;
   std::cout<<"===== Boucle"<<std::endl ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
@@ -881,16 +744,12 @@ int main()
  
 """
 
-shared = """
-//==============================================
-// fonction principale
-//==============================================
-
+shared = HEADER + """
 int main()
  {
   Testeurs ts ;
-  ts.acquiere(std::make_shared<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
-  ts.acquiere(std::make_shared<TesteurSomme<unsigned char>>(100)) ;
+  ts.acquiere(std::make_shared<TesteurCoefs<unsigned char>>(1000,1000)) ;
+  ts.acquiere(std::make_shared<TesteurSommes<unsigned char>>(1000,1000)) ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
   return 0 ;
@@ -898,16 +757,12 @@ int main()
  
 """
 
-unique = """
-//==============================================
-// fonction principale
-//==============================================
-
+unique = HEADER + """
 int main()
  {
   Testeurs ts ;
-  ts.acquiere(std::make_unique<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
-  ts.acquiere(std::make_unique<TesteurSomme<unsigned char>>(100)) ;
+  ts.acquiere(std::make_unique<TesteurCoefs<unsigned char>>(1000,1000)) ;
+  ts.acquiere(std::make_unique<TesteurSommes<unsigned char>>(1000,1000)) ;
   boucle(1,8,1,ts) ;
   std::cout<<std::endl ;
   return 0 ;
@@ -915,20 +770,75 @@ int main()
  
 """
 
-direct = """
-//==============================================
-// fonction principale
-//==============================================
+direct = HEADER + """
+int main()
+ {
+  std::vector<std::unique_ptr<RandTesteur>> ts ;
+  ts.push_back(std::make_unique<TesteurCoefs<unsigned char>>(1000,1000)) ;
+  ts.push_back(std::make_unique<TesteurSommes<unsigned char>>(1000,1000)) ;
+  boucle(1,8,1,ts) ;
+  std::cout<<std::endl ;
+  return 0 ;
+ }
+ 
+"""
+
+
+#=====================================================================
+# TP PARALLELE
+#=====================================================================
+
+parallele = HEADER + """
+#include <chrono>
 
 int main()
  {
-  std::vector<std::unique_ptr<Testeur>> ts ;
-  ts.push_back(std::make_unique<TesteurRandCoefs<unsigned char>>(1000,1000)) ;
-  ts.push_back(std::make_unique<TesteurSomme<unsigned char>>(100)) ;
+  std::chrono::time_point<std::chrono::steady_clock> debut = std::chrono::steady_clock::now() ;
+
+  constexpr int SIZE = 1000000 ;
+  std::vector<std::unique_ptr<RandTesteur<SIZE>>> ts ;
+  ts.push_back(std::make_unique<TesteurCoefs<unsigned char,SIZE>>(1000)) ;
+  ts.push_back(std::make_unique<TesteurSommes<unsigned char,SIZE>>(1000)) ;
   boucle(1,8,1,ts) ;
-  std::cout<<std::endl ;
+  
+  std::chrono::time_point<std::chrono::steady_clock> fin = std::chrono::steady_clock::now() ;
+  std::chrono::milliseconds temps = std::chrono::duration_cast<std::chrono::milliseconds>(fin - debut) ;
+  
+  std::cout<<"\\ntemps ecoule : "<<temps.count()<<" ms\\n"<<std::endl ;
+  
   return 0 ;
  }
  
 """
 
+main1 = """
+#include <chrono>
+
+int main()
+ {
+  using namespace std ;
+  using namespace chrono ;
+  
+  auto debut = steady_clock::now() ;
+
+  constexpr int SIZE = """
+  
+main2 = """ ;
+  vector<unique_ptr<RandTesteur<SIZE>>> ts ;
+  ts.push_back(make_unique<TesteurCoefs<unsigned char,SIZE>>(1000)) ;
+  ts.push_back(make_unique<TesteurSommes<unsigned char,SIZE>>(1000)) ;
+  boucle(1,8,1,ts) ;
+  
+  auto fin = steady_clock::now() ;
+  auto temps = duration_cast<milliseconds>(fin - debut) ;
+  
+  std::cout<<"\\ntemps ecoule : "<<temps.count()<<" ms\\n"<<std::endl ;
+  
+  return 0 ;
+ }
+ 
+"""
+
+auto = HEADER + main1 + "1000000" + main2
+stress = HEADER + main1 + "100000" + main2
+mutex = HEADER + main1 + "10000" + main2

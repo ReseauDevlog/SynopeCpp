@@ -61,6 +61,7 @@ void approxime( int max, double valeur )
 // fonction principale
 //==============================================
 
+
 int main()
  {
   std::cout << std::endl ;

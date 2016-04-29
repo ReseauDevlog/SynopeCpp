@@ -148,6 +148,7 @@ void teste_rand_coefs( int bits )
 // fonction principale
 //==============================================
 
+
 #include <cstdlib>  // for atoi
 
 int main( int argc, char *argv[] )
