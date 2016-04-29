@@ -223,6 +223,7 @@ class TesteurSomme : public Testeur
 // fonction principale
 //==============================================
 
+
 int main()
  {
   Testeurs ts(3) ;

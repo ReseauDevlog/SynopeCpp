@@ -31,49 +31,54 @@ constexpr int fois_puissance_de_deux( int nombre, int exposant )
 constexpr int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
 
-// crée sur le tas un tableau dynamique de coefficients
-double * new_rand_coefs( int taille )
+class RandCoefs
  {
-  std::random_device rd ;
-  std::mt19937 gen(rd()) ;
-  std::uniform_real_distribution<> dis(0,1) ;
-  
-  double * res = new double [taille] ;
-  for ( int i=0 ; i<taille ; i++ )
-   { res[i] = dis(gen) ; }
-  return res ;
- }
+  public :
+    RandCoefs() : rd_{}, gen_{rd_()}, dis_(0,1) {}
+    double operator()()
+     { return dis_(gen_) ; }
+  private :
+    std::random_device rd_ ;
+    std::mt19937 gen_ ;
+    std::uniform_real_distribution<> dis_ ;
+ } ;
+
 
 
 //==============================================
 // framework general de test
 //==============================================
 
+#include <array>
+#include <algorithm>
+
+template<int SIZE>
 class RandTesteur
  {
   public :
-    RandTesteur( int nb, int resolution, int width )
-     : nb_{nb}, num_{new_rand_coefs(nb)}, 
-       exact_{new double [nb]}, approx_{new double [nb]},
-       resolution_{resolution}, width_{width}
-     {}
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
+     }
+     
     RandTesteur( RandTesteur const & ) = delete ;
     RandTesteur & operator=( RandTesteur const & ) = delete ;
-    virtual void execute( int bits ) =0 ;
-    virtual ~RandTesteur()
-     { delete [] num_ ; delete [] exact_ ; delete [] approx_ ; }
-  protected : 
-    int nb_ ;
-    double * num_, * exact_, * approx_ ;
-    void erreur( int bits )
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
      {
-      double exacts {}, approxs {}, erreurs {} ;
-      for ( int i=0 ; i<nb_ ; ++i )
+      double exact, approx ;
+      double exacts {0}, approxs {0}, erreurs {0} ;
+      for ( double coef : coefs_ )
        {
-        exacts += exact_[i] ; approxs += approx_[i] ;
-        erreurs += fabs(exact_[i]-approx_[i])/exact_[i] ;
+        execute(bits,coef,exact,approx) ;
+        exacts +=exact ; approxs += approx ;
+        erreurs += fabs(exact-approx)/exact ;
        }
-      exacts /= nb_ ; approxs /= nb_ ; erreurs /= nb_ ;
+      exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
       erreurs *= resolution_ ;
       std::cout
         <<bits<<" bits : "
@@ -81,33 +86,34 @@ class RandTesteur
         <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
         <<std::endl ;
      }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
   private :
+  
+    std::array<double,SIZE> coefs_ ;
+    RandCoefs rand_coefs_ ;
     int const resolution_ ;
     int const width_ ;
- } ;
-
-
-#include <memory>
-
-class Testeurs
- {
-  public :
-    void acquiere( std::unique_ptr<RandTesteur> && t ) { testeurs_.push_back(std::move(t)) ; }
-    int nb_elements() { return testeurs_.size() ; }
-    std::unique_ptr<RandTesteur> & operator[]( int i ) { return testeurs_.at(i) ; }
-  private :
-    std::vector<std::unique_ptr<RandTesteur>> testeurs_ ;
- } ;
     
+ } ;
 
+
+template<typename Testeurs>
 void boucle( int deb, int fin, int inc, Testeurs & ts )
  {
-  for ( int i=0 ; i<ts.nb_elements() ; ++i )
-   {
-    std::cout<<std::endl ;
-    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
-     { ts[i]->execute(bits) ; }
-   }
+  std::for_each
+   (
+    ts.begin(),ts.end(),
+    [=]( typename Testeurs::value_type & testeur )
+     {
+      std::cout<<std::endl ;
+      for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+       { testeur->execute(bits) ; }
+     }
+   ) ;
  }
 
 
@@ -145,41 +151,33 @@ class Coef
 // tests
 //==============================================
 
-template<typename U>
-class TesteurCoefs : public RandTesteur
+template<typename U, int SIZE>
+class TesteurCoefs : public RandTesteur<SIZE>
  {
   public :
-    TesteurCoefs( int nb, int resolution )
-     : RandTesteur(nb,resolution,8) {}
-    virtual void execute( int bits )
+    TesteurCoefs( int resolution )
+     : RandTesteur<SIZE>(resolution,8) {}
+    virtual void execute( int bits, double coef, double & exact, double & approx )
      {
       Coef<U> c(bits) ;
-      for ( int i=0 ; i<nb_ ; ++i )
-       {
-        c = num_[i] ;
-        exact_[i] = num_[i] ;
-        approx_[i] = arrondi(c,6) ;
-       }
-      erreur(bits) ;
+      c = coef ;
+      exact =coef ;
+      approx = arrondi(c,6) ;
      }
  } ;
 
-template<typename U>
-class TesteurSommes : public RandTesteur
+template<typename U, int SIZE>
+class TesteurSommes : public RandTesteur<SIZE>
  {
   public :
-    TesteurSommes( int nb, int resolution )
-     : RandTesteur(nb,resolution,7) {}
-    virtual void execute( int bits )
+    TesteurSommes( int resolution )
+     : RandTesteur<SIZE>(resolution,7) {}
+    virtual void execute( int bits, double coef, double & exact, double & approx )
      {
       Coef<U> coef1(bits), coef2(bits) ;
-      for ( int i=0 ; i<nb_ ; ++i )
-       {
-        coef1 = num_[i] ; coef2 = (1-num_[i]) ;
-        exact_[i] = 200. ;
-        approx_[i] = arrondi(coef1*U(exact_[i]) + coef2*U(exact_[i]),3) ;
-       }
-      erreur(bits) ;
+      coef1 = coef ; coef2 = (1-coef) ;
+      exact = 200. ;
+      approx = arrondi(coef1*U(exact) + coef2*U(exact),3) ;
      }
  } ;
 
@@ -189,13 +187,26 @@ class TesteurSommes : public RandTesteur
 //==============================================
 
 
+#include <chrono>
+
 int main()
  {
-  Testeurs ts ;
-  ts.acquiere(std::make_unique<TesteurCoefs<unsigned char>>(1000,1000)) ;
-  ts.acquiere(std::make_unique<TesteurSommes<unsigned char>>(1000,1000)) ;
+  using namespace std ;
+  using namespace chrono ;
+  
+  auto debut = steady_clock::now() ;
+
+  constexpr int SIZE = 1000000 ;
+  vector<unique_ptr<RandTesteur<SIZE>>> ts ;
+  ts.push_back(make_unique<TesteurCoefs<unsigned char,SIZE>>(1000)) ;
+  ts.push_back(make_unique<TesteurSommes<unsigned char,SIZE>>(1000)) ;
   boucle(1,8,1,ts) ;
-  std::cout<<std::endl ;
+  
+  auto fin = steady_clock::now() ;
+  auto temps = duration_cast<milliseconds>(fin - debut) ;
+  
+  std::cout<<"\ntemps ecoule : "<<temps.count()<<" ms\n"<<std::endl ;
+  
   return 0 ;
  }
  

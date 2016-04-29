@@ -974,32 +974,35 @@ void boucle( int deb, int fin, int inc, Testeurs<SIZE> & ts )
 # TP BIBLIO
 #=====================================================================
 
-testeur_biblio = """
-class Testeur
+rand_testeur = """
+class RandTesteur
  {
   public :
-    Testeur( int resolution, int width )
-     : resolution_(resolution), width_(width) {}
-    Testeur( Testeur const & ) = delete ;
-    Testeur & operator=( Testeur const & ) = delete ;
+    RandTesteur( int nb, int resolution, int width )
+     : nb_{nb}, num_{new_rand_coefs(nb)}, 
+       exact_{new double [nb]}, approx_{new double [nb]},
+       resolution_{resolution}, width_{width}
+     {}
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
     virtual void execute( int bits ) =0 ;
-    virtual ~Testeur() = default ;
+    virtual ~RandTesteur()
+     { delete [] num_ ; delete [] exact_ ; delete [] approx_ ; }
   protected : 
-    // recoit des tableaux de valeurs exactes et approximations
-    void erreur( int bits, double * exact, double * approx, int nb )
+    int nb_ ;
+    double * num_, * exact_, * approx_ ;
+    void erreur( int bits )
      {
       double exacts {}, approxs {}, erreurs {} ;
-      for ( int i=0 ; i<nb ; ++i )
+      for ( int i=0 ; i<nb_ ; ++i )
        {
-        exacts += exact[i] ;
-        approxs += approx[i] ;
-        erreurs += fabs(exact[i]-approx[i])/exact[i] ;
+        exacts += exact_[i] ; approxs += approx_[i] ;
+        erreurs += fabs(exact_[i]-approx_[i])/exact_[i] ;
        }
-      exacts /= nb ;
-      approxs /= nb ;
-      erreurs *= (resolution_/nb) ;
+      exacts /= nb_ ; approxs /= nb_ ; erreurs /= nb_ ;
+      erreurs *= resolution_ ;
       std::cout
-        <<std::right<<std::setw(2)<<bits<<" bits : "
+        <<bits<<" bits : "
         <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
         <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
         <<std::endl ;
@@ -1017,9 +1020,9 @@ class Testeurs
  {
   public :
     Testeurs() : indice_{} {}
-    void acquiere( Testeur * t ) { testeurs_[indice_++] = t ; }
+    void acquiere( RandTesteur * t ) { testeurs_[indice_++] = t ; }
     int nb_elements()  { return indice_ ; }
-    Testeur * operator[]( int i ) { return testeurs_[i] ; }
+    RandTesteur * operator[]( int i ) { return testeurs_[i] ; }
     ~Testeurs()
      {
       for ( int i=0 ; i<indice_ ; ++i )
@@ -1027,7 +1030,7 @@ class Testeurs
      }
   private :
     int indice_ ;
-    Testeur * testeurs_[SIZE] ;
+    RandTesteur * testeurs_[SIZE] ;
  } ;
     
 
@@ -1047,18 +1050,18 @@ void boucle( int deb, int fin, int inc, Testeurs<SIZE> & ts )
 
 """
 
-biblio0 = HEADER + testeur_biblio + testeurs_biblio0 + boucle_biblio0
+biblio = HEADER + rand_testeur + testeurs_biblio0 + boucle_biblio0
 
 testeurs_vector = """
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { testeurs_.push_back(t) ; }
+    void acquiere( RandTesteur * t ) { testeurs_.push_back(t) ; }
     int nb_elements() const { return testeurs_.size() ; }
-    Testeur * operator[]( int i ) { return testeurs_.at(i) ; }
-    ~Testeurs() { for ( Testeur * t : testeurs_ ) delete t ; } 
+    RandTesteur * operator[]( int i ) { return testeurs_.at(i) ; }
+    ~Testeurs() { for ( RandTesteur * t : testeurs_ ) delete t ; } 
   private :
-    std::vector<Testeur *> testeurs_ ;
+    std::vector<RandTesteur *> testeurs_ ;
  } ;
     
 """
@@ -1076,77 +1079,77 @@ void boucle( int deb, int fin, int inc, Testeurs & ts )
 
 """
 
-vector = HEADER + testeur_biblio + testeurs_vector + boucle_biblio
+vector = HEADER + rand_testeur + testeurs_vector + boucle_biblio
 
 testeurs_pointeur = """
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { testeurs_.push_back(t) ; }
+    void acquiere( RandTesteur * t ) { testeurs_.push_back(t) ; }
     int nb_elements() { return testeurs_.size() ; }
-    Pointeur<Testeur> operator[]( int i ) { return testeurs_.at(i) ; }
+    Pointeur<RandTesteur> operator[]( int i ) { return testeurs_.at(i) ; }
   private :
-    std::vector<Pointeur<Testeur>> testeurs_ ;
+    std::vector<Pointeur<RandTesteur>> testeurs_ ;
  } ;
     
 """
 
-pointeur = HEADER + testeur_biblio + testeurs_pointeur + boucle_biblio
+pointeur = HEADER + rand_testeur + testeurs_pointeur + boucle_biblio
 
 testeurs_bavard = """
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { std::cout<<"(testeurs : acquiere "<<t<<")"<<std::endl ; testeurs_.push_back(t) ; }
+    void acquiere( RandTesteur * t ) { std::cout<<"(testeurs : acquiere "<<t<<")"<<std::endl ; testeurs_.push_back(t) ; }
     int nb_elements() { return testeurs_.size() ; }
-    Pointeur<Testeur> operator[]( int i )
+    Pointeur<RandTesteur> operator[]( int i )
      {
       std::cout<<"(testeurs : accede "<<i<<"->"<<testeurs_.at(i).get()<<")"<<std::endl ;
       return testeurs_.at(i) ;
      }
     ~Testeurs() { std::cout<<"(testeurs : libere"<<")"<<std::endl ; }
   private :
-    std::vector<Pointeur<Testeur>> testeurs_ ;
+    std::vector<Pointeur<RandTesteur>> testeurs_ ;
  } ;
 
 """
 
-pointeur_bavard = HEADER + testeur_biblio + testeurs_bavard + boucle_biblio
+pointeur_bavard = HEADER + rand_testeur + testeurs_bavard + boucle_biblio
 
 testeurs_ref_bavard = """
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { std::cout<<"(testeurs : acquiere "<<t<<")"<<std::endl ; testeurs_.push_back(t) ; }
+    void acquiere( RandTesteur * t ) { std::cout<<"(testeurs : acquiere "<<t<<")"<<std::endl ; testeurs_.push_back(t) ; }
     int nb_elements() { return testeurs_.size() ; }
-    Pointeur<Testeur> & operator[]( int i )
+    Pointeur<RandTesteur> & operator[]( int i )
      {
       std::cout<<"(testeurs : accede "<<i<<"->"<<testeurs_.at(i).get()<<")"<<std::endl ;
       return testeurs_.at(i) ;
      }
     ~Testeurs() { std::cout<<"(testeurs : libere"<<")"<<std::endl ; }
   private :
-    std::vector<Pointeur<Testeur>> testeurs_ ;
+    std::vector<Pointeur<RandTesteur>> testeurs_ ;
  } ;
 
 """
 
-auto_pointeur_bavard = HEADER + testeur_biblio + testeurs_ref_bavard + boucle_biblio
+auto_pointeur_bavard = HEADER + rand_testeur + testeurs_ref_bavard + boucle_biblio
 
 testeurs_ref = """
 class Testeurs
  {
   public :
-    void acquiere( Testeur * t ) { testeurs_.push_back(t) ; }
+    void acquiere( RandTesteur * t ) { testeurs_.push_back(t) ; }
     int nb_elements() { return testeurs_.size() ; }
-    Pointeur<Testeur> & operator[]( int i ) { return testeurs_.at(i) ; }
+    Pointeur<RandTesteur> & operator[]( int i ) { return testeurs_.at(i) ; }
   private :
-    std::vector<Pointeur<Testeur>> testeurs_ ;
+    std::vector<Pointeur<RandTesteur>> testeurs_ ;
  } ;
     
 """
 
-auto_pointeur = HEADER + testeur_biblio + testeurs_ref + boucle_biblio
+auto_pointeur = HEADER + rand_testeur + testeurs_ref + boucle_biblio
 
 testeurs_shared = """
 #include <memory>
@@ -1154,16 +1157,16 @@ testeurs_shared = """
 class Testeurs
  {
   public :
-    void acquiere( std::shared_ptr<Testeur> const & t ) { testeurs_.push_back(t) ; }
+    void acquiere( std::shared_ptr<RandTesteur> const & t ) { testeurs_.push_back(t) ; }
     int nb_elements() { return testeurs_.size() ; }
-    std::shared_ptr<Testeur> & operator[]( int i ) { return testeurs_.at(i) ; }
+    std::shared_ptr<RandTesteur> & operator[]( int i ) { return testeurs_.at(i) ; }
   private :
-    std::vector<std::shared_ptr<Testeur>> testeurs_ ;
+    std::vector<std::shared_ptr<RandTesteur>> testeurs_ ;
  } ;
     
 """
 
-shared = HEADER + testeur_biblio + testeurs_shared + boucle_biblio
+shared = HEADER + rand_testeur + testeurs_shared + boucle_biblio
 
 testeurs_unique = """
 #include <memory>
@@ -1171,25 +1174,693 @@ testeurs_unique = """
 class Testeurs
  {
   public :
-    void acquiere( std::unique_ptr<Testeur> && t ) { testeurs_.push_back(std::move(t)) ; }
+    void acquiere( std::unique_ptr<RandTesteur> && t ) { testeurs_.push_back(std::move(t)) ; }
     int nb_elements() { return testeurs_.size() ; }
-    std::unique_ptr<Testeur> & operator[]( int i ) { return testeurs_.at(i) ; }
+    std::unique_ptr<RandTesteur> & operator[]( int i ) { return testeurs_.at(i) ; }
   private :
-    std::vector<std::unique_ptr<Testeur>> testeurs_ ;
+    std::vector<std::unique_ptr<RandTesteur>> testeurs_ ;
  } ;
     
 """
 
-unique = HEADER + testeur_biblio + testeurs_unique + boucle_biblio
+unique = HEADER + rand_testeur + testeurs_unique + boucle_biblio
 
-direct = HEADER + testeur_biblio + """
-void boucle( int deb, int fin, int inc, std::vector<std::unique_ptr<Testeur>> & ts )
+direct = HEADER + rand_testeur + """
+void boucle( int deb, int fin, int inc, std::vector<std::unique_ptr<RandTesteur>> & ts )
  {
   for ( int i=0 ; i<ts.size() ; ++i )
    {
     std::cout<<std::endl ;
     for ( int bits = deb ; bits <= fin ; bits = bits + inc )
      { ts[i]->execute(bits) ; }
+   }
+ }
+
+"""
+
+
+#=====================================================================
+# TP PARALLELE
+#=====================================================================
+
+testeur_parallele = """
+#include <array>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      typename conteneur::iterator icoef ;
+      for ( icoef = coefs_.begin() ; icoef != coefs_.end() ; ++icoef )
+       { *icoef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      double exact, approx ;
+      double exacts {0}, approxs {0}, erreurs {0} ;
+      typename conteneur::iterator icoef ;
+      for ( icoef = coefs_.begin() ; icoef != coefs_.end() ; ++icoef )
+       {
+        execute(bits,*icoef,exact,approx) ;
+        exacts +=exact ; approxs += approx ;
+        erreurs += fabs(exact-approx)/exact ;
+       }
+      exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
+      erreurs *= resolution_ ;
+      std::cout
+        <<bits<<" bits : "
+        <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+        <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+        <<std::endl ;
+     }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    using conteneur = std::array<double,SIZE> ;
+    conteneur coefs_ ;
+    
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+parallele = HEADER + testeur_parallele +"""
+template<typename Testeurs>
+void boucle( int deb, int fin, int inc, Testeurs & ts )
+ {
+  typename Testeurs::iterator itesteur ;
+  for ( itesteur = ts.begin() ; itesteur != ts.end() ; ++itesteur )
+   {
+    std::cout<<std::endl ;
+    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+     { (*itesteur)->execute(bits) ; }
+   }
+ }
+
+"""
+
+testeur_auto = """
+#include <array>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( auto icoef = coefs_.begin() ; icoef != coefs_.end() ; ++icoef )
+       { *icoef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      double exact, approx ;
+      double exacts {0}, approxs {0}, erreurs {0} ;
+      for ( auto icoef = coefs_.begin() ; icoef != coefs_.end() ; ++icoef )
+       {
+        execute(bits,*icoef,exact,approx) ;
+        exacts +=exact ; approxs += approx ;
+        erreurs += fabs(exact-approx)/exact ;
+       }
+      exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
+      erreurs *= resolution_ ;
+      std::cout
+        <<bits<<" bits : "
+        <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+        <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+        <<std::endl ;
+     }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    std::array<double,SIZE> coefs_ ;
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+boucle_auto = """
+template<typename Testeurs>
+void boucle( int deb, int fin, int inc, Testeurs & ts )
+ {
+  for ( auto itesteur = ts.begin() ; itesteur != ts.end() ; ++itesteur )
+   {
+    std::cout<<std::endl ;
+    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+     { (*itesteur)->execute(bits) ; }
+   }
+ }
+
+"""
+
+auto = HEADER + testeur_auto + boucle_auto
+
+testeur_lambdas = """
+#include <array>
+#include <algorithm>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      std::for_each
+       (
+        coefs_.begin(),coefs_.end(),
+        [this]( double & coef )
+         { coef = rand_coefs_() ; }
+       ) ;
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      double exact, approx ;
+      double exacts {0}, approxs {0}, erreurs {0} ;
+      std::for_each
+       (
+        coefs_.begin(),coefs_.end(),
+        [&]( double coef )
+         {
+          execute(bits,coef,exact,approx) ;
+          exacts +=exact ; approxs += approx ;
+          erreurs += fabs(exact-approx)/exact ;
+         }
+       ) ;
+      exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
+      erreurs *= resolution_ ;
+      std::cout
+        <<bits<<" bits : "
+        <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+        <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+        <<std::endl ;
+     }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    std::array<double,SIZE> coefs_ ;
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+boucle_lambdas = """
+template<typename Testeurs>
+void boucle( int deb, int fin, int inc, Testeurs & ts )
+ {
+  std::for_each
+   (
+    ts.begin(),ts.end(),
+    [=]( typename Testeurs::value_type & testeur )
+     {
+      std::cout<<std::endl ;
+      for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+       { testeur->execute(bits) ; }
+     }
+   ) ;
+ }
+
+"""
+
+lambdas = HEADER + testeur_lambdas + boucle_lambdas
+
+testeur_forgen = """
+#include <array>
+#include <algorithm>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      double exact, approx ;
+      double exacts {0}, approxs {0}, erreurs {0} ;
+      for ( double coef : coefs_ )
+       {
+        execute(bits,coef,exact,approx) ;
+        exacts +=exact ; approxs += approx ;
+        erreurs += fabs(exact-approx)/exact ;
+       }
+      exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
+      erreurs *= resolution_ ;
+      std::cout
+        <<bits<<" bits : "
+        <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+        <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+        <<std::endl ;
+     }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    std::array<double,SIZE> coefs_ ;
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+forgen = HEADER + testeur_forgen + boucle_lambdas
+
+testeur_map = """
+#include <array>
+#include <map>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      double exact, approx ;
+      Resultat & res = resultats_[bits] ;
+      for ( double coef : coefs_ )
+       {
+        execute(bits,coef,exact,approx) ;
+        res.exacts +=exact ; res.approxs += approx ;
+        res.erreurs += fabs(exact-approx)/exact ;
+       }
+      res.exacts /= SIZE ; res.approxs /= SIZE ; res.erreurs /= SIZE ;
+      res.erreurs *= resolution_ ;
+     }
+     
+    void affiche()
+     {
+      std::cout<<std::endl ;
+      for ( auto res : resultats_ )
+       {
+        std::cout
+          <<res.first<<" bits : "
+          <<std::left<<res.second.exacts<<" ~ "
+          <<std::setw(width_)<<res.second.approxs
+          <<" ("<<arrondi(res.second.erreurs)<<"/"<<resolution_<<")"
+          <<std::endl ;
+       }
+     }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    struct Resultat
+     {
+      Resultat() : exacts {0}, approxs {0}, erreurs {0} {}
+      double exacts, approxs, erreurs ;
+     } ;
+    
+    std::array<double,SIZE> coefs_ ;
+    std::map<int,Resultat> resultats_ ;
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+testeur_mmap = """
+#include <array>
+#include <map>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      Resultat res ;
+      for ( double coef : coefs_ )
+       {
+        execute(bits,coef,res.exact,res.approx) ;
+        resultats_.insert(std::pair<int,Resultat>(bits,res)) ;
+       }
+     }
+     
+    void affiche()
+     {
+      std::cout<<std::endl ;
+      auto ires1 = resultats_.begin() ;
+      decltype(ires1) ires2 ;
+      auto iend1 = resultats_.end() ;
+      decltype(iend1) iend2 ;
+      for ( ; ires1 != iend1 ; ires1 = ires2 )
+       {
+        int bits = ires1->first ;
+        double exact, approx ; 
+        double exacts {0}, approxs {0}, erreurs {0} ; 
+        ires2 = ires1 ;
+        iend2 = resultats_.upper_bound(bits) ;
+        for ( ; ires2 != iend2 ; ++ires2 )
+         {
+          exact = ires2->second.exact ;
+          approx = ires2->second.approx ;
+          exacts += exact ; approxs += approx ;
+          erreurs += fabs(exact-approx)/exact ;
+         }
+        exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
+        erreurs *= resolution_ ;
+        std::cout
+          <<bits<<" bits : "
+          <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+          <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+          <<std::endl ;
+       }
+     }
+          
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    struct Resultat
+     { double exact, approx ; } ;
+    
+    std::array<double,SIZE> coefs_ ;
+    std::multimap<int,Resultat> resultats_ ;
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+boucle_threads = """
+#include <thread>
+
+template<typename Testeurs>
+void boucle( int deb, int fin, int inc, Testeurs & ts )
+ {
+  std::vector<std::thread> threads ;
+  for ( auto & testeur : ts )
+   {
+    threads.push_back(std::thread(
+      [deb,fin,inc,&testeur]()
+       {
+        for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+         { testeur->execute(bits) ; }
+       })) ;
+   }
+  for ( auto & thr : threads )
+   { thr.join() ; }
+  for ( auto & testeur : ts )
+   { testeur->affiche() ; }
+ }
+
+"""
+
+threads = HEADER + testeur_map + boucle_threads
+
+stress = HEADER + testeur_mmap + boucle_threads
+
+testeur_mutex = """
+#include <array>
+#include <map>
+#include <mutex>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    void execute( int bits )
+     {
+      Resultat res ;
+      for ( double coef : coefs_ )
+       {
+        execute(bits,coef,res.exact,res.approx) ;
+        resultats_mutex_.lock() ;
+        resultats_.insert(std::pair<int,Resultat>(bits,res)) ;
+        resultats_mutex_.unlock() ;
+       }
+     }
+     
+    void affiche()
+     {
+      std::cout<<std::endl ;
+      auto ires1 = resultats_.begin() ;
+      decltype(ires1) ires2 ;
+      auto iend1 = resultats_.end() ;
+      decltype(iend1) iend2 ;
+      for ( ; ires1 != iend1 ; ires1 = ires2 )
+       {
+        int bits = ires1->first ;
+        double exact, approx ; 
+        double exacts {0}, approxs {0}, erreurs {0} ; 
+        ires2 = ires1 ;
+        iend2 = resultats_.upper_bound(bits) ;
+        for ( ; ires2 != iend2 ; ++ires2 )
+         {
+          exact = ires2->second.exact ;
+          approx = ires2->second.approx ;
+          exacts += exact ; approxs += approx ;
+          erreurs += fabs(exact-approx)/exact ;
+         }
+        exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
+        erreurs *= resolution_ ;
+        std::cout
+          <<bits<<" bits : "
+          <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
+          <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
+          <<std::endl ;
+       }
+     }
+          
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    struct Resultat
+     { double exact, approx ; } ;
+    
+    std::array<double,SIZE> coefs_ ;
+    
+    std::mutex resultats_mutex_ ;
+    std::multimap<int,Resultat> resultats_ ;
+    
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+"""
+
+boucle_mthreads = """
+#include <thread>
+
+template<typename Testeurs>
+void boucle( int deb, int fin, int inc, Testeurs & ts )
+ {
+  std::vector<std::thread> threads ;
+  for ( auto & testeur : ts )
+   {
+    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+     {
+      threads.push_back(std::thread(
+        [bits,&testeur]()
+         { testeur->execute(bits) ; })) ;
+     }
+   }
+  for ( auto & thr : threads )
+   { thr.join() ; }
+  for ( auto & testeur : ts )
+   { testeur->affiche() ; }
+ }
+
+"""
+
+sharedmem = HEADER + testeur_mutex + boucle_mthreads
+
+async = HEADER + """
+#include <array>
+
+template<int SIZE>
+class RandTesteur
+ {
+  public :
+  
+    RandTesteur( int resolution, int width )
+     : resolution_{resolution}, width_{width}
+     {
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
+     }
+     
+    RandTesteur( RandTesteur const & ) = delete ;
+    RandTesteur & operator=( RandTesteur const & ) = delete ;
+    virtual ~RandTesteur() = default ;
+
+    struct Resultat
+     {
+      Resultat() : exacts {0}, approxs {0}, erreurs {0} {}
+      double exacts, approxs, erreurs ;
+     } ;
+    
+    Resultat execute( int bits )
+     {
+      double exact, approx ;
+      Resultat res ;
+      for ( double coef : coefs_ )
+       {
+        execute(bits,coef,exact,approx) ;
+        res.exacts +=exact ; res.approxs += approx ;
+        res.erreurs += fabs(exact-approx)/exact ;
+       }
+      res.exacts /= SIZE ; res.approxs /= SIZE ; res.erreurs /= SIZE ;
+      res.erreurs *= resolution_ ;
+      return res ;
+     }
+     
+    void affiche( int bits, Resultat const & res )
+     {
+      std::cout
+        <<bits<<" bits : "
+        <<std::left<<res.exacts<<" ~ "
+        <<std::setw(width_)<<res.approxs
+        <<" ("<<arrondi(res.erreurs)<<"/"<<resolution_<<")"
+        <<std::endl ;
+     }
+     
+  protected : 
+  
+    virtual void execute( int bits, double coef, double & exact, double & approx ) =0 ;
+    
+  private :
+  
+    std::array<double,SIZE> coefs_ ;
+    RandCoefs rand_coefs_ ;
+    int const resolution_ ;
+    int const width_ ;
+    
+ } ;
+
+#include <map>
+#include <future>
+
+template<typename Testeurs>
+void boucle( int deb, int fin, int inc, Testeurs & ts )
+ {
+  using Testeur = typename Testeurs::value_type ;
+  using Resultat = typename Testeur::element_type::Resultat ;
+  using TesteurResultats = std::map<int,std::future<Resultat>> ;
+  std::map<Testeur*,TesteurResultats> resultats ;
+  
+  for ( auto & testeur : ts )
+   {
+    resultats[&testeur] = TesteurResultats() ;
+    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+     {
+      resultats[&testeur][bits] = std::async(std::launch::async,
+          [bits,&testeur](){ return testeur->execute(bits) ; }) ;
+     }
+   }
+   
+  for ( auto & testeur : ts )
+   {
+    std::cout<<std::endl ;
+    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+      { testeur->affiche(bits,resultats[&testeur][bits].get()) ; }
    }
  }
 

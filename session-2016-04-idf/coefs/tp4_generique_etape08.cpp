@@ -79,6 +79,7 @@ class Testeur
 
  } ;
 
+
 template<int SIZE>
 class Testeurs
  {
@@ -99,10 +100,10 @@ class Testeurs
       indice_++ ;
      }
      
-    unsigned int nb_testeurs() const
+    int nb_elements() const
      { return indice_ ; }
      
-    Testeur * operator[]( unsigned i ) const
+    Testeur * operator[]( int i )
      {
       if (i>=indice_) { throw EchecIndiceIncorrect() ; }
       return testeurs_[i] ;
@@ -110,7 +111,7 @@ class Testeurs
      
     ~Testeurs()
      {
-      for ( unsigned i=0 ; i<indice_ ; ++i )
+      for ( int i=0 ; i<indice_ ; ++i )
        { delete testeurs_[i] ; }
      }
      
@@ -121,9 +122,9 @@ class Testeurs
  } ;
     
 template<int SIZE>
-void boucle( int deb, int fin, int inc, const Testeurs<SIZE> & ts )
+void boucle( int deb, int fin, int inc, Testeurs<SIZE> & ts )
  {
-  for ( int i=0 ; i<ts.nb_testeurs() ; ++i )
+  for ( int i=0 ; i<ts.nb_elements() ; ++i )
    {
     try
      {
@@ -272,6 +273,7 @@ class TesteurSomme : public Testeur
 //==============================================
 // fonction principale
 //==============================================
+
 
 int main()
  {

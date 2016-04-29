@@ -121,6 +121,7 @@ void teste_065_3515_035_4832( int bits )
 // fonction principale
 //==============================================
 
+
 int main()
  {
   std::cout<<std::endl ;

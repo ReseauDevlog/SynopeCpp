@@ -50,6 +50,7 @@ class RandCoefs
 //==============================================
 
 #include <array>
+#include <map>
 
 template<int SIZE>
 class RandTesteur
@@ -59,8 +60,8 @@ class RandTesteur
     RandTesteur( int resolution, int width )
      : resolution_{resolution}, width_{width}
      {
-      for ( auto icoef = coefs_.begin() ; icoef != coefs_.end() ; ++icoef )
-       { *icoef = rand_coefs_() ; }
+      for ( double & coef : coefs_ )
+       { coef = rand_coefs_() ; }
      }
      
     RandTesteur( RandTesteur const & ) = delete ;
@@ -70,20 +71,29 @@ class RandTesteur
     void execute( int bits )
      {
       double exact, approx ;
-      double exacts {0}, approxs {0}, erreurs {0} ;
-      for ( auto icoef = coefs_.begin() ; icoef != coefs_.end() ; ++icoef )
+      Resultat & res = resultats_[bits] ;
+      for ( double coef : coefs_ )
        {
-        execute(bits,*icoef,exact,approx) ;
-        exacts +=exact ; approxs += approx ;
-        erreurs += fabs(exact-approx)/exact ;
+        execute(bits,coef,exact,approx) ;
+        res.exacts +=exact ; res.approxs += approx ;
+        res.erreurs += fabs(exact-approx)/exact ;
        }
-      exacts /= SIZE ; approxs /= SIZE ; erreurs /= SIZE ;
-      erreurs *= resolution_ ;
-      std::cout
-        <<bits<<" bits : "
-        <<std::left<<exacts<<" ~ "<<std::setw(width_)<<approxs
-        <<" ("<<arrondi(erreurs)<<"/"<<resolution_<<")"
-        <<std::endl ;
+      res.exacts /= SIZE ; res.approxs /= SIZE ; res.erreurs /= SIZE ;
+      res.erreurs *= resolution_ ;
+     }
+     
+    void affiche()
+     {
+      std::cout<<std::endl ;
+      for ( auto res : resultats_ )
+       {
+        std::cout
+          <<res.first<<" bits : "
+          <<std::left<<res.second.exacts<<" ~ "
+          <<std::setw(width_)<<res.second.approxs
+          <<" ("<<arrondi(res.second.erreurs)<<"/"<<resolution_<<")"
+          <<std::endl ;
+       }
      }
      
   protected : 
@@ -92,7 +102,14 @@ class RandTesteur
     
   private :
   
+    struct Resultat
+     {
+      Resultat() : exacts {0}, approxs {0}, erreurs {0} {}
+      double exacts, approxs, erreurs ;
+     } ;
+    
     std::array<double,SIZE> coefs_ ;
+    std::map<int,Resultat> resultats_ ;
     RandCoefs rand_coefs_ ;
     int const resolution_ ;
     int const width_ ;
@@ -100,15 +117,25 @@ class RandTesteur
  } ;
 
 
+#include <thread>
+
 template<typename Testeurs>
 void boucle( int deb, int fin, int inc, Testeurs & ts )
  {
-  for ( auto itesteur = ts.begin() ; itesteur != ts.end() ; ++itesteur )
+  std::vector<std::thread> threads ;
+  for ( auto & testeur : ts )
    {
-    std::cout<<std::endl ;
-    for ( int bits = deb ; bits <= fin ; bits = bits + inc )
-     { (*itesteur)->execute(bits) ; }
+    threads.push_back(std::thread(
+      [deb,fin,inc,&testeur]()
+       {
+        for ( int bits = deb ; bits <= fin ; bits = bits + inc )
+         { testeur->execute(bits) ; }
+       })) ;
    }
+  for ( auto & thr : threads )
+   { thr.join() ; }
+  for ( auto & testeur : ts )
+   { testeur->affiche() ; }
  }
 
 

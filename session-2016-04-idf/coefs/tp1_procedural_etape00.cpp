@@ -40,6 +40,7 @@ int entier_max( int nombre_bits )
 // fonction principale
 //==============================================
 
+
 int main()
  {
   // tests sur arrondi()

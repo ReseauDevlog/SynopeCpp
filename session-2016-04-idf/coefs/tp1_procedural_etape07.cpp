@@ -85,6 +85,7 @@ void teste_approxime( int bits, double valeur )
 // fonction principale
 //==============================================
 
+
 int main()
  {
   int bits ;

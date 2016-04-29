@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-approxime = """
+HEADER = """
 //==============================================
 // tests
 //==============================================
+"""
 
+approxime = HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   int numerateur, exposant, erreur ;
@@ -22,11 +24,7 @@ void teste_approxime( int bits, double valeur )
 
 """
 
-simple = """
-//==============================================
-// tests
-//==============================================
-
+simple =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   int numerateur, exposant, erreur ;
@@ -57,11 +55,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-fonctions = """
-//==============================================
-// tests
-//==============================================
-
+fonctions =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   int numerateur, exposant, erreur ;
@@ -105,11 +99,7 @@ void teste_065_3515_035_4832( int bits )
 
 """
 
-fonctions_rand = """
-//==============================================
-// tests
-//==============================================
-
+fonctions_rand =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   int numerateur, exposant, erreur ;
@@ -165,11 +155,7 @@ void teste_rand_coefs( int bits )
 
 """
 
-fonctions_ostream = """
-//==============================================
-// tests
-//==============================================
-
+fonctions_ostream =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   int numerateur, exposant, erreur ;
@@ -225,11 +211,7 @@ void teste_rand_coefs( int bits )
 
 """
 
-struct = """
-//==============================================
-// tests
-//==============================================
-
+struct =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   Coef coef ;
@@ -261,11 +243,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-retour = """
-//==============================================
-// tests
-//==============================================
-
+retour =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   int erreur ;
@@ -296,11 +274,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-coef = """
-//==============================================
-// tests
-//==============================================
-
+coef =  HEADER + """
 void teste_approxime( int bits, double valeur )
  {
   Coef coef ;
@@ -333,11 +307,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-tcoef = """
-//==============================================
-// tests
-//==============================================
-
+tcoef =  HEADER + """
 class TesteurCoef
  {
   public :
@@ -384,11 +354,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-tcoefbits = """
-//==============================================
-// tests
-//==============================================
-
+tcoefbits =  HEADER + """
 class TesteurCoef
  {
   public :
@@ -438,11 +404,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-tcoefatt = """
-//==============================================
-// tests
-//==============================================
-
+tcoefatt =  HEADER + """
 class TesteurCoef
  {
   public :
@@ -493,11 +455,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 
 """
 
-testeurs = """
-//==============================================
-// tests
-//==============================================
-
+testeurs =  HEADER + """
 class TesteurCoef
  {
   public :
@@ -559,11 +517,7 @@ class TesteurSomme
 
 """
 
-erreur = """
-//==============================================
-// tests
-//==============================================
-
+erreur =  HEADER + """
 class TesteurCoef
  {
   public :
@@ -615,11 +569,7 @@ class TesteurSomme
 
 """
 
-heritage = """
-//==============================================
-// tests
-//==============================================
-
+heritage =  HEADER + """
 class TesteurCoef : public Testeur
  {
   protected :
@@ -676,11 +626,7 @@ class TesteurSomme : public Testeur
 
 """
 
-virtual = """
-//==============================================
-// tests
-//==============================================
-
+virtual =  HEADER + """
 class TesteurCoef : public Testeur
  {
   protected :
@@ -735,11 +681,7 @@ class TesteurSomme : public Testeur
 """
 
 
-constructeurs_derives = """
-//==============================================
-// tests
-//==============================================
-
+constructeurs_derives =  HEADER + """
 class TesteurCoef : public Testeur
  {
   protected :
@@ -797,11 +739,7 @@ class TesteurSomme : public Testeur
 
 """
 
-constructeurs_testeurs = """
-//==============================================
-// tests
-//==============================================
-
+constructeurs_testeurs =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -870,11 +808,7 @@ class TesteurSomme : public Testeur
 
 """
 
-constructeurs = """
-//==============================================
-// tests
-//==============================================
-
+constructeurs =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -935,11 +869,7 @@ class TesteurSomme : public Testeur
 
 """
 
-affiche = """
-//==============================================
-// tests
-//==============================================
-
+affiche =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1002,11 +932,7 @@ class TesteurSomme : public Testeur
 
 """
 
-bug = """
-//==============================================
-// tests
-//==============================================
-
+bug =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1069,11 +995,7 @@ class TesteurSomme : public Testeur
 
 """
 
-opmult = """
-//==============================================
-// tests
-//==============================================
-
+opmult =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1136,11 +1058,7 @@ class TesteurSomme : public Testeur
 
 """
 
-opaffect = """
-//==============================================
-// tests
-//==============================================
-
+opaffect =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1203,11 +1121,7 @@ class TesteurSomme : public Testeur
 
 """
 
-ostream = """
-//==============================================
-// tests
-//==============================================
-
+ostream =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1268,11 +1182,7 @@ class TesteurSomme : public Testeur
 
 """
 
-opdouble = """
-//==============================================
-// tests
-//==============================================
-
+opdouble =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1333,11 +1243,7 @@ class TesteurSomme : public Testeur
 
 """
 
-opexec = """
-//==============================================
-// tests
-//==============================================
-
+opexec =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1400,11 +1306,7 @@ class TesteurSomme : public Testeur
 
 gen0 = opexec
 
-coefint = """
-//==============================================
-// tests
-//==============================================
-
+coefint =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1465,11 +1367,7 @@ class TesteurSomme : public Testeur
 
 """
 
-gensomme = """
-//==============================================
-// tests
-//==============================================
-
+gensomme =  HEADER + """
 class TesteurCoef : public Testeur
  {
   public :
@@ -1531,11 +1429,7 @@ class TesteurSomme : public Testeur
 
 """
 
-gencoef = """
-//==============================================
-// tests
-//==============================================
-
+gencoef =  HEADER + """
 template<typename U>
 class TesteurCoef : public Testeur
  {
@@ -1604,46 +1498,80 @@ class TesteurSomme : public Testeur
 # TP BIBLIO
 #=====================================================================
 
-biblio = """
-//==============================================
-// tests
-//==============================================
-
+biblio =  HEADER + """
 template<typename U>
-class TesteurRandCoefs : public Testeur
+class TesteurCoefs : public RandTesteur
  {
   public :
-    TesteurRandCoefs( int resolution, int nbcoefs )
-     : Testeur(resolution,8), nbcoefs_{nbcoefs}
-     { exact_ = new_rand_coefs(nbcoefs_) ; approx_ = new double [nbcoefs_] ; }
+    TesteurCoefs( int nb, int resolution )
+     : RandTesteur(nb,resolution,8) {}
     virtual void execute( int bits )
      {
       Coef<U> c(bits) ;
-      for ( int i=0 ; i<nbcoefs_ ; ++i )
-       { c = exact_[i] ; approx_[i] = arrondi(c,6) ; }
-      erreur(bits,exact_,approx_,nbcoefs_) ;
+      for ( int i=0 ; i<nb_ ; ++i )
+       {
+        c = num_[i] ;
+        exact_[i] = num_[i] ;
+        approx_[i] = arrondi(c,6) ;
+       }
+      erreur(bits) ;
      }
-    virtual ~TesteurRandCoefs()
-     { delete [] exact_ ; delete [] approx_ ; }
-  private :
-    int nbcoefs_ ;
-    double * exact_ ;
-    double * approx_ ;
  } ;
 
 template<typename U>
-class TesteurSomme : public Testeur
+class TesteurSommes : public RandTesteur
  {
   public :
-    TesteurSomme( int resolution )
-     : Testeur(resolution,3) {}
+    TesteurSommes( int nb, int resolution )
+     : RandTesteur(nb,resolution,7) {}
     virtual void execute( int bits )
      {
       Coef<U> coef1(bits), coef2(bits) ;
-      coef1 = 0.65 ; coef2 = 0.35 ;
-      double exact = 100 ;
-      double approx = coef1*U(exact) + coef2*U(exact) ;
-      erreur(bits,&exact,&approx,1) ;
+      for ( int i=0 ; i<nb_ ; ++i )
+       {
+        coef1 = num_[i] ; coef2 = (1-num_[i]) ;
+        exact_[i] = 200. ;
+        approx_[i] = arrondi(coef1*U(exact_[i]) + coef2*U(exact_[i]),3) ;
+       }
+      erreur(bits) ;
+     }
+ } ;
+
+"""
+
+
+#=====================================================================
+# TP PARALLELE
+#=====================================================================
+
+parallele =  HEADER + """
+template<typename U, int SIZE>
+class TesteurCoefs : public RandTesteur<SIZE>
+ {
+  public :
+    TesteurCoefs( int resolution )
+     : RandTesteur<SIZE>(resolution,8) {}
+    virtual void execute( int bits, double coef, double & exact, double & approx )
+     {
+      Coef<U> c(bits) ;
+      c = coef ;
+      exact =coef ;
+      approx = arrondi(c,6) ;
+     }
+ } ;
+
+template<typename U, int SIZE>
+class TesteurSommes : public RandTesteur<SIZE>
+ {
+  public :
+    TesteurSommes( int resolution )
+     : RandTesteur<SIZE>(resolution,7) {}
+    virtual void execute( int bits, double coef, double & exact, double & approx )
+     {
+      Coef<U> coef1(bits), coef2(bits) ;
+      coef1 = coef ; coef2 = (1-coef) ;
+      exact = 200. ;
+      approx = arrondi(coef1*U(exact) + coef2*U(exact),3) ;
      }
  } ;
 

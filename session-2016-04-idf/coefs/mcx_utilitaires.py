@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-simple ="""
+HEADER = """
 //==============================================
 // utilitaires
 //==============================================
+"""
 
+simple = HEADER + """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -57,11 +59,7 @@ double * new_rand_coefs( int taille )
 
 simple_rand = simple + rand_patch
 
-compacte = """
-//==============================================
-// utilitaires
-//==============================================
-
+compacte = HEADER + """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -94,11 +92,7 @@ int entier_max( int nombre_bits )
 
 compacte_rand = compacte + rand_patch
 
-const = """
-//==============================================
-// utilitaires
-//==============================================
-
+const = HEADER + """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -130,11 +124,7 @@ int entier_max( int nombre_bits )
 """
 
 
-exception = """
-//==============================================
-// utilitaires
-//==============================================
-
+exception = HEADER + """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -173,11 +163,7 @@ int entier_max( int nombre_bits )
 
 gen0 = exception
 
-constexpr = """
-//==============================================
-// utilitaires
-//==============================================
-
+constexpr = HEADER + """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -214,11 +200,7 @@ constexpr int nombre_bits()
 
 """
 
-traits = """
-//==============================================
-// utilitaires
-//==============================================
-
+traits = HEADER + """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -260,11 +242,12 @@ constexpr int nombre_bits_hors_signe()
 
 """
 
-biblio = """
-//==============================================
-// utilitaires
-//==============================================
 
+#==============================================
+# TP BIBLIO
+#==============================================
+
+common = """
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -291,7 +274,9 @@ constexpr int fois_puissance_de_deux( int nombre, int exposant )
 
 constexpr int entier_max( int nombre_bits )
  { return (fois_puissance_de_deux(1,nombre_bits)-1) ; }
+"""
 
+biblio = HEADER + common + """
 // crée sur le tas un tableau dynamique de coefficients
 double * new_rand_coefs( int taille )
  {
@@ -400,5 +385,26 @@ class Pointeur
     Valeur * val_ ;
  } ;
  
+"""
+
+
+#==============================================
+# TP PARALLELE
+#==============================================
+
+parallele = HEADER + common + """
+class RandCoefs
+ {
+  public :
+    RandCoefs() : rd_{}, gen_{rd_()}, dis_(0,1) {}
+    double operator()()
+     { return dis_(gen_) ; }
+  private :
+    std::random_device rd_ ;
+    std::mt19937 gen_ ;
+    std::uniform_real_distribution<> dis_ ;
+ } ;
+
+
 """
 

@@ -126,6 +126,7 @@ void teste_somme( int bits, double c1, int e1, double c2, int e2 )
 // fonction principale
 //==============================================
 
+
 int main()
  {
   int bits ;

@@ -150,6 +150,7 @@ void teste_rand_coefs( int bits )
 // fonction principale
 //==============================================
 
+
 #include <fstream>
 
 int main( int argc, char *argv[] )

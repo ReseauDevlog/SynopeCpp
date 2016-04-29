@@ -154,6 +154,7 @@ class TesteurSomme
 // fonction principale
 //==============================================
 
+
 int main()
  {
   int bits ;
