@@ -17,7 +17,7 @@ class Echec
     std::string const & commentaire() const { return commentaire_ ; }
   private :
     unsigned int code_ ;
-	std::string commentaire_ ;
+    std::string commentaire_ ;
  } ;
 
 int fois_puissance_de_deux( int nombre, int exposant )
@@ -53,7 +53,7 @@ class Testeur
     void erreur( int bits, double exact, double approx )
      {
       if (exact==0) { throw Echec(1,"division par 0") ; }
-      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      int erreur = arrondi(resolution_*(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
         <<std::right<<std::setw(2)<<bits<<" bits : "
@@ -119,7 +119,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()

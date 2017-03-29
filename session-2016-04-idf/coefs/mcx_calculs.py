@@ -266,7 +266,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -312,7 +312,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -358,7 +358,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -407,7 +407,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -459,7 +459,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -511,7 +511,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -563,7 +563,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -615,7 +615,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()
@@ -667,7 +667,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
     int lit_bits() const
      { return bits_ ; }
@@ -713,7 +713,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
     int lit_bits() const
      { return bits_ ; }
@@ -760,7 +760,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
     int lit_bits() const
      { return bits_ ; }
@@ -826,7 +826,7 @@ class Coef
      { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
      
     explicit Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      { if (bits_>max_bits__) throw EchecTropDeBits() ; }
      
     int lit_bits() const
@@ -888,7 +888,7 @@ class Coef
      { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
      
     explicit Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      { if (bits_>max_bits__) throw EchecTropDeBits() ; }
      
     int lit_bits() const
@@ -949,7 +949,7 @@ template<typename U>
 class Coef
  {
   public :
-    Coef( int bits ) : bits_(bits), numerateur_{}, exposant_{} {}  
+    Coef( int bits ) : bits_{bits}, numerateur_{}, exposant_{} {}  
     int lit_bits() const { return bits_ ; }
     void operator=( double valeur )
       {

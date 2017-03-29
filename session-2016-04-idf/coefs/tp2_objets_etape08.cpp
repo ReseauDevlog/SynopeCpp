@@ -40,7 +40,7 @@ int entier_max( int nombre_bits )
 void erreur( int bits, double exact, double approx, int resolution )
  {
   if (exact==0) { echec(1,"division par 0") ; }
-  int erreur = arrondi(resolution*double(exact-approx)/exact) ;
+  int erreur = arrondi(resolution*(exact-approx)/exact) ;
   if (erreur<0) { erreur = -erreur ; }
   std::cout
     <<std::right<<std::setw(2)<<bits<<" bits : "

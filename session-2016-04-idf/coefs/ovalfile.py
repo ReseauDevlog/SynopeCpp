@@ -100,18 +100,6 @@ tps = [
 targets = []
 
 
-# backup targets
-
-name = "bak_{}_{}"
-command = "cp {0}_{1}.cpp bak_{0}_{1}.cpp"
-
-for session in tps:
-
-    base = session["name"]
-    for etape in session["etapes"]:
-        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
-
-
 # code generation targets
 
 name = "gen_{}_{}"
@@ -122,18 +110,6 @@ for session in tps:
     base = session["name"]
     for etape in session["etapes"]:
         targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"],etape["mcx"])})
-
-
-# source diff targets
-
-name = "sdiff_{}_{}"
-command = "diff bak_{0}_{1}.cpp {0}_{1}.cpp"
-
-for session in tps:
-
-    base = session["name"]
-    for etape in session["etapes"]:
-        targets.append({"name": name.format(base,etape["name"]), "command": command.format(base,etape["name"])})
 
 
 # compilation targets

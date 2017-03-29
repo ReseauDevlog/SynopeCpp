@@ -17,7 +17,7 @@ class Echec
     std::string const & commentaire() const { return commentaire_ ; }
   private :
     unsigned int code_ ;
-	std::string commentaire_ ;
+    std::string commentaire_ ;
  } ;
 
 double arrondi( double d, unsigned precision =0 )
@@ -60,7 +60,7 @@ class Testeur
     void erreur( int bits, double exact, double approx )
      {
       if (exact==0) { throw EchecDivisionParZero() ; }
-      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      int erreur = arrondi(resolution_*(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
         <<std::right<<std::setw(2)<<bits<<" bits : "
@@ -147,7 +147,7 @@ class Coef
      { public : EchecTropDeBits() : Echec(2,"trop de bits pour ce type") {} } ;
      
     explicit Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      { if (bits_>max_bits__) throw EchecTropDeBits() ; }
      
     int lit_bits() const

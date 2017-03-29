@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <memory>
 #include <random>
 
 // émule la fonction std::make_unique qui apparait en C++14
@@ -134,7 +135,7 @@ template<typename U>
 class Coef
  {
   public :
-    Coef( int bits ) : bits_(bits), numerateur_{}, exposant_{} {}  
+    Coef( int bits ) : bits_{bits}, numerateur_{}, exposant_{} {}  
     int lit_bits() const { return bits_ ; }
     void operator=( double valeur )
       {
