@@ -251,6 +251,7 @@ common = """
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <memory>
 #include <random>
 
 // émule la fonction std::make_unique qui apparait en C++14
