@@ -104,7 +104,7 @@ class Coef
   public :
   
     Coef( int bits )
-     : bits_(bits), numerateur_{}, exposant_{}
+     : bits_{bits}, numerateur_{}, exposant_{}
      {}
 
     int lit_bits()

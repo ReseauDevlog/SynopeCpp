@@ -150,7 +150,7 @@ template<typename U>
 class Coef
  {
   public :
-    Coef( int bits ) : bits_(bits), numerateur_{}, exposant_{} {}  
+    Coef( int bits ) : bits_{bits}, numerateur_{}, exposant_{} {}  
     int lit_bits() const { return bits_ ; }
     void operator=( double valeur )
       {

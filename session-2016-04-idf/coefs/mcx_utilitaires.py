@@ -138,7 +138,7 @@ class Echec
     std::string const & commentaire() const { return commentaire_ ; }
   private :
     unsigned int code_ ;
-	std::string commentaire_ ;
+    std::string commentaire_ ;
  } ;
 
 int fois_puissance_de_deux( int nombre, int exposant )
@@ -177,7 +177,7 @@ class Echec
     std::string const & commentaire() const { return commentaire_ ; }
   private :
     unsigned int code_ ;
-	std::string commentaire_ ;
+    std::string commentaire_ ;
  } ;
 
 double arrondi( double d, unsigned precision =0 )
@@ -214,7 +214,7 @@ class Echec
     std::string const & commentaire() const { return commentaire_ ; }
   private :
     unsigned int code_ ;
-	std::string commentaire_ ;
+    std::string commentaire_ ;
  } ;
 
 double arrondi( double d, unsigned precision =0 )

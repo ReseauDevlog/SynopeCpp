@@ -19,7 +19,7 @@ args = parser.parse_args()
 fichier = open(args.sortie,'w')
 fichier.write('// -*- coding: utf-8 -*-\n')
 for morceau in args.morceaux:
-    print morceau
+    print(morceau)
     elems = morceau.split('.')
     module = __import__(elems[0])
     fichier.write(module.__dict__[elems[1]])
