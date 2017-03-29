@@ -47,7 +47,7 @@ class Testeur
     void erreur( int bits, double exact, double approx )
      {
       if (exact==0) { echec(1,"division par 0") ; }
-      int erreur = arrondi(resolution_*double(exact-approx)/exact) ;
+      int erreur = arrondi(resolution_*(exact-approx)/exact) ;
       if (erreur<0) { erreur = -erreur ; }
       std::cout
         <<std::right<<std::setw(2)<<bits<<" bits : "
